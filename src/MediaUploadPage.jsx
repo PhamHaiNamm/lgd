@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { storage, auth, db } from "./firebase";
 import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { FestivalStrip } from "./components/Decorations";
@@ -45,6 +45,7 @@ async function loadAllMedia() {
 
 export default function MediaUploadPage() {
     const [mediaFiles, setMediaFiles] = useState([]);
+    const [members, setMembers] = useState([]);
     const [loadingGallery, setLoadingGallery] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [user, setUser] = useState(null);
@@ -54,6 +55,7 @@ export default function MediaUploadPage() {
         return () => unsub();
     }, []);
 
+    // Load gallery
     useEffect(() => {
         loadAllMedia().then((data) => {
             setMediaFiles(data);
@@ -61,7 +63,17 @@ export default function MediaUploadPage() {
         });
     }, []);
 
-    // 🔥 UPLOAD + GHI FIRESTORE
+    // 🔥 LOAD MEMBERS FROM FIRESTORE
+    useEffect(() => {
+        const loadMembers = async () => {
+            const snap = await getDocs(collection(db, "members"));
+            const arr = snap.docs.map(d => d.data());
+            setMembers(arr);
+        };
+        loadMembers();
+    }, []);
+
+    // 🔥 UPLOAD + SAVE MEMBER PROFILE
     const handleUpload = async (e) => {
         if (!user) return alert("Bạn cần đăng nhập");
 
@@ -72,21 +84,17 @@ export default function MediaUploadPage() {
 
         try {
             for (const file of files) {
-                const storageRef = ref(
-                    storage,
-                    `media/${user.uid}/${Date.now()}-${file.name}`
-                );
-
+                const storageRef = ref(storage, `media/${user.uid}/${Date.now()}-${file.name}`);
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
 
-                // 👉 LƯU VÀO FIRESTORE (collection: members)
-                await addDoc(collection(db, "members"), {
+                // 1 USER = 1 MEMBER DOC
+                await setDoc(doc(db, "members", user.uid), {
                     name: user.email,
                     avatar: url,
                     userId: user.uid,
                     createdAt: serverTimestamp()
-                });
+                }, { merge: true });
 
                 setMediaFiles((prev) => [
                     ...prev,
@@ -129,7 +137,7 @@ export default function MediaUploadPage() {
                         </div>
                     ) : (
                         <p style={{ color: "#a3a3a3" }}>
-                            Đăng nhập để upload. Bạn vẫn xem được media bên dưới.
+                            Đăng nhập để upload. Khách vẫn xem được bên dưới.
                         </p>
                     )}
 
@@ -137,8 +145,6 @@ export default function MediaUploadPage() {
 
                     {loadingGallery ? (
                         <p style={{ color: "#a3a3a3" }}>Đang tải...</p>
-                    ) : mediaFiles.length === 0 ? (
-                        <p style={{ color: "#a3a3a3" }}>Chưa có media.</p>
                     ) : (
                         <div className="d-flex flex-wrap gap-3 mt-3">
                             {mediaFiles.map((item, i) => (
@@ -152,6 +158,18 @@ export default function MediaUploadPage() {
                             ))}
                         </div>
                     )}
+
+                    <h3 style={{ color: "#eab308", marginTop: 40 }}>Thành viên</h3>
+
+                    <div className="d-flex flex-wrap gap-3 mt-3">
+                        {members.map((m, i) => (
+                            <div key={i} style={{ textAlign: "center" }}>
+                                <img src={m.avatar} width={120} height={120} style={{ borderRadius: "50%" }} />
+                                <p style={{ color: "#fafafa", marginTop: 8 }}>{m.name}</p>
+                            </div>
+                        ))}
+                    </div>
+
                 </div>
             </div>
             <Footer />
