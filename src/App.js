@@ -1,18 +1,21 @@
-
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
-import HomePage from './HomePage';
+
+import Introduction from './Introduction';
+import Login from './Login';
+import PerformanceServices from './PerformanceServices';
+import MediaUploadPage from './MediaUploadPage';
 
 function App() {
   return (
     <div className="App">
-
-
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<Introduction />} />
+        <Route path="/introduction" element={<Introduction />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/performance-services" element={<PerformanceServices />} />
+        <Route path="/blog" element={<MediaUploadPage />} />
       </Routes>
-
-      <p> Thị Kitty là 1 con gà</p>
     </div>
   );
 }

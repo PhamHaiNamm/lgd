@@ -1,0 +1,78 @@
+/* ===== HỌA TIẾT LÂN SƯ RỒNG – TẾT (Hoa đào hồng + đèn lồng) ===== */
+
+/* Nền pattern: hoa đào hồng + chấm vàng nhẹ */
+.lgd-pattern-bg {
+  position: relative;
+}
+.lgd-pattern-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Hoa 5 cánh đơn giản (hồng) + vàng */
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='48' height='48' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(0 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(72 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(144 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(216 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(288 24 24)'/%3E%3Ccircle cx='24' cy='24' r='2' fill='%23d4a012' opacity='0.1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg width='32' height='32' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='16' cy='16' rx='2' ry='2' fill='%23d4a012' opacity='0.06'/%3E%3C/svg%3E");
+  background-size: 48px 48px, 32px 32px;
+  background-position: 0 0, 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+.lgd-pattern-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Viền góc trang trí (L-shaped vàng) */
+.lgd-corners {
+  position: relative;
+}
+.lgd-corners::before,
+.lgd-corners::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: rgba(212, 160, 18, 0.5);
+  border-style: solid;
+  pointer-events: none;
+}
+.lgd-corners::before {
+  top: 8px;
+  left: 8px;
+  border-width: 2px 0 0 2px;
+}
+.lgd-corners::after {
+  top: 8px;
+  right: 8px;
+  border-width: 2px 2px 0 0;
+}
+
+/* Đường kẻ trang trí giữa section (sóng / mây) */
+.lgd-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+  margin: 1rem 0;
+}
+.lgd-divider::before,
+.lgd-divider::after {
+  content: "";
+  flex: 1;
+  max-width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(212, 160, 18, 0.6), transparent);
+}
+.lgd-divider::after {
+  background: linear-gradient(90deg, transparent, rgba(212, 160, 18, 0.6), transparent);
+}
+
+/* Icon nhỏ cạnh tiêu đề */
+.lgd-title-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}

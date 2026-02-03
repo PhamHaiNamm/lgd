@@ -1,13 +1,186 @@
+/* ===== LỤC GIA ĐƯỜNG – PHONG CÁCH LÂN SƯ RỒNG (Đỏ – Vàng – Đen) ===== */
+:root {
+  --lgd-black: #0a0a0a;
+  --lgd-black-soft: #141414;
+  --lgd-black-card: #1a1510;
+  --lgd-gray: #262626;
+  --lgd-gray-border: #3d352c;
+  --lgd-red: #c41e3a;
+  --lgd-red-light: #e63950;
+  --lgd-red-dark: #9a1830;
+  --lgd-red-glow: rgba(196, 30, 58, 0.4);
+  --lgd-gold: #d4a012;
+  --lgd-gold-light: #eab308;
+  --lgd-gold-bright: #f5c542;
+  --lgd-gold-dark: #b8860b;
+  --lgd-gold-glow: rgba(212, 160, 18, 0.35);
+  --lgd-text: #faf8f5;
+  --lgd-text-muted: #a89f94;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
+    "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--lgd-black);
+  color: var(--lgd-text);
+  min-height: 100vh;
+  /* Nền hoa văn Tết: hoa đào hồng + vàng nhẹ */
+  background-image:
+    url("data:image/svg+xml,%3Csvg width='56' height='56' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='28' cy='28' rx='3' ry='4' fill='%23e879a0' opacity='0.06' transform='rotate(0 28 28)'/%3E%3Cellipse cx='28' cy='28' rx='3' ry='4' fill='%23e879a0' opacity='0.06' transform='rotate(72 28 28)'/%3E%3Cellipse cx='28' cy='28' rx='3' ry='4' fill='%23e879a0' opacity='0.06' transform='rotate(144 28 28)'/%3E%3Cellipse cx='28' cy='28' rx='3' ry='4' fill='%23e879a0' opacity='0.06' transform='rotate(216 28 28)'/%3E%3Cellipse cx='28' cy='28' rx='3' ry='4' fill='%23e879a0' opacity='0.06' transform='rotate(288 28 28)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='30' cy='30' rx='2' ry='2' fill='%23d4a012' opacity='0.05'/%3E%3C/svg%3E");
+  background-size: 56px 56px, 60px 60px;
+  background-position: 0 0, 28px 28px;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+a {
+  color: var(--lgd-gold-light);
+}
+a:hover {
+  color: var(--lgd-gold-bright);
+}
+
+/* Nút – đỏ viền vàng, hover vàng */
+.btn-primary,
+.btn-danger {
+  background: linear-gradient(180deg, var(--lgd-red) 0%, var(--lgd-red-dark) 100%) !important;
+  border: 1px solid var(--lgd-gold-dark) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+.btn-primary:hover,
+.btn-danger:hover {
+  background: linear-gradient(180deg, var(--lgd-red-light) 0%, var(--lgd-red) 100%) !important;
+  border-color: var(--lgd-gold) !important;
+  box-shadow: 0 0 16px var(--lgd-gold-glow), 0 0 8px var(--lgd-red-glow);
+}
+.btn-outline-light:hover {
+  background-color: var(--lgd-red) !important;
+  border-color: var(--lgd-gold) !important;
+  color: #fff !important;
+  box-shadow: 0 0 12px var(--lgd-gold-glow);
+}
+.btn-outline-secondary {
+  border-color: var(--lgd-gray-border);
+  color: var(--lgd-text-muted);
+}
+.btn-outline-secondary:hover {
+  border-color: var(--lgd-gold);
+  color: var(--lgd-gold-bright);
+  background-color: transparent;
+}
+.btn-outline-danger:hover {
+  background: linear-gradient(180deg, var(--lgd-red) 0%, var(--lgd-red-dark) 100%) !important;
+  border-color: var(--lgd-gold) !important;
+  color: #fff !important;
+}
+
+.form-control,
+.form-select {
+  background-color: var(--lgd-black-card) !important;
+  border: 1px solid var(--lgd-gray-border) !important;
+  color: var(--lgd-text) !important;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--lgd-gold) !important;
+  box-shadow: 0 0 0 2px var(--lgd-gold-glow) !important;
+}
+.form-control::placeholder {
+  color: var(--lgd-text-muted);
+}
+
+.card {
+  background-color: var(--lgd-black-card) !important;
+  border: 1px solid var(--lgd-gray-border) !important;
+  color: var(--lgd-text);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.card-title {
+  color: var(--lgd-text);
+}
+.card-text,
+.text-muted {
+  color: var(--lgd-text-muted) !important;
+}
+
+.bg-dark {
+  background-color: var(--lgd-black) !important;
+}
+.text-warning {
+  color: var(--lgd-gold) !important;
+}
+.border-secondary {
+  border-color: var(--lgd-gray-border) !important;
+}
+.badge.bg-warning {
+  background: linear-gradient(180deg, var(--lgd-gold) 0%, var(--lgd-gold-dark) 100%) !important;
+  color: #0a0a0a !important;
+  font-weight: 700;
+}
+
+.navbar-toggler {
+  border-color: var(--lgd-gold-dark);
+}
+.navbar-toggler-icon {
+  filter: invert(1);
+}
+
+.dropdown-menu {
+  background-color: var(--lgd-black-card);
+  border: 1px solid var(--lgd-gold-dark);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+.dropdown-item {
+  color: var(--lgd-text);
+}
+.dropdown-item:hover {
+  background-color: rgba(212, 160, 18, 0.15);
+  color: var(--lgd-gold-bright);
+}
+.dropdown-item.text-danger {
+  color: var(--lgd-red-light) !important;
+}
+
+.carousel {
+  background-color: var(--lgd-black);
+}
+.carousel-caption {
+  color: var(--lgd-text);
+}
+
+/* Section – tiêu đề vàng kiểu Lân Sư Rồng */
+.lgd-section {
+  background-color: var(--lgd-black);
+  color: var(--lgd-text);
+  padding: 3rem 1rem;
+}
+.lgd-section h2,
+.lgd-section .display-4,
+.lgd-section .fw-bold {
+  color: var(--lgd-text);
+}
+.lgd-section .text-secondary {
+  color: var(--lgd-text-muted) !important;
+}
+
+/* Viền trang trí kiểu lễ hội */
+.lgd-border-gold {
+  border: 2px solid var(--lgd-gold-dark);
+  box-shadow: inset 0 0 0 1px rgba(212, 160, 18, 0.2);
+}
+.lgd-title-gold {
+  color: var(--lgd-gold) !important;
+  text-shadow: 0 0 20px var(--lgd-gold-glow);
+  font-weight: 700;
 }
