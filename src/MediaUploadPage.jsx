@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { storage, auth } from "./firebase";
+import { storage, auth, db } from "./firebase";
 import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { FestivalStrip } from "./components/Decorations";
@@ -16,7 +17,6 @@ function getTypeFromName(name) {
     return "image";
 }
 
-// 🔥 LOAD TOÀN BỘ MEDIA TỪ STORAGE
 async function loadAllMedia() {
     const mediaRef = ref(storage, "media");
     const list = [];
@@ -24,13 +24,11 @@ async function loadAllMedia() {
     try {
         const { prefixes, items } = await listAll(mediaRef);
 
-        // File nằm trực tiếp trong /media
         for (const itemRef of items) {
             const url = await getDownloadURL(itemRef);
             list.push({ url, type: getTypeFromName(itemRef.name) });
         }
 
-        // File nằm trong từng thư mục userId
         for (const folderRef of prefixes) {
             const { items: userItems } = await listAll(folderRef);
             for (const itemRef of userItems) {
@@ -51,13 +49,11 @@ export default function MediaUploadPage() {
     const [uploading, setUploading] = useState(false);
     const [user, setUser] = useState(null);
 
-    // Theo dõi đăng nhập
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (u) => setUser(u));
         return () => unsub();
     }, []);
 
-    // Load gallery
     useEffect(() => {
         loadAllMedia().then((data) => {
             setMediaFiles(data);
@@ -65,7 +61,7 @@ export default function MediaUploadPage() {
         });
     }, []);
 
-    // 🔥 UPLOAD FILE
+    // 🔥 UPLOAD + GHI FIRESTORE
     const handleUpload = async (e) => {
         if (!user) return alert("Bạn cần đăng nhập");
 
@@ -83,6 +79,14 @@ export default function MediaUploadPage() {
 
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
+
+                // 👉 LƯU VÀO FIRESTORE (collection: members)
+                await addDoc(collection(db, "members"), {
+                    name: user.email,
+                    avatar: url,
+                    userId: user.uid,
+                    createdAt: serverTimestamp()
+                });
 
                 setMediaFiles((prev) => [
                     ...prev,
