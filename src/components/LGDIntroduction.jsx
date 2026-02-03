@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { auth, storage, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { doc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { ADMIN_EMAILS } from "../config";
-import { DragonIcon, LionIcon, PeachBlossomIcon, LanternIcon, FestivalStrip } from "./Decorations";
 
 const DEFAULT_IMAGE = "/lan-su-rong.jpg";
 
@@ -14,12 +13,34 @@ export default function LucGiaDuongIntroSection() {
   const [imageUrl, setImageUrl] = useState(DEFAULT_IMAGE);
   const [uploading, setUploading] = useState(false);
 
-  // 🔹 Theo dõi đăng nhập
+  // 🔹 Theo dõi đăng nhập + tự tạo hồ sơ user
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
       console.log("AUTH USER:", u);
       setUser(u);
+
+      if (!u) return;
+
+      try {
+        await setDoc(
+          doc(db, "members", u.uid),
+          {
+            uid: u.uid,
+            email: u.email,
+            name: u.displayName || "",
+            photo: u.photoURL || "",
+            role: "member",
+            lastLogin: serverTimestamp(),
+            createdAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
+        console.log("✅ USER SYNC FIRESTORE OK");
+      } catch (err) {
+        console.error("❌ USER SYNC ERROR:", err);
+      }
     });
+
     return () => unsub();
   }, []);
 
@@ -43,20 +64,12 @@ export default function LucGiaDuongIntroSection() {
   const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
   const handleImageUpload = async (e) => {
-    if (!user) {
-      alert("Chưa đăng nhập");
-      return;
-    }
-
-    if (!isAdmin) {
-      alert("Bạn không phải admin");
-      return;
-    }
+    if (!user) return alert("Chưa đăng nhập");
+    if (!isAdmin) return alert("Bạn không phải admin");
 
     const file = e.target.files?.[0];
     if (!file || !file.type.startsWith("image/")) {
-      alert("Vui lòng chọn file ảnh.");
-      return;
+      return alert("Vui lòng chọn file ảnh.");
     }
 
     setUploading(true);
@@ -69,12 +82,18 @@ export default function LucGiaDuongIntroSection() {
 
       console.log("UPLOAD STORAGE OK:", url);
 
-      console.log("GHI FIRESTORE...");
-      await setDoc(doc(db, "config", "intro"), { imageUrl: url }, { merge: true });
+      await setDoc(
+        doc(db, "config", "intro"),
+        {
+          imageUrl: url,
+          updatedAt: serverTimestamp(),
+          updatedBy: user.uid,
+        },
+        { merge: true }
+      );
 
       console.log("GHI FIRESTORE THÀNH CÔNG");
       setImageUrl(url);
-
     } catch (err) {
       console.error("UPLOAD ERROR:", err);
       alert("Lỗi: " + err.message);
