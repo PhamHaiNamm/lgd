@@ -80,9 +80,6 @@ export function PeachBlossomIcon({ size = 24, color = PEACH_BLOSSOM_PINK, classN
     const rad = (deg * Math.PI) / 180;
     return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
   });
-  const d = petals
-    .map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`)
-    .join(" ") + " Z";
   return (
     <svg
       width={size}
@@ -261,7 +258,7 @@ export function DecorativeTitle({ children, showIcons = true, iconSize = 22, cla
   );
 }
 
-export default {
+const LGDDecorations = {
   DragonIcon,
   LionIcon,
   TigerIcon,
@@ -274,3 +271,5 @@ export default {
   DecorativeTitle,
   PEACH_BLOSSOM_PINK,
 };
+
+export default LGDDecorations;

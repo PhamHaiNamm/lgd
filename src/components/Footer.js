@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { DragonIcon, LionIcon, PeachBlossomIcon, LanternIcon, FestivalStrip } from './Decorations'
+import { DragonIcon, PeachBlossomIcon, LanternIcon, FestivalStrip } from './Decorations'
 
 function Footer() {
   return (
@@ -79,7 +79,7 @@ function Footer() {
             <p className="mb-2">
               <a href="https://www.facebook.com/profile.php?id=100092666694525" 
                  target="_blank" 
-                 rel="noopener" 
+                 rel="noopener noreferrer" 
                  className="text-white-50 hover-text-white">
                 Facebook
               </a>
@@ -87,7 +87,7 @@ function Footer() {
             <p className="mb-0">
               <a href="https://www.tiktok.com/@lucgiaduong" 
                  target="_blank" 
-                 rel="noopener" 
+                 rel="noopener noreferrer" 
                  className="text-white-50 hover-text-white">
                 TikTok
               </a>
