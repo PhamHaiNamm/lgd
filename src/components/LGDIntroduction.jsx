@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
-import { auth, storage } from "../firebase";
+import { auth, storage, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, onSnapshot, setDoc } from "firebase/firestore";
+
 import { ADMIN_EMAILS } from "../config";
 import { DragonIcon, LionIcon, PeachBlossomIcon, LanternIcon, FestivalStrip } from "./Decorations";
 
@@ -19,9 +21,14 @@ export default function LucGiaDuongIntroSection() {
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem(INTRO_IMAGE_KEY);
-    if (saved) setImageUrl(saved);
+    const unsub = onSnapshot(doc(db, "config", "intro"), (snapshot) => {
+      if (snapshot.exists()) {
+        setImageUrl(snapshot.data().imageUrl || DEFAULT_IMAGE);
+      }
+    });
+    return () => unsub();
   }, []);
+
 
   const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
@@ -41,7 +48,8 @@ export default function LucGiaDuongIntroSection() {
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
       setImageUrl(url);
-      localStorage.setItem(INTRO_IMAGE_KEY, url);
+      await setDoc(doc(db, "config", "intro"), { imageUrl: url }, { merge: true });
+
     } catch (err) {
       console.error(err);
       alert("Upload ảnh lỗi ❌");
@@ -129,11 +137,11 @@ export default function LucGiaDuongIntroSection() {
             style={{ backgroundColor: "#1a1510", border: "2px solid rgba(212,160,18,0.4)" }}
           >
             <h3 className="font-semibold text-lg d-flex align-items-center gap-2" style={{ color: "#eab308", textShadow: "0 0 12px rgba(212,160,18,0.4)" }}>
-            <PeachBlossomIcon size={22} color="#e879a0" />
-            <PeachBlossomIcon size={18} color="#e879a0" />
-            <LanternIcon size={22} color="#eab308" />
-            Thành tích nổi bật
-          </h3>
+              <PeachBlossomIcon size={22} color="#e879a0" />
+              <PeachBlossomIcon size={18} color="#e879a0" />
+              <LanternIcon size={22} color="#eab308" />
+              Thành tích nổi bật
+            </h3>
             <ul className="list-disc list-inside space-y-1" style={{ color: "#e5e5e5" }}>
               <li>Vô địch Giải Địa Bửu – Hội Đền Gin lần thứ I</li>
               <li>Hạng 3 Giải Song Lân – Đền Gin lần thứ I</li>

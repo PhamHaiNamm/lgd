@@ -3,10 +3,21 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import LGDIntroduction from './components/LGDIntroduction';
 import { DecorativeTitle, FestivalStrip } from './components/Decorations';
-import { auth, storage } from './firebase';
+import { auth, storage, db } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy
+} from 'firebase/firestore';
 import { ADMIN_EMAILS } from './config';
+
 
 function Introduction() {
   const [user, setUser] = useState(null);
@@ -28,20 +39,17 @@ function Introduction() {
   const isAdmin = user && ADMIN_EMAILS.includes(user.email);
 
   useEffect(() => {
-    const saved = localStorage.getItem('members');
-    if (saved) {
-      try {
-        setMembers(JSON.parse(saved));
-      } catch {
-        setMembers([]);
-      }
-    }
+    const q = query(collection(db, 'members'), orderBy('id', 'asc'));
+    const unsub = onSnapshot(q, (snapshot) => {
+      const docs = snapshot.docs.map(doc => ({
+        ...doc.data(),
+        firestoreId: doc.id // Lưu lại ID của Firestore để update/delete
+      }));
+      setMembers(docs);
+    });
+    return () => unsub();
   }, []);
 
-  const persistMembers = (next) => {
-    setMembers(next);
-    localStorage.setItem('members', JSON.stringify(next));
-  };
 
   const handleChange = (e) => {
     setForm({
@@ -79,20 +87,14 @@ function Introduction() {
         return;
       }
 
-      const updated = members.map((m) =>
-        m.id === editingId
-          ? {
-              ...m,
-              name: form.name,
-              yearOfBirth: form.yearOfBirth,
-              role: form.role,
-              image:
-                form.image ||
-                'https://via.placeholder.com/250x250.png?text=Member',
-            }
-          : m
-      );
-      persistMembers(updated);
+      const memberDoc = doc(db, 'members', target.firestoreId);
+      updateDoc(memberDoc, {
+        name: form.name,
+        yearOfBirth: form.yearOfBirth,
+        role: form.role,
+        image: form.image || 'https://via.placeholder.com/250x250.png?text=Member',
+      }).catch(err => console.error("Update error:", err));
+
     } else {
       const newMember = {
         id: Date.now(),
@@ -100,11 +102,12 @@ function Introduction() {
         name: form.name,
         yearOfBirth: form.yearOfBirth,
         role: form.role,
-        image:
-          form.image || 'https://via.placeholder.com/250x250.png?text=Member',
+        image: form.image || 'https://via.placeholder.com/250x250.png?text=Member',
       };
-      persistMembers([...members, newMember]);
+      addDoc(collection(db, 'members'), newMember)
+        .catch(err => console.error("Add error:", err));
     }
+
 
     setForm({
       name: '',
@@ -134,13 +137,15 @@ function Introduction() {
     });
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (member) => {
     if (!user || !isAdmin) {
       alert('Chỉ admin mới được xóa thông tin.');
       return;
     }
-    const next = members.filter((m) => m.id !== id);
-    persistMembers(next);
+    if (window.confirm(`Xóa thành viên ${member.name}?`)) {
+      deleteDoc(doc(db, 'members', member.firestoreId))
+        .catch(err => console.error("Delete error:", err));
+    }
   };
 
   const handleMemberImageUpload = async (e) => {
@@ -181,66 +186,66 @@ function Introduction() {
         {/* Form chỉ hiển thị khi đã đăng nhập (Firebase) */}
         {user && (
           <form className="row g-3 mb-4" onSubmit={handleAddMember}>
-          <div className="col-md-3">
-            <input
-              type="text"
-              className="form-control"
-              name="name"
-              placeholder="Tên"
-              value={form.name}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="col-md-2">
-            <input
-              type="number"
-              className="form-control"
-              name="yearOfBirth"
-              placeholder="Năm sinh"
-              value={form.yearOfBirth}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="col-md-3">
-            <select
-              className="form-select"
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-            >
-              <option value="">Chọn vị trí</option>
-              <option value="Trống">Trống</option>
-              <option value="Lân">Lân</option>
-              <option value="Sư">Sư</option>
-              <option value="Xõa">Xõa</option>
-              <option value="Lố">Lố</option>
-            </select>
-          </div>
-          <div className="col-md-3">
-            <input
-              type="text"
-              className="form-control"
-              name="image"
-              placeholder="Link ảnh (tùy chọn)"
-              value={form.image}
-              onChange={handleChange}
-            />
-            <small className="text-muted">Hoặc upload ảnh bên dưới</small>
-            <input
-              type="file"
-              accept="image/*"
-              className="form-control form-control-sm mt-1"
-              onChange={handleMemberImageUpload}
-              disabled={uploadingMemberImage}
-            />
-            {uploadingMemberImage && <small style={{ color: '#ef4444' }}>Đang tải lên...</small>}
-          </div>
-          <div className="col-md-1 d-grid">
-            <button type="submit" className="btn" style={{ background: 'linear-gradient(180deg, #c41e3a 0%, #9a1830 100%)', border: '1px solid #d4a012', color: '#fff' }}>
-              {editingId ? 'Lưu' : 'Thêm'}
-            </button>
-          </div>
-        </form>
+            <div className="col-md-3">
+              <input
+                type="text"
+                className="form-control"
+                name="name"
+                placeholder="Tên"
+                value={form.name}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="col-md-2">
+              <input
+                type="number"
+                className="form-control"
+                name="yearOfBirth"
+                placeholder="Năm sinh"
+                value={form.yearOfBirth}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="col-md-3">
+              <select
+                className="form-select"
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+              >
+                <option value="">Chọn vị trí</option>
+                <option value="Trống">Trống</option>
+                <option value="Lân">Lân</option>
+                <option value="Sư">Sư</option>
+                <option value="Xõa">Xõa</option>
+                <option value="Lố">Lố</option>
+              </select>
+            </div>
+            <div className="col-md-3">
+              <input
+                type="text"
+                className="form-control"
+                name="image"
+                placeholder="Link ảnh (tùy chọn)"
+                value={form.image}
+                onChange={handleChange}
+              />
+              <small className="text-muted">Hoặc upload ảnh bên dưới</small>
+              <input
+                type="file"
+                accept="image/*"
+                className="form-control form-control-sm mt-1"
+                onChange={handleMemberImageUpload}
+                disabled={uploadingMemberImage}
+              />
+              {uploadingMemberImage && <small style={{ color: '#ef4444' }}>Đang tải lên...</small>}
+            </div>
+            <div className="col-md-1 d-grid">
+              <button type="submit" className="btn" style={{ background: 'linear-gradient(180deg, #c41e3a 0%, #9a1830 100%)', border: '1px solid #d4a012', color: '#fff' }}>
+                {editingId ? 'Lưu' : 'Thêm'}
+              </button>
+            </div>
+          </form>
         )}
 
         {/* Danh sách thẻ thành viên do người dùng nhập */}
@@ -265,19 +270,19 @@ function Introduction() {
                       {(isAdmin ||
                         member.owner === user.uid ||
                         member.owner === user.email) && (
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-secondary"
-                          onClick={() => handleEditClick(member)}
-                        >
-                          Sửa
-                        </button>
-                      )}
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => handleEditClick(member)}
+                          >
+                            Sửa
+                          </button>
+                        )}
                       {isAdmin && (
                         <button
                           type="button"
                           className="btn btn-sm btn-outline-danger"
-                          onClick={() => handleDelete(member.id)}
+                          onClick={() => handleDelete(member)}
                         >
                           Xóa
                         </button>
@@ -290,7 +295,7 @@ function Introduction() {
           ))}
         </div>
       </section>
-      
+
       <LGDIntroduction />
       <Footer />
     </div>
