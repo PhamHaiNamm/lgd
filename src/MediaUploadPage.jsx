@@ -4,13 +4,7 @@ import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import {
-    DragonIcon,
-    LionIcon,
-    PeachBlossomIcon,
-    LanternIcon,
-    FestivalStrip,
-} from "./components/Decorations";
+import { FestivalStrip } from "./components/Decorations";
 import "./MediaUploadPage.css";
 
 const IMAGE_EXT = /\.(jpg|jpeg|png|gif|webp|bmp)$/i;
