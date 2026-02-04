@@ -22,7 +22,7 @@ function Login() {
     try {
       await signInWithEmailAndPassword(auth, form.email, form.password);
       alert("Đăng nhập thành công ✅");
-      navigate("/member"); // vào trang upload
+      navigate("/introduction"); // vào trang upload
     } catch (err) {
       alert("Sai email hoặc mật khẩu ❌");
       console.error(err);
