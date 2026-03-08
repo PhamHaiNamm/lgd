@@ -11,23 +11,20 @@ function Header() {
       {/* Dải Tết: nhiều hoa đào hồng + đèn lồng + rồng */}
       <FestivalStrip iconSize={26} />
       {/* logo */}
-      <div className='container-fluid text-white py-3 position-relative lgd-corners' style={{ background: 'linear-gradient(90deg, #0a0a0a 0%, #1a0a0a 15%, #9a1830 40%, #c41e3a 50%, #9a1830 60%, #0a0a0a 100%)', borderBottom: '3px solid #d4a012', boxShadow: '0 4px 12px rgba(212,160,18,0.2)' }}>
+      <div className='container-fluid text-white py-3 position-relative lgd-corners' style={{ background: 'linear-gradient(90deg, #0a0a0a 0%, #1a0a1a 15%, #5b21b6 40%, #7c3aed 50%, #5b21b6 60%, #0a0a0a 100%)', borderBottom: '3px solid #8b5cf6', boxShadow: '0 4px 12px rgba(139,92,246,0.2)' }}>
         <div className='row'>
           <div className='col-3 col-md-3 col-lg-2 d-flex justify-content-start align-items-center flex-wrap'>
-            <PeachBlossomIcon size={22} color="#e879a0" className="d-none d-md-inline-block me-1" />
-            <PeachBlossomIcon size={18} color="#e879a0" className="d-none d-lg-inline-block me-0" />
+            <PeachBlossomIcon size={22} color="#a78bfa" className="d-none d-md-inline-block me-1" />
+            <PeachBlossomIcon size={18} color="#a78bfa" className="d-none d-lg-inline-block me-0" />
             <img
               src='/images/Logo_full.png'
               alt='Logo'
               className='img-fluid'
               style={{ maxHeight: '100px' }}
             />
-            <DragonIcon size={26} color="#eab308" className="d-none d-lg-inline-block ms-1 me-0" />
-            <DragonIcon size={22} color="#eab308" className="d-none d-xl-inline-block me-1" />
-            <h1 className='fw-bold ms-2 my-auto' style={{ textShadow: '0 0 12px rgba(212,160,18,0.5)' }}><Link to="/" className='text-white text-decoration-none'>LGĐ</Link></h1>
-            <LanternIcon size={22} color="#eab308" className="d-none d-lg-inline-block ms-1" />
-            <LionIcon size={26} color="#eab308" className="d-none d-lg-inline-block ms-0" />
-            <PeachBlossomIcon size={18} color="#e879a0" className="d-none d-xl-inline-block ms-1" />
+            <DragonIcon size={26} color="#a78bfa" className="d-none d-lg-inline-block ms-1 me-0" />
+            <DragonIcon size={22} color="#a78bfa" className="d-none d-xl-inline-block me-1" />
+            <PeachBlossomIcon size={18} color="#a78bfa" className="d-none d-xl-inline-block ms-1" />
           </div>
           {/* navbar */}
           <div className='col-6 col-md-6 col-lg-8 d-flex gap-4 justify-content-center'>
@@ -41,20 +38,18 @@ function Header() {
                     <li className="nav-item">
                       <Link to="/" className="nav-link text-white fw-bold fs-5 px-3" style={{ textShadow: '0 1px 2px #000' }}>Trang chủ</Link>
                     </li>
-                    <li className="nav-item">
-                      <Link to="/introduction" className="nav-link text-white fw-bold fs-5 px-3">Giới thiệu đoàn</Link>
-                    </li>
+              
                     <li className="nav-item">
                       <Link to="/performance-services" className="nav-link text-white fw-bold fs-5 px-3 position-relative">
                         Dịch vụ biểu diễn
-                        <span className="badge ms-2" style={{ fontSize: '0.7rem', background: 'linear-gradient(180deg, #eab308 0%, #b8860b 100%)', color: '#0a0a0a', border: '1px solid #f5c542' }}>HOT</span>
+                        <span className="badge ms-2" style={{ fontSize: '0.7rem', background: 'linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%)', color: '#fff', border: '1px solid #a78bfa' }}>HOT</span>
                       </Link>
                     </li>
                     <li className="nav-item">
                       <Link to="/blog" className="nav-link text-white fw-bold fs-5 px-3">Thư viện ảnh/video</Link>
                     </li>
                     <li className="nav-item">
-                      <Link to="/performance-services" className="nav-link text-white fw-bold fs-5 px-3">Liên hệ / Đặt lịch</Link>
+                      <Link to="/contact" className="nav-link text-white fw-bold fs-5 px-3">Liên hệ / Đặt lịch</Link>
                     </li>
                   </ul>
                 </div>

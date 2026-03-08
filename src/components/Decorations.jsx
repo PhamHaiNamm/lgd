@@ -1,7 +1,7 @@
 import React from "react";
 
 /* Icon Rồng – cách điệu */
-export function DragonIcon({ size = 28, color = "#eab308", className = "" }) {
+export function DragonIcon({ size = 28, color = "#a78bfa", className = "" }) {
   return (
     <svg
       width={size}
@@ -27,7 +27,7 @@ export function DragonIcon({ size = 28, color = "#eab308", className = "" }) {
 }
 
 /* Icon Lân – cách điệu (đầu lân) */
-export function LionIcon({ size = 28, color = "#eab308", className = "" }) {
+export function LionIcon({ size = 28, color = "#a78bfa", className = "" }) {
   return (
     <svg
       width={size}
@@ -48,7 +48,7 @@ export function LionIcon({ size = 28, color = "#eab308", className = "" }) {
 }
 
 /* Icon Sư tử – cách điệu */
-export function TigerIcon({ size = 28, color = "#eab308", className = "" }) {
+export function TigerIcon({ size = 28, color = "#a78bfa", className = "" }) {
   return (
     <svg
       width={size}
@@ -68,7 +68,7 @@ export function TigerIcon({ size = 28, color = "#eab308", className = "" }) {
 }
 
 /* Màu hoa đào hồng Tết */
-export const PEACH_BLOSSOM_PINK = "#e879a0";
+export const PEACH_BLOSSOM_PINK = "#a78bfa";
 export const PEACH_BLOSSOM_PINK_DARK = "#db2777";
 
 /* Hoa đào – 5 cánh (mặc định hồng, có thể truyền color vàng) */
@@ -106,13 +106,13 @@ export function PeachBlossomIcon({ size = 24, color = PEACH_BLOSSOM_PINK, classN
           />
         );
       })}
-      <circle cx={cx} cy={cy} r="3" fill={color === PEACH_BLOSSOM_PINK || color === PEACH_BLOSSOM_PINK_DARK ? "#c41e3a" : "#c41e3a"} opacity="0.9" />
+      <circle cx={cx} cy={cy} r="3" fill={color === PEACH_BLOSSOM_PINK || color === PEACH_BLOSSOM_PINK_DARK ? "#8b5cf6" : "#8b5cf6"} opacity="0.9" />
     </svg>
   );
 }
 
 /* Đèn lồng Tết */
-export function LanternIcon({ size = 24, color = "#eab308", className = "" }) {
+export function LanternIcon({ size = 24, color = "#a78bfa", className = "" }) {
   return (
     <svg
       width={size}
@@ -163,11 +163,11 @@ export function DecorativeStrip({ height = 12, className = "" }) {
           90deg,
           transparent,
           transparent 20px,
-          rgba(212,160,18,0.25) 20px,
-          rgba(212,160,18,0.25) 22px
+          rgba(139,92,246,0.25) 20px,
+          rgba(139,92,246,0.25) 22px
         )`,
-        borderTop: "1px solid rgba(212,160,18,0.5)",
-        borderBottom: "1px solid rgba(212,160,18,0.5)",
+        borderTop: "1px solid rgba(139,92,246,0.5)",
+        borderBottom: "1px solid rgba(139,92,246,0.5)",
       }}
       aria-hidden
     />
@@ -193,7 +193,7 @@ export function FestivalStrip({ iconSize = 28, className = "" }) {
         gap: "0.25rem 0.75rem",
         padding: "0.5rem 1rem",
         background: "linear-gradient(90deg, rgba(20,20,20,0.95) 0%, rgba(26,10,20,0.98) 50%, rgba(20,20,20,0.95) 100%)",
-        borderTop: "2px solid rgba(212,160,18,0.4)",
+        borderTop: "2px solid rgba(139,92,246,0.4)",
         borderBottom: "2px solid rgba(232,121,160,0.35)",
         minHeight: 48,
       }}
@@ -202,8 +202,8 @@ export function FestivalStrip({ iconSize = 28, className = "" }) {
       {items.map(({ key, type }) => (
         <span key={key} style={{ display: "inline-flex", alignItems: "center" }}>
           {type === "flower" && <PeachBlossomIcon size={iconSize} color={PEACH_BLOSSOM_PINK} />}
-          {type === "lantern" && <LanternIcon size={iconSize} color="#eab308" />}
-          {type === "dragon" && <DragonIcon size={iconSize} color="#eab308" />}
+          {type === "lantern" && <LanternIcon size={iconSize} color="#a78bfa" />}
+          {type === "dragon" && <DragonIcon size={iconSize} color="#a78bfa" />}
         </span>
       ))}
     </div>
@@ -216,7 +216,7 @@ export function CornerOrnament({ position = "top-left", size = 24 }) {
     position: "absolute",
     width: size,
     height: size,
-    borderColor: "rgba(212,160,18,0.6)",
+    borderColor: "rgba(139,92,246,0.6)",
     borderStyle: "solid",
     borderWidth: "2px 2px 0 0",
   };

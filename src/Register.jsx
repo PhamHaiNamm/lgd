@@ -29,13 +29,13 @@ export default function Register() {
                             className="card shadow"
 style={{
                                                 backgroundColor: "#1a1510",
-                                                border: "2px solid rgba(212,160,18,0.4)",
+                                                border: "2px solid rgba(139,92,246,0.4)",
                                             }}
                         >
                             <div className="card-body p-4">
                                 <h2
                                     className="text-center mb-4 lgd-title-gold"
-                                    style={{ color: "#eab308", textShadow: "0 0 12px rgba(212,160,18,0.4)" }}
+                                    style={{ color: "#a78bfa", textShadow: "0 0 12px rgba(139,92,246,0.4)" }}
                                 >
                                     Đăng ký tài khoản
                                 </h2>
@@ -74,8 +74,8 @@ style={{
                                         type="submit"
                                         className="btn w-100"
                                         style={{
-                                            background: "linear-gradient(180deg, #c41e3a 0%, #9a1830 100%)",
-                                            border: "1px solid #d4a012",
+                                            background: "linear-gradient(180deg, #8b5cf6 0%, #5b21b6 100%)",
+                                            border: "1px solid #a78bfa",
                                             color: "#fff",
                                         }}
                                     >
@@ -89,7 +89,7 @@ style={{
                                     Đã có tài khoản?{" "}
                                     <a
                                         href="/login"
-                                        style={{ color: "#eab308" }}
+                                        style={{ color: "#a78bfa" }}
                                     >
                                         Đăng nhập
                                     </a>

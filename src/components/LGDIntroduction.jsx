@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { auth, storage, db } from "../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { ADMIN_EMAILS } from "../config";
 
@@ -44,21 +44,18 @@ export default function LucGiaDuongIntroSection() {
     return () => unsub();
   }, []);
 
-  // 🔹 Lắng nghe ảnh từ Firestore
+  // 🔹 Đọc ảnh từ Firestore (một lần, tránh lỗi onSnapshot)
   useEffect(() => {
-    const unsub = onSnapshot(
-      doc(db, "config", "intro"),
-      (snapshot) => {
-        console.log("FIRESTORE SNAPSHOT:", snapshot.exists(), snapshot.data());
-        if (snapshot.exists()) {
-          setImageUrl(snapshot.data().imageUrl || DEFAULT_IMAGE);
+    let cancelled = false;
+    getDoc(doc(db, "config", "intro"))
+      .then((snapshot) => {
+        if (cancelled) return;
+        if (snapshot.exists() && snapshot.data().imageUrl) {
+          setImageUrl(snapshot.data().imageUrl);
         }
-      },
-      (err) => {
-        console.error("LISTEN FIRESTORE ERROR:", err);
-      }
-    );
-    return () => unsub();
+      })
+      .catch((err) => console.warn("Firestore intro config:", err?.message));
+    return () => { cancelled = true; };
   }, []);
 
   const isAdmin = user && ADMIN_EMAILS.includes(user.email);
@@ -108,20 +105,20 @@ export default function LucGiaDuongIntroSection() {
       <div className="grid md:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
 
         <div>
-          <div className="overflow-hidden rounded-2xl shadow-xl" style={{ border: "2px solid rgba(212,160,18,0.45)" }}>
+          <div className="overflow-hidden rounded-2xl shadow-xl" style={{ border: "2px solid rgba(139,92,246,0.45)" }}>
             <img src={imageUrl} alt="Lân Sư Rồng" className="w-full h-full object-cover" />
           </div>
 
           {isAdmin && (
             <div className="mt-3">
               <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
-              {uploading && <span style={{ color: "#eab308" }}>Đang tải lên...</span>}
+              {uploading && <span style={{ color: "#a78bfa" }}>Đang tải lên...</span>}
             </div>
           )}
         </div>
 
         <div>
-          <h2 style={{ color: "#eab308" }}>ĐOÀN LÂN SƯ RỒNG LỤC GIA ĐƯỜNG</h2>
+          <h2 style={{ color: "#a78bfa" }}>ĐOÀN LÂN SƯ RỒNG LỤC GIA ĐƯỜNG</h2>
           <p>Được thành lập năm 2023 tại Hạ Long, Quảng Ninh.</p>
         </div>
 

@@ -1,66 +1,128 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Container, Row, Col, Card, Button, Form } from "react-bootstrap";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { DragonIcon, LionIcon, PeachBlossomIcon, LanternIcon, FestivalStrip } from "./components/Decorations";
-import { auth, storage } from "./firebase";
+import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { ADMIN_EMAILS } from "./config";
 import "./PerformanceServices.css";
 
+const withPosition = (s) => ({ ...s, position: s.position ?? { x: 50, y: 50 } });
+
 const defaultServices = [
-    { title: "Múa Sư Tử Truyền Thống", img: "/services/su-tu-truyen-thong.jpg" },
-    { title: "Múa Song Lân", img: "/services/song-lan.jpg" },
-    { title: "Múa Tam Lân", img: "/services/tam-lan.jpg" },
-    { title: "Múa Tứ Lân", img: "/services/tu-lan.jpg" },
-    { title: "Múa Ngũ Lân", img: "/services/ngu-lan.jpg" },
-    { title: "Múa Rồng Nghệ Thuật", img: "/services/rong-nghe-thuat.jpg" },
-    { title: "Múa Lân Địa Bửu", img: "/services/lan-dia-buu.jpg" },
+    { title: "Múa Sư Tử Truyền Thống", img: "/images/sư_tử.jpg", position: { x: 50, y: 50 } },
+    { title: "Múa Song Lân", img: "/images/song_lân.jpg", position: { x: 50, y: 50 } },
+    { title: "Múa Tam Lân", img: "/images/tam-lân.jpg", position: { x: 50, y: 50 } },
+    { title: "Múa Tứ Lân", img: "/images/tứ_lân.jpg", position: { x: 50, y: 50 } },
+    { title: "Múa Ngũ Lân", img: "/images/ngũ_lân.jpg", position: { x: 50, y: 50 } },
+    { title: "Múa Rồng Nghệ Thuật", img: "/images/múa_rồng.jpg", position: { x: 50, y: 50 } },
+    { title: "Múa Lân Địa Bửu", img: "/images/địa_bửu.jpg", position: { x: 50, y: 50 } },
 ];
+
+const CONFIG_KEY = "performanceServices";
 
 export default function PerformanceServices() {
     const [services, setServices] = useState(defaultServices);
     const [isAdmin, setIsAdmin] = useState(false);
     const [user, setUser] = useState(null);
-    const [uploadingIndex, setUploadingIndex] = useState(null);
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (u) => setUser(u));
         return () => unsub();
     }, []);
 
+    useEffect(() => {
+        let cancelled = false;
+        getDoc(doc(db, "config", CONFIG_KEY))
+            .then((snapshot) => {
+                if (cancelled) return;
+                if (snapshot.exists() && Array.isArray(snapshot.data().services) && snapshot.data().services.length > 0) {
+                    setServices(snapshot.data().services.map(withPosition));
+                }
+            })
+            .catch(() => setServices(defaultServices));
+        return () => { cancelled = true; };
+    }, []);
+
     const isAdminUser = user && ADMIN_EMAILS.includes(user.email);
 
     const handleChange = (index, field, value) => {
+        if (!isAdminUser) return;
         const updated = [...services];
-        updated[index][field] = value;
+        updated[index] = { ...updated[index], [field]: value };
         setServices(updated);
     };
 
-    const handleImageUpload = async (index, e) => {
-        if (!user || !isAdminUser) return;
-        const file = e.target.files?.[0];
-        if (!file || !file.type.startsWith("image/")) {
-            alert("Vui lòng chọn file ảnh.");
-            return;
-        }
-        setUploadingIndex(index);
-        try {
-            const storageRef = ref(
-                storage,
-                `performance-services/${user.uid}/${Date.now()}-${file.name}`
-            );
-            await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(storageRef);
-            handleChange(index, "img", url);
-        } catch (err) {
-            console.error(err);
-            alert("Upload ảnh lỗi ❌");
-        } finally {
-            setUploadingIndex(null);
-            e.target.value = "";
-        }
+    const saveToFirestore = (nextServices) => {
+        setDoc(doc(db, "config", CONFIG_KEY), { services: nextServices }).catch((err) =>
+            console.error("Save performance services error:", err)
+        );
+    };
+
+    const handleSave = () => {
+        if (!isAdminUser) return;
+        saveToFirestore(services);
+        alert("Đã lưu.");
+    };
+
+    const handleAdd = () => {
+        if (!isAdminUser) return;
+        const newService = { title: "Dịch vụ mới", img: "/images/sư_tử.jpg", position: { x: 50, y: 50 } };
+        const next = [...services, newService];
+        setServices(next);
+        saveToFirestore(next);
+    };
+
+    const [dragService, setDragService] = useState(null);
+    const [failedImgKeys, setFailedImgKeys] = useState(() => new Set());
+    const sensitivity = 0.2;
+
+    const handleServiceImageMouseDown = useCallback((index, e) => {
+        if (!isAdmin || !isAdminUser || e.button !== 0) return;
+        e.preventDefault();
+        const svc = services[index];
+        const pos = svc.position ?? { x: 50, y: 50 };
+        setDragService({ index, startX: e.clientX, startY: e.clientY, startPX: pos.x, startPY: pos.y });
+    }, [isAdmin, isAdminUser, services]);
+
+    useEffect(() => {
+        if (dragService == null) return;
+        const { index, startX, startY, startPX, startPY } = dragService;
+        const handleMove = (e) => {
+            const dx = (e.clientX - startX) * sensitivity;
+            const dy = (e.clientY - startY) * sensitivity;
+            setServices((prev) => {
+                const next = prev.map((s, i) =>
+                    i === index
+                        ? { ...s, position: { x: Math.min(100, Math.max(0, startPX + dx)), y: Math.min(100, Math.max(0, startPY + dy)) } }
+                        : s
+                );
+                return next;
+            });
+        };
+        const handleUp = () => {
+            setServices((prev) => {
+                saveToFirestore(prev);
+                return prev;
+            });
+            setDragService(null);
+        };
+        window.addEventListener("mousemove", handleMove);
+        window.addEventListener("mouseup", handleUp);
+        return () => {
+            window.removeEventListener("mousemove", handleMove);
+            window.removeEventListener("mouseup", handleUp);
+        };
+    }, [dragService, saveToFirestore]);
+
+    const handleDelete = (index) => {
+        if (!isAdminUser) return;
+        if (!window.confirm("Xóa dịch vụ này?")) return;
+        const next = services.filter((_, i) => i !== index);
+        setServices(next);
+        saveToFirestore(next.length ? next : defaultServices);
     };
 
     return (
@@ -71,32 +133,43 @@ export default function PerformanceServices() {
                 <div className="text-center mb-5 lgd-pattern-bg">
                     <FestivalStrip iconSize={24} />
                     <h2 className="display-4 fw-bold mb-4 d-flex align-items-center justify-content-center gap-2 flex-wrap">
-                      <PeachBlossomIcon size={34} color="#e879a0" />
-                      <PeachBlossomIcon size={28} color="#e879a0" />
-                      <LanternIcon size={36} color="#eab308" />
-                      <DragonIcon size={40} color="#eab308" />
-                      <DragonIcon size={36} color="#eab308" />
+                      <PeachBlossomIcon size={34} color="#a78bfa" />
+                      <PeachBlossomIcon size={28} color="#a78bfa" />
+                      <LanternIcon size={36} color="#a78bfa" />
+                      <DragonIcon size={40} color="#a78bfa" />
+                      <DragonIcon size={36} color="#a78bfa" />
                       DỊCH VỤ BIỂU DIỄN
-                      <DragonIcon size={36} color="#eab308" />
-                      <DragonIcon size={40} color="#eab308" />
-                      <LanternIcon size={36} color="#eab308" />
-                      <PeachBlossomIcon size={28} color="#e879a0" />
-                      <PeachBlossomIcon size={34} color="#e879a0" />
-                      <LionIcon size={38} color="#eab308" />
+                      <DragonIcon size={36} color="#a78bfa" />
+                      <DragonIcon size={40} color="#a78bfa" />
+                      <LanternIcon size={36} color="#a78bfa" />
+                      <PeachBlossomIcon size={28} color="#a78bfa" />
+                      <PeachBlossomIcon size={34} color="#a78bfa" />
+                      <LionIcon size={38} color="#a78bfa" />
                     </h2>
                     <p className="text-secondary mx-auto" style={{ maxWidth: "600px" }}>
                         Các tiết mục Lân – Sư – Rồng chuyên nghiệp, phù hợp lễ hội, khai trương, sự kiện và chương trình nghệ thuật.
                     </p>
 
-                    {/* Chỉ admin đăng nhập mới thấy nút bật chế độ Admin */}
+                    {/* Chỉ admin mới thấy: bật chế độ Admin, Thêm dịch vụ, Lưu */}
                     {isAdminUser && (
-                        <Button
-                            variant={isAdmin ? "outline-light" : "danger"}
-                            className="mt-4"
-                            onClick={() => setIsAdmin(!isAdmin)}
-                        >
-                            {isAdmin ? "Tắt chế độ Admin" : "Bật chế độ Admin"}
-                        </Button>
+                        <div className="d-flex align-items-center justify-content-center gap-2 mt-4 flex-wrap">
+                            <Button
+                                variant={isAdmin ? "outline-light" : "danger"}
+                                onClick={() => setIsAdmin(!isAdmin)}
+                            >
+                                {isAdmin ? "Tắt chế độ Admin" : "Bật chế độ Admin"}
+                            </Button>
+                            {isAdmin && (
+                                <>
+                                    <Button variant="outline-success" onClick={handleAdd}>
+                                        Thêm dịch vụ
+                                    </Button>
+                                    <Button variant="outline-warning" onClick={handleSave}>
+                                        Lưu thay đổi
+                                    </Button>
+                                </>
+                            )}
+                        </div>
                     )}
                 </div>
 
@@ -104,17 +177,52 @@ export default function PerformanceServices() {
                     {services.map((service, index) => (
                         <Col key={index} sm={6} lg={4}>
                             <Card className="service-card h-100">
-                                <div className="service-img-container">
+                                <div
+                                    className="service-img-container"
+                                    onMouseDown={(e) => handleServiceImageMouseDown(index, e)}
+                                    style={{
+                                        cursor: isAdmin && isAdminUser ? (dragService?.index === index ? "grabbing" : "grab") : undefined,
+                                        userSelect: "none",
+                                        position: "relative",
+                                    }}
+                                >
                                     <Card.Img
                                         variant="top"
-                                        src={service.img}
+                                        src={
+                                            failedImgKeys.has(`${index}-${service.img}`)
+                                                ? defaultServices[0].img
+                                                : (service.img || defaultServices[0].img)
+                                        }
                                         alt={service.title}
                                         className="service-img"
+                                        style={{
+                                            objectPosition: `${service.position?.x ?? 50}% ${service.position?.y ?? 50}%`,
+                                        }}
+                                        onError={() => setFailedImgKeys((prev) => new Set(prev).add(`${index}-${service.img}`))}
                                     />
+                                    {isAdmin && isAdminUser && (
+                                        <div
+                                            className="service-img-hint"
+                                            style={{
+                                                position: "absolute",
+                                                bottom: 6,
+                                                left: "50%",
+                                                transform: "translateX(-50%)",
+                                                background: "rgba(0,0,0,0.75)",
+                                                color: "#a78bfa",
+                                                padding: "2px 8px",
+                                                borderRadius: 4,
+                                                fontSize: 11,
+                                                pointerEvents: "none",
+                                            }}
+                                        >
+                                            Kéo để chỉnh ảnh
+                                        </div>
+                                    )}
                                 </div>
 
                                 <Card.Body className="text-center p-4">
-                                    {isAdmin ? (
+                                    {isAdmin && isAdminUser ? (
                                         <>
                                             <Form.Control
                                                 type="text"
@@ -125,24 +233,20 @@ export default function PerformanceServices() {
                                             />
                                             <Form.Control
                                                 type="text"
-                                                className="admin-input form-control-sm"
+                                                className="admin-input form-control-sm mt-2"
                                                 value={service.img}
                                                 onChange={(e) => handleChange(index, "img", e.target.value)}
-                                                placeholder="Đường dẫn ảnh"
+                                                placeholder="Link ảnh (hoặc đường dẫn ảnh fix cứng)"
                                             />
-                                            <Form.Group className="mt-2">
-                                                <Form.Label className="small text-muted">Hoặc upload ảnh</Form.Label>
-                                                <Form.Control
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={(e) => handleImageUpload(index, e)}
-                                                    disabled={uploadingIndex !== null}
-                                                    className="form-control-sm"
-                                                />
-                                                {uploadingIndex === index && (
-                                                    <small className="text-warning">Đang tải lên...</small>
-                                                )}
-                                            </Form.Group>
+                                            <small className="text-muted d-block mt-1">Ảnh: link hoặc ảnh mặc định</small>
+                                            <Button
+                                                variant="outline-danger"
+                                                size="sm"
+                                                className="mt-2"
+                                                onClick={() => handleDelete(index)}
+                                            >
+                                                Xóa
+                                            </Button>
                                         </>
                                     ) : (
                                         <Card.Title className="service-title mb-0">{service.title}</Card.Title>

@@ -10,8 +10,8 @@
   inset: 0;
   /* Hoa 5 cánh đơn giản (hồng) + vàng */
   background-image:
-    url("data:image/svg+xml,%3Csvg width='48' height='48' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(0 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(72 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(144 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(216 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23e879a0' opacity='0.12' transform='rotate(288 24 24)'/%3E%3Ccircle cx='24' cy='24' r='2' fill='%23d4a012' opacity='0.1'/%3E%3C/svg%3E"),
-    url("data:image/svg+xml,%3Csvg width='32' height='32' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='16' cy='16' rx='2' ry='2' fill='%23d4a012' opacity='0.06'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg width='48' height='48' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23a78bfa' opacity='0.12' transform='rotate(0 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23a78bfa' opacity='0.12' transform='rotate(72 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23a78bfa' opacity='0.12' transform='rotate(144 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23a78bfa' opacity='0.12' transform='rotate(216 24 24)'/%3E%3Cellipse cx='24' cy='24' rx='4' ry='5' fill='%23a78bfa' opacity='0.12' transform='rotate(288 24 24)'/%3E%3Ccircle cx='24' cy='24' r='2' fill='%238b5cf6' opacity='0.1'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg width='32' height='32' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='16' cy='16' rx='2' ry='2' fill='%238b5cf6' opacity='0.06'/%3E%3C/svg%3E");
   background-size: 48px 48px, 32px 32px;
   background-position: 0 0, 24px 24px;
   pointer-events: none;
@@ -32,7 +32,7 @@
   position: absolute;
   width: 24px;
   height: 24px;
-  border-color: rgba(212, 160, 18, 0.5);
+  border-color: rgba(139, 92, 246, 0.5);
   border-style: solid;
   pointer-events: none;
 }
@@ -62,10 +62,10 @@
   flex: 1;
   max-width: 120px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(212, 160, 18, 0.6), transparent);
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.6), transparent);
 }
 .lgd-divider::after {
-  background: linear-gradient(90deg, transparent, rgba(212, 160, 18, 0.6), transparent);
+  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.6), transparent);
 }
 
 /* Icon nhỏ cạnh tiêu đề */
