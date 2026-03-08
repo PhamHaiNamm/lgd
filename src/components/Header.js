@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import React, { useContext } from 'react';
 import { AuthContext } from '../AuthContext';
-import { DragonIcon, LionIcon, PeachBlossomIcon, LanternIcon, FestivalStrip } from './Decorations';
+import { DragonIcon, PeachBlossomIcon, FestivalStrip } from './Decorations';
 
 function Header() {
   const { user, logout } = useContext(AuthContext);

@@ -164,7 +164,7 @@ export default function MediaUploadPage() {
                     <div className="d-flex flex-wrap gap-3 mt-3">
                         {members.map((m, i) => (
                             <div key={i} style={{ textAlign: "center" }}>
-                                <img src={m.avatar} width={120} height={120} style={{ borderRadius: "50%" }} />
+                                <img src={m.avatar} alt={m.name ? `Avatar ${m.name}` : ""} width={120} height={120} style={{ borderRadius: "50%" }} />
                                 <p style={{ color: "#fafafa", marginTop: 8 }}>{m.name}</p>
                             </div>
                         ))}

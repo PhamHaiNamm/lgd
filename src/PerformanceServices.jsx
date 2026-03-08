@@ -55,11 +55,11 @@ export default function PerformanceServices() {
         setServices(updated);
     };
 
-    const saveToFirestore = (nextServices) => {
+    const saveToFirestore = useCallback((nextServices) => {
         setDoc(doc(db, "config", CONFIG_KEY), { services: nextServices }).catch((err) =>
             console.error("Save performance services error:", err)
         );
-    };
+    }, []);
 
     const handleSave = () => {
         if (!isAdminUser) return;

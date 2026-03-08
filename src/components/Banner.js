@@ -49,9 +49,6 @@ function Banner() {
   const handleMouseDown = useCallback((index, e) => {
     if (!isAdmin || e.button !== 0) return;
     e.preventDefault();
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
     setDragging({ index, startX: e.clientX, startY: e.clientY, startPX: positions[index].x, startPY: positions[index].y });
   }, [isAdmin, positions]);
 
