@@ -33,7 +33,7 @@ function ContactPage() {
         >
           <div className="flex-shrink-0" style={{ width: '100%', maxWidth: '380px' }}>
             <img
-              src="/images/giới_thiệu_đoàn.jpg"
+              src="/images/trưởng_đoàn.jpg"
               alt="Liên hệ Lục Gia Đường"
               className="w-100 h-100"
               style={{ objectFit: 'cover', minHeight: '280px' }}
