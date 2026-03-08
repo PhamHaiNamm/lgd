@@ -60,9 +60,9 @@ function Footer() {
             <h5 className="fw-bold mb-3 lgd-title-gold" style={{ color: '#a78bfa', textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>CHÍNH SÁCH</h5>
             <ul className="list-unstyled">
               <li className="mb-2"><Link to="/" className="text-white-50 hover-text-white">Trang chủ</Link></li>
-              <li className="mb-2"><Link to="/san-pham" className="text-white-50 hover-text-white">Sản phẩm</Link></li>
-              <li className="mb-2"><Link to="/gioi-thieu" className="text-white-50 hover-text-white">Giới thiệu</Link></li>
-              <li className="mb-2"><Link to="/tin-tuc" className="text-white-50 hover-text-white">Tin tức</Link></li>
+              <li className="mb-2"><Link to="/performance-services" className="text-white-50 hover-text-white">Dịch Vụ</Link></li>
+              <li className="mb-2"><Link to="/blog" className="text-white-50 hover-text-white">Thư Viện</Link></li>
+              <li className="mb-2"><Link to="/contact" className="text-white-50 hover-text-white">Liên hệ</Link></li>
             </ul>
           </div>
 
