@@ -62,10 +62,21 @@ function Introduction() {
           </div>
           <div className="p-4 p-md-5 flex-grow-1" style={{ lineHeight: 1.8, fontSize: '1.05rem' }}>
             <p className="mb-3">
-              <strong style={{ color: '#a78bfa' }}>Lục Gia Đường</strong> là đoàn Lân – Sư – Rồng chuyên nghiệp, gắn bó với nghệ thuật biểu diễn dân gian và các dịch vụ biểu diễn phục vụ lễ hội, khai trương, sự kiện. Đoàn quy tụ các thành viên đam mê, có kỹ năng biểu diễn và tinh thần đoàn kết.
+              <strong style={{ color: '#a78bfa' }}>Tiền thân của Lục Gia Đường</strong> là đội Kì Lân Khu 6, được hình thành từ những người đam mê nghệ thuật Lân – Sư – Rồng tại địa phương.
+              Từ một đội biểu diễn mang tính cộng đồng, qua thời gian tập luyện và phát triển, đội đã mở rộng quy mô và chính thức phát triển thành
+              <strong style={{ color: '#a78bfa' }}> đoàn Lân – Sư – Rồng Lục Gia Đường</strong> như ngày nay.
             </p>
+
+            <p className="mb-3">
+              Đoàn có đại bản doanh tại <strong>Khu Trới 6, phường Hoành Bồ, tỉnh Quảng Ninh</strong>, là nơi các thành viên cùng nhau tập luyện, gìn giữ
+              và phát huy nghệ thuật biểu diễn truyền thống.
+            </p>
+
             <p className="mb-0">
-              Chúng tôi mang đến các tiết mục Múa Lân, Múa Sư Tử, Múa Rồng đa dạng, từ truyền thống đến hiện đại, cùng trang phục và phụ kiện chất lượng, phù hợp mọi quy mô sự kiện trong và ngoài địa bàn.
+              <strong style={{ color: '#a78bfa' }}>Lục Gia Đường</strong> hiện là một đoàn Lân – Sư – Rồng chuyên nghiệp, chuyên biểu diễn phục vụ
+              lễ hội, khai trương, khánh thành và nhiều sự kiện khác. Chúng tôi mang đến các tiết mục
+              <strong> Múa Lân, Múa Sư Tử, Múa Rồng</strong> đa dạng từ truyền thống đến hiện đại, cùng trang phục và phụ kiện chất lượng,
+              phù hợp với nhiều quy mô sự kiện trong và ngoài địa bàn.
             </p>
           </div>
         </div>
