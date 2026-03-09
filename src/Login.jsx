@@ -30,14 +30,14 @@ function Login() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--lgd-black)' }}>
       <Header />
       <div className="container my-5">
         <div className="row justify-content-center">
           <div className="col-md-6 col-lg-4">
-            <div className="card shadow lgd-border-gold" style={{ backgroundColor: '#1a1510', border: '2px solid rgba(139,92,246,0.4)' }}>
+            <div className="card shadow lgd-border-gold" style={{ backgroundColor: 'var(--lgd-black-card)', border: '2px solid var(--lgd-purple-glow)' }}>
               <div className="card-body p-4">
-                <h2 className="text-center mb-4 lgd-title-gold" style={{ color: '#a78bfa', textShadow: '0 0 12px rgba(139,92,246,0.4)' }}>Đăng nhập hệ thống</h2>
+                <h2 className="text-center mb-4 lgd-title-gold" style={{ color: '#a78bfa', textShadow: '0 0 12px var(--lgd-purple-glow)' }}>Đăng nhập hệ thống</h2>
 
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">

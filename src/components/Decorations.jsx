@@ -38,9 +38,9 @@ export function LionIcon({ size = 28, color = "#a78bfa", className = "" }) {
       aria-hidden
     >
       <ellipse cx="16" cy="18" rx="10" ry="10" fill={color} opacity="0.9" />
-      <circle cx="12" cy="16" r="2" fill="#1a1510" />
-      <circle cx="20" cy="16" r="2" fill="#1a1510" />
-      <path d="M14 22c1 1 2 1 4 0" stroke="#1a1510" strokeWidth="1.2" fill="none" />
+      <circle cx="12" cy="16" r="2" fill="var(--lgd-black-card)" />
+      <circle cx="20" cy="16" r="2" fill="var(--lgd-black-card)" />
+      <path d="M14 22c1 1 2 1 4 0" stroke="var(--lgd-black-card)" strokeWidth="1.2" fill="none" />
       <path d="M8 14l-2-4 2-2 2 2-2 4zM24 14l2-4-2-2-2 2 2 4z" fill={color} opacity="0.85" />
       <path d="M16 8l-1 4h2l-1-4z" fill={color} />
     </svg>
@@ -59,10 +59,10 @@ export function TigerIcon({ size = 28, color = "#a78bfa", className = "" }) {
       aria-hidden
     >
       <circle cx="16" cy="16" r="9" fill={color} opacity="0.9" stroke={color} strokeWidth="1" />
-      <circle cx="12" cy="15" r="1.5" fill="#1a1510" />
-      <circle cx="20" cy="15" r="1.5" fill="#1a1510" />
-      <path d="M14 21c1.5 0.5 2.5 0.5 4 0" stroke="#1a1510" strokeWidth="1" fill="none" />
-      <path d="M16 10v3M13 12h6" stroke="#1a1510" strokeWidth="1" />
+      <circle cx="12" cy="15" r="1.5" fill="var(--lgd-black-card)" />
+      <circle cx="20" cy="15" r="1.5" fill="var(--lgd-black-card)" />
+      <path d="M14 21c1.5 0.5 2.5 0.5 4 0" stroke="var(--lgd-black-card)" strokeWidth="1" fill="none" />
+      <path d="M16 10v3M13 12h6" stroke="var(--lgd-black-card)" strokeWidth="1" />
     </svg>
   );
 }
@@ -127,7 +127,7 @@ export function LanternIcon({ size = 24, color = "#a78bfa", className = "" }) {
         fill={color}
         opacity="0.95"
       />
-      <path d="M12 14v8M9 16h6M8 22h8" stroke="#1a1510" strokeWidth="0.8" fill="none" opacity="0.6" />
+      <path d="M12 14v8M9 16h6M8 22h8" stroke="var(--lgd-black-card)" strokeWidth="0.8" fill="none" opacity="0.6" />
       <rect x="10" y="24" width="4" height="4" rx="1" fill={color} opacity="0.8" />
     </svg>
   );
@@ -193,7 +193,7 @@ export function FestivalStrip({ iconSize = 28, className = "" }) {
         gap: "0.25rem 0.75rem",
         padding: "0.5rem 1rem",
         background: "linear-gradient(90deg, rgba(20,20,20,0.95) 0%, rgba(26,10,20,0.98) 50%, rgba(20,20,20,0.95) 100%)",
-        borderTop: "2px solid rgba(139,92,246,0.4)",
+        borderTop: "2px solid var(--lgd-purple-glow)",
         borderBottom: "2px solid rgba(232,121,160,0.35)",
         minHeight: 48,
       }}

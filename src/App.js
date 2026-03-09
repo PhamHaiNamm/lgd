@@ -6,6 +6,7 @@ import Login from './Login';
 import PerformanceServices from './PerformanceServices';
 import MediaUploadPage from './MediaUploadPage';
 import ContactPage from './ContactPage';
+import SchedulePage from './SchedulePage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/introduction" element={<Introduction />} />
         <Route path="/login" element={<Login />} />
         <Route path="/performance-services" element={<PerformanceServices />} />
+        <Route path="/schedule" element={<SchedulePage />} />
         <Route path="/blog" element={<MediaUploadPage />} />
         <Route path="/contact" element={<ContactPage />} />
       </Routes>

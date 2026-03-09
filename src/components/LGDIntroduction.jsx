@@ -101,7 +101,7 @@ export default function LucGiaDuongIntroSection() {
   };
 
   return (
-    <section className="w-full py-12 px-4 md:px-10 lg:px-20" style={{ background: "linear-gradient(180deg,#0a0a0a 0%,#141414 50%,#0a0a0a 100%)", color: "#faf8f5" }}>
+    <section className="w-full py-12 px-4 md:px-10 lg:px-20" style={{ background: "linear-gradient(180deg,var(--lgd-black) 0%,var(--lgd-black-soft) 50%,var(--lgd-black) 100%)", color: "var(--lgd-text)" }}>
       <div className="grid md:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
 
         <div>

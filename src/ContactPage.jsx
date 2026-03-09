@@ -11,11 +11,11 @@ const CONTACT = {
 
 function ContactPage() {
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--lgd-black)' }}>
       <Header />
       <section className="container my-5 lgd-section lgd-pattern-bg">
         <FestivalStrip iconSize={22} />
-        <h2 className="text-center mb-4 fw-bold" style={{ color: '#a78bfa', textShadow: '0 0 16px rgba(139,92,246,0.4)' }}>
+        <h2 className="text-center mb-4 fw-bold" style={{ color: '#a78bfa', textShadow: '0 0 16px var(--lgd-purple-glow)' }}>
           <DecorativeTitle showIcons={true}>Liên hệ / Đặt lịch</DecorativeTitle>
         </h2>
         <p className="text-center text-secondary mb-4 mx-auto" style={{ maxWidth: '560px' }}>
@@ -25,9 +25,9 @@ function ContactPage() {
           className="rounded overflow-hidden d-flex flex-column flex-md-row mx-auto align-items-stretch"
           style={{
             maxWidth: '900px',
-            background: 'linear-gradient(180deg, #1a1510 0%, #141414 100%)',
-            border: '2px solid rgba(139,92,246,0.4)',
-            color: '#faf8f5',
+            background: 'linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black-soft) 100%)',
+            border: '2px solid var(--lgd-purple-glow)',
+            color: 'var(--lgd-text)',
             minHeight: '320px',
           }}
         >
@@ -46,7 +46,7 @@ function ContactPage() {
             </div>
             <div className="mb-4">
               <label className="d-block small text-uppercase mb-1" style={{ color: '#a78bfa' }}>Số điện thoại</label>
-              <a href={`tel:${CONTACT.phone.replace(/\s/g, '')}`} className="text-decoration-none fw-bold" style={{ color: '#faf8f5', fontSize: '1.15rem' }}>
+              <a href={`tel:${CONTACT.phone.replace(/\s/g, '')}`} className="text-decoration-none fw-bold" style={{ color: 'var(--lgd-text)', fontSize: '1.15rem' }}>
                 {CONTACT.phone}
               </a>
             </div>

@@ -111,7 +111,7 @@ export default function MediaUploadPage() {
     };
 
     return (
-        <div style={{ minHeight: "100vh", background: "#0a0a0a" }}>
+        <div style={{ minHeight: "100vh", background: "var(--lgd-black)" }}>
             <Header />
             <div className="media-upload-section">
                 <div className="container">

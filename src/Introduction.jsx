@@ -17,7 +17,7 @@ const MEMBERS = [
   { id: 'nguyen-duc-huy', name: 'Nguyễn Đức Huy', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
   { id: 'nguyen-bao-long', name: 'Nguyễn Bảo Long', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
   { id: 'ho-nam', name: 'Hồ Nam', role: 'Đang cập nhật', birthYear: '2006', avatarUrl: '/images/Logo_full.png' },
-  { id: 'nguyen-thi-tam', name: 'Nguyễn Thị Tâm', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
+  { id: 'nguyen-thi-tam', name: 'Nguyễn Thị Tâm', role: 'Truyền Thông', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
   { id: 'nguyen-danh-duc', name: 'Nguyễn Danh Đức', role: 'Đang cập nhật', birthYear: '2012', avatarUrl: '/images/Logo_full.png' },
   { id: 'bao-nguyen', name: 'Bảo Nguyên', role: 'Đang cập nhật', birthYear: '2012', avatarUrl: '/images/Logo_full.png' },
   { id: 'ngo-trung-hieu-lo-voi', name: 'Ngô Trung Hiếu (Lò Voi)', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
@@ -71,23 +71,23 @@ function Introduction() {
   }, [selectedMemberId]);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--lgd-black)' }}>
       <Header />
       <Banner />
 
       {/* Giới thiệu chung về đoàn */}
       <section className="container my-5 lgd-section lgd-pattern-bg">
         <FestivalStrip iconSize={22} />
-        <h2 className="text-center mb-4 fw-bold" style={{ color: '#a78bfa', textShadow: '0 0 16px rgba(139,92,246,0.4)' }}>
+        <h2 className="text-center mb-4 fw-bold" style={{ color: '#a78bfa', textShadow: '0 0 16px var(--lgd-purple-glow)' }}>
           <DecorativeTitle showIcons={true}>Giới thiệu về đoàn</DecorativeTitle>
         </h2>
         <div
           className="rounded overflow-hidden d-flex flex-column flex-md-row mx-auto"
           style={{
             maxWidth: '960px',
-            background: 'linear-gradient(180deg, #1a1510 0%, #141414 100%)',
-            border: '2px solid rgba(139,92,246,0.4)',
-            color: '#faf8f5',
+            background: 'linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black-soft) 100%)',
+            border: '2px solid var(--lgd-purple-glow)',
+            color: 'var(--lgd-text)',
           }}
         >
           <div className="flex-shrink-0" style={{ width: '100%', maxWidth: '360px' }}>
@@ -123,16 +123,16 @@ function Introduction() {
       {/* Thành tích nổi bật */}
       <section className="container my-5 lgd-section lgd-pattern-bg">
         <FestivalStrip iconSize={22} />
-        <h2 className="text-center mb-4 fw-bold" style={{ color: '#a78bfa', textShadow: '0 0 16px rgba(139,92,246,0.4)' }}>
+        <h2 className="text-center mb-4 fw-bold" style={{ color: '#a78bfa', textShadow: '0 0 16px var(--lgd-purple-glow)' }}>
           <DecorativeTitle showIcons={true}>Thành tích nổi bật</DecorativeTitle>
         </h2>
         <div
           className="rounded p-4 p-md-5"
           style={{
-            background: 'linear-gradient(180deg, #1a1510 0%, #141414 100%)',
-            border: '2px solid rgba(139,92,246,0.4)',
+            background: 'linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black-soft) 100%)',
+            border: '2px solid var(--lgd-purple-glow)',
             borderLeft: '4px solid #8b5cf6',
-            color: '#faf8f5',
+            color: 'var(--lgd-text)',
           }}
         >
           <ul className="mb-0 ps-3 ps-md-4" style={{ listStyle: 'none', fontSize: '1.05rem', lineHeight: 2 }}>
@@ -147,15 +147,15 @@ function Introduction() {
 
       <section className="container my-5 lgd-section lgd-pattern-bg">
         <FestivalStrip iconSize={22} />
-        <h2 className="text-center mb-4 fw-bold lgd-title-gold" style={{ color: '#a78bfa', textShadow: '0 0 16px rgba(139,92,246,0.4)' }}>
+        <h2 className="text-center mb-4 fw-bold lgd-title-gold" style={{ color: '#a78bfa', textShadow: '0 0 16px var(--lgd-purple-glow)' }}>
           <DecorativeTitle showIcons={true}>Thành viên Lục Gia Đường</DecorativeTitle>
         </h2>
         <div
           className="rounded p-4 p-md-5"
           style={{
-            background: 'linear-gradient(180deg, #1a1510 0%, #141414 100%)',
-            border: '2px solid rgba(139,92,246,0.4)',
-            color: '#faf8f5',
+            background: 'linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black-soft) 100%)',
+            border: '2px solid var(--lgd-purple-glow)',
+            color: 'var(--lgd-text)',
           }}
         >
           <div className="row g-2 g-md-3">
@@ -171,7 +171,7 @@ function Introduction() {
                   style={{
                     background: selectedMemberId === member.id ? 'rgba(139,92,246,0.22)' : 'rgba(139,92,246,0.1)',
                     border: selectedMemberId === member.id ? '1px solid rgba(253,224,71,0.9)' : '1px solid rgba(139,92,246,0.35)',
-                    color: '#faf8f5',
+                    color: 'var(--lgd-text)',
                     fontSize: '0.95rem',
                     cursor: 'pointer',
                     outline: 'none',
@@ -207,7 +207,7 @@ function Introduction() {
                 className="rounded p-4 p-md-5 w-100"
                 style={{
                   maxWidth: 960,
-                  background: 'linear-gradient(180deg, #1a1510 0%, #0f0f14 100%)',
+                  background: 'linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black) 100%)',
                   border: '2px solid rgba(139,92,246,0.55)',
                   boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
                 }}
@@ -224,17 +224,17 @@ function Introduction() {
                         borderRadius: 26,
                         objectFit: 'cover',
                         border: '2px solid rgba(139,92,246,0.7)',
-                        background: '#0a0a0a',
+                        background: 'var(--lgd-black)',
                       }}
                     />
                     <div>
                       <div className="fw-bold" style={{ fontSize: '1.9rem', lineHeight: 1.15, color: '#fde047' }}>
                         {selectedMember.name}
                       </div>
-                      <div style={{ color: '#faf8f5', marginTop: 12, fontSize: '1.2rem' }}>
+                      <div style={{ color: 'var(--lgd-text)', marginTop: 12, fontSize: '1.2rem' }}>
                         <span style={{ color: '#a78bfa', fontWeight: 800 }}>Vị trí:</span> {selectedMember.role || 'Đang cập nhật'}
                       </div>
-                      <div style={{ color: '#faf8f5', marginTop: 8, fontSize: '1.2rem' }}>
+                      <div style={{ color: 'var(--lgd-text)', marginTop: 8, fontSize: '1.2rem' }}>
                         <span style={{ color: '#a78bfa', fontWeight: 800 }}>Năm sinh:</span> {selectedMember.birthYear || 'Đang cập nhật'}
                       </div>
                       <div className="mt-3" style={{ color: 'rgba(250,248,245,0.75)', fontSize: '0.95rem' }}>

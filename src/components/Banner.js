@@ -153,7 +153,7 @@ function Banner() {
                 <LionIcon size={30} color="#a78bfa" />
               </h3>
               {slide.subtitle && (
-                <p style={{ color: '#faf8f5', textShadow: '0 1px 2px #000', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <p style={{ color: 'var(--lgd-text)', textShadow: '0 1px 2px #000', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                   <PeachBlossomIcon size={18} color="#a78bfa" />
                   {slide.subtitle}
                   <LanternIcon size={20} color="#a78bfa" />

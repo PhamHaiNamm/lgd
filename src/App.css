@@ -1,6 +1,6 @@
 .App {
   min-height: 100vh;
-  background-color: var(--lgd-black, #0a0a0a);
+  background-color: var(--lgd-black, var(--lgd-black));
   color: var(--lgd-text, #fafafa);
 }
 
@@ -16,7 +16,7 @@
 }
 
 .App-header {
-  background: linear-gradient(180deg, #0a0a0a 0%, #141414 50%, #0a0a0a 100%);
+  background: linear-gradient(180deg, var(--lgd-black) 0%, var(--lgd-black-soft) 50%, var(--lgd-black) 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;

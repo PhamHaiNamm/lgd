@@ -1,8 +1,8 @@
 /* Thư viện media – phong cách Lân Sư Rồng (đỏ vàng đen) */
 .media-upload-section {
   min-height: 60vh;
-  background: linear-gradient(180deg, #0a0a0a 0%, #141414 50%, #0a0a0a 100%);
-  color: #faf8f5;
+  background: linear-gradient(180deg, var(--lgd-black) 0%, var(--lgd-black-soft) 50%, var(--lgd-black) 100%);
+  color: var(--lgd-text);
   padding: 4rem 1rem;
 }
 
@@ -14,7 +14,7 @@
 }
 
 .upload-card {
-  background: linear-gradient(180deg, #1a1510 0%, #141414 100%);
+  background: linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black-soft) 100%);
   border: 2px solid rgba(212, 160, 18, 0.4);
   border-radius: 1rem;
   margin-bottom: 3rem;
@@ -34,7 +34,7 @@
 }
 
 .media-item-card {
-  background: linear-gradient(180deg, #1a1510 0%, #141414 100%);
+  background: linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black-soft) 100%);
   border: 2px solid rgba(212, 160, 18, 0.35);
   border-radius: 1rem;
   overflow: hidden;

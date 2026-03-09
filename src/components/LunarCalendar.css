@@ -1,0 +1,131 @@
+.lunar-calendar {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: inherit;
+    /* inherit from body */
+    border: 1px solid var(--lgd-gray-border);
+    background-color: var(--lgd-black-card);
+    color: var(--lgd-text);
+}
+
+.lunar-calendar-topbar {
+    background-color: var(--lgd-gray);
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--lgd-gray-border);
+    color: var(--lgd-text);
+}
+
+.lunar-calendar-header {
+    background-color: var(--lgd-purple-dark);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    font-weight: bold;
+}
+
+.lunar-nav-btn {
+    background: transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 0 10px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.lunar-nav-btn:hover {
+    color: var(--lgd-accent-light);
+}
+
+.lunar-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border-left: 1px solid var(--lgd-gray-border);
+}
+
+.lunar-weekday {
+    background-color: var(--lgd-purple);
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    padding: 10px 0;
+    border-right: 1px solid var(--lgd-gray-border);
+    font-size: 14px;
+}
+
+.lunar-cell {
+    border-right: 1px solid var(--lgd-gray-border);
+    border-bottom: 1px solid var(--lgd-gray-border);
+    aspect-ratio: 1;
+    min-height: 80px;
+    position: relative;
+    cursor: pointer;
+    background-color: var(--lgd-black-card);
+    transition: background-color 0.2s;
+}
+
+.lunar-cell:hover:not(.empty) {
+    background-color: var(--lgd-gray);
+}
+
+.lunar-cell.empty {
+    background-color: var(--lgd-black-soft);
+    cursor: default;
+}
+
+.lunar-cell.selected {
+    background-color: var(--lgd-purple-dark) !important;
+}
+
+.lunar-cell.has-events {
+    background-color: rgba(139, 92, 246, 0.15);
+    /* light purple tint */
+}
+
+/* Event indicator dot */
+.lunar-cell.has-events::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    background-color: var(--lgd-accent-bright);
+    border-radius: 50%;
+    box-shadow: 0 0 5px var(--lgd-purple-glow);
+}
+
+.solar-date {
+    position: absolute;
+    top: 5px;
+    left: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    color: var(--lgd-text);
+}
+
+.solar-date.sunday {
+    color: #ff6b6b;
+    /* Soft red for weekend to stand out on dark */
+}
+
+.solar-date.saturday {
+    color: #4dabf7;
+    /* Soft blue */
+}
+
+.lunar-date {
+    position: absolute;
+    top: 25px;
+    right: 8px;
+    font-size: 12px;
+    color: var(--lgd-text-muted);
+}

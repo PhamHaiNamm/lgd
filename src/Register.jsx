@@ -20,7 +20,7 @@ export default function Register() {
     };
 
     return (
-        <div style={{ minHeight: "100vh", background: "#0a0a0a" }}>
+        <div style={{ minHeight: "100vh", background: "var(--lgd-black)" }}>
             <Header />
             <div className="container my-5">
                 <div className="row justify-content-center">
@@ -28,14 +28,14 @@ export default function Register() {
                         <div
                             className="card shadow"
 style={{
-                                                backgroundColor: "#1a1510",
-                                                border: "2px solid rgba(139,92,246,0.4)",
+                                                backgroundColor: "var(--lgd-black-card)",
+                                                border: "2px solid var(--lgd-purple-glow)",
                                             }}
                         >
                             <div className="card-body p-4">
                                 <h2
                                     className="text-center mb-4 lgd-title-gold"
-                                    style={{ color: "#a78bfa", textShadow: "0 0 12px rgba(139,92,246,0.4)" }}
+                                    style={{ color: "#a78bfa", textShadow: "0 0 12px var(--lgd-purple-glow)" }}
                                 >
                                     Đăng ký tài khoản
                                 </h2>

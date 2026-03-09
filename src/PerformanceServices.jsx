@@ -126,7 +126,7 @@ export default function PerformanceServices() {
     };
 
     return (
-        <div style={{ minHeight: "100vh", background: "#0a0a0a" }}>
+        <div style={{ minHeight: "100vh", background: "var(--lgd-black)" }}>
             <Header />
             <section className="performance-section">
             <Container>

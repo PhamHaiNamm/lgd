@@ -1,4 +1,3 @@
-/* ===== LỤC GIA ĐƯỜNG – TONE TÍM ĐEN ===== */
 :root {
   --lgd-black: #0a0a0a;
   --lgd-black-soft: #141414;
@@ -16,6 +15,50 @@
   --lgd-accent-dark: #6d28d9;
   --lgd-text: #faf8f5;
   --lgd-text-muted: #a89f94;
+}
+
+[data-theme="light"] {
+  --lgd-black: #f5f3ff;
+  /* Very soft purple/light bg */
+  --lgd-black-soft: #ede9fe;
+  --lgd-black-card: #ffffff;
+  --lgd-gray: #ddd6fe;
+  --lgd-gray-border: #c4b5fd;
+  --lgd-text: #171717;
+  --lgd-text-muted: #525252;
+  --lgd-purple-dark: #7c3aed;
+}
+
+/* Base Bootstrap theme overrides for light/dark mode */
+.text-white,
+.text-light {
+  color: var(--lgd-text) !important;
+}
+
+.bg-dark {
+  background-color: var(--lgd-black) !important;
+}
+
+.bg-black {
+  background-color: var(--lgd-black-soft) !important;
+}
+
+.text-white-50 {
+  color: var(--lgd-text-muted) !important;
+}
+
+[data-theme="light"] .lgd-logo {
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+  background: var(--lgd-purple-dark);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+[data-theme="light"] .btn-close-white,
+[data-theme="light"] .navbar-toggler-icon,
+[data-theme="light"] .carousel-control-prev-icon,
+[data-theme="light"] .carousel-control-next-icon {
+  filter: invert(1);
 }
 
 * {
@@ -45,6 +88,7 @@ code {
 a {
   color: var(--lgd-accent-light);
 }
+
 a:hover {
   color: var(--lgd-accent-bright);
 }
@@ -56,27 +100,32 @@ a:hover {
   color: #fff !important;
   font-weight: 600;
 }
+
 .btn-primary:hover,
 .btn-danger:hover {
   background: linear-gradient(180deg, var(--lgd-purple-bright) 0%, var(--lgd-purple-light) 100%) !important;
   border-color: var(--lgd-accent) !important;
   box-shadow: 0 0 16px var(--lgd-purple-glow);
 }
+
 .btn-outline-light:hover {
   background-color: var(--lgd-purple-light) !important;
   border-color: var(--lgd-accent) !important;
   color: #fff !important;
   box-shadow: 0 0 12px var(--lgd-purple-glow);
 }
+
 .btn-outline-secondary {
   border-color: var(--lgd-gray-border);
   color: var(--lgd-text-muted);
 }
+
 .btn-outline-secondary:hover {
   border-color: var(--lgd-accent);
   color: var(--lgd-accent-bright);
   background-color: transparent;
 }
+
 .btn-outline-danger:hover {
   background: linear-gradient(180deg, var(--lgd-purple-light) 0%, var(--lgd-purple-dark) 100%) !important;
   border-color: var(--lgd-accent) !important;
@@ -89,11 +138,13 @@ a:hover {
   border: 1px solid var(--lgd-gray-border) !important;
   color: var(--lgd-text) !important;
 }
+
 .form-control:focus,
 .form-select:focus {
   border-color: var(--lgd-accent) !important;
   box-shadow: 0 0 0 2px var(--lgd-purple-glow) !important;
 }
+
 .form-control::placeholder {
   color: var(--lgd-text-muted);
 }
@@ -104,9 +155,11 @@ a:hover {
   color: var(--lgd-text);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
+
 .card-title {
   color: var(--lgd-text);
 }
+
 .card-text,
 .text-muted {
   color: var(--lgd-text-muted) !important;
@@ -115,12 +168,15 @@ a:hover {
 .bg-dark {
   background-color: var(--lgd-black) !important;
 }
+
 .text-warning {
   color: var(--lgd-accent) !important;
 }
+
 .border-secondary {
   border-color: var(--lgd-gray-border) !important;
 }
+
 .badge.bg-warning {
   background: linear-gradient(180deg, var(--lgd-purple-light) 0%, var(--lgd-purple-dark) 100%) !important;
   color: #fff !important;
@@ -130,6 +186,7 @@ a:hover {
 .navbar-toggler {
   border-color: var(--lgd-purple-dark);
 }
+
 .navbar-toggler-icon {
   filter: invert(1);
 }
@@ -139,13 +196,16 @@ a:hover {
   border: 1px solid var(--lgd-purple-dark);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
+
 .dropdown-item {
   color: var(--lgd-text);
 }
+
 .dropdown-item:hover {
   background-color: rgba(139, 92, 246, 0.15);
   color: var(--lgd-accent-bright);
 }
+
 .dropdown-item.text-danger {
   color: var(--lgd-purple-bright) !important;
 }
@@ -153,6 +213,7 @@ a:hover {
 .carousel {
   background-color: var(--lgd-black);
 }
+
 .carousel-caption {
   color: var(--lgd-text);
 }
@@ -162,11 +223,13 @@ a:hover {
   color: var(--lgd-text);
   padding: 3rem 1rem;
 }
+
 .lgd-section h2,
 .lgd-section .display-4,
 .lgd-section .fw-bold {
   color: var(--lgd-text);
 }
+
 .lgd-section .text-secondary {
   color: var(--lgd-text-muted) !important;
 }
@@ -175,6 +238,7 @@ a:hover {
   border: 2px solid var(--lgd-purple-dark);
   box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.2);
 }
+
 .lgd-title-gold {
   color: var(--lgd-accent-light) !important;
   text-shadow: 0 0 20px var(--lgd-purple-glow);
