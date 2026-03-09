@@ -21,7 +21,7 @@ const MEMBERS = [
   { id: 'nguyen-thi-tam', name: 'Nguyễn Thị Tâm', role: 'Truyền Thông', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
   { id: 'nguyen-danh-duc', name: 'Nguyễn Danh Đức', role: 'Đang cập nhật', birthYear: '2012', avatarUrl: '/images/Logo_full.png' },
   { id: 'bao-nguyen', name: 'Bảo Nguyên', role: 'Đang cập nhật', birthYear: '2012', avatarUrl: '/images/Logo_full.png' },
-  { id: 'ngo-trung-hieu-lo-voi', name: 'Ngô Trung Hiếu (Lò Voi)', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
+  { id: 'ngo-trung-hieu-lo-voi', name: 'Ngô Trung Hiếu (Lò Voi)', role: 'Đuôi Lân', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
   { id: 'du-giang-son', name: 'Đụ Giang Sơn', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
   { id: 'tien-manh', name: 'Tiến Mạnh', role: 'Đang cập nhật', birthYear: 'Đang cập nhật', avatarUrl: '/images/Logo_full.png' },
   { id: 'xuan-hieu', name: 'Xuân Hiếu', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
