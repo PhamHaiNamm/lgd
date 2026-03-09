@@ -5,8 +5,8 @@ import Banner from './components/Banner';
 import { DecorativeTitle, FestivalStrip } from './components/Decorations';
 
 const MEMBERS = [
-  'Phạm Hải Nam',
   'Hồ Ngọc Thảo',
+  'Phạm Hải Nam',
   'Hạ Gia Minh',
   'Lê Minh Hiếu',
   'Lê Anh Tuấn',
