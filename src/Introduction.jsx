@@ -1,38 +1,75 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Banner from './components/Banner';
 import { DecorativeTitle, FestivalStrip } from './components/Decorations';
 
+const MEMBER_AVATAR_DIR = '/images/thành_viên';
+const DEFAULT_AVATAR = '/images/Logo_full.png';
+const AVATAR_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
+
 const MEMBERS = [
-  'Hồ Ngọc Thảo',
-  'Phạm Hải Nam',
-  'Hạ Gia Minh',
-  'Lê Minh Hiếu',
-  'Lê Anh Tuấn',
-  'Nguyễn Đức Huy',
-  'Nguyễn Bảo Long',
-  'Hồ Nam',
-  'Nguyễn Thị Tâm',
-  'Nguyễn Danh Đức',
-  'Bảo Nguyên',
-  'Ngô Trung Hiếu (Lò Voi)',
-  'Đụ Giang Sơn',
-  'Tiến Mạnh',
-  'Xuân Hiếu',
-  'Ngô Quân',
-  'Trần Dũng',
-  'Trần Duy Mạnh',
-  'Trần Gia Hưng',
-  'Đào Quốc Trưởng',
-  'Phạm Gia Huy',
-  'Nguyễn Huy',
-  'Nguyễn Tiến Dũng',
-  'Phạm Tài',
+  { id: 'ho-ngoc-thao', name: 'Hồ Ngọc Thảo', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
+  { id: 'pham-hai-nam', name: 'Phạm Hải Nam', role: 'Đang cập nhật', birthYear: '2004', avatarUrl: '/images/Logo_full.png' },
+  { id: 'ha-gia-minh', name: 'Hạ Gia Minh', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
+  { id: 'le-minh-hieu', name: 'Lê Minh Hiếu', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
+  { id: 'le-anh-tuan', name: 'Lê Anh Tuấn', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
+  { id: 'nguyen-duc-huy', name: 'Nguyễn Đức Huy', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
+  { id: 'nguyen-bao-long', name: 'Nguyễn Bảo Long', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
+  { id: 'ho-nam', name: 'Hồ Nam', role: 'Đang cập nhật', birthYear: '2006', avatarUrl: '/images/Logo_full.png' },
+  { id: 'nguyen-thi-tam', name: 'Nguyễn Thị Tâm', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
+  { id: 'nguyen-danh-duc', name: 'Nguyễn Danh Đức', role: 'Đang cập nhật', birthYear: '2012', avatarUrl: '/images/Logo_full.png' },
+  { id: 'bao-nguyen', name: 'Bảo Nguyên', role: 'Đang cập nhật', birthYear: '2012', avatarUrl: '/images/Logo_full.png' },
+  { id: 'ngo-trung-hieu-lo-voi', name: 'Ngô Trung Hiếu (Lò Voi)', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
+  { id: 'du-giang-son', name: 'Đụ Giang Sơn', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
+  { id: 'tien-manh', name: 'Tiến Mạnh', role: 'Đang cập nhật', birthYear: 'Đang cập nhật', avatarUrl: '/images/Logo_full.png' },
+  { id: 'xuan-hieu', name: 'Xuân Hiếu', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
+  { id: 'ngo-quan', name: 'Ngô Quân', role: 'Đang cập nhật', birthYear: '2012', avatarUrl: '/images/Logo_full.png' },
+  { id: 'tran-dung', name: 'Trần Dũng', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
+  { id: 'tran-duy-manh', name: 'Trần Duy Mạnh', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
+  { id: 'tran-gia-hung', name: 'Trần Gia Hưng', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
+  { id: 'dao-quoc-truong', name: 'Đào Quốc Trưởng', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
+  { id: 'pham-gia-huy', name: 'Phạm Gia Huy', role: 'Đang cập nhật', birthYear: 'Đang cập nhật', avatarUrl: '/images/Logo_full.png' },
+  { id: 'nguyen-huy', name: 'Nguyễn Huy', role: 'Đang cập nhật', birthYear: 'Đang cập nhật', avatarUrl: '/images/Logo_full.png' },
+  { id: 'nguyen-tien-dung', name: 'Nguyễn Tiến Dũng', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
+  { id: 'pham-tai', name: 'Phạm Tài', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
   
 ];
 
 function Introduction() {
+  const [selectedMemberId, setSelectedMemberId] = useState(null);
+  const [avatarAttempt, setAvatarAttempt] = useState(0);
+  const selectedMember = useMemo(
+    () => MEMBERS.find((m) => m.id === selectedMemberId) || null,
+    [selectedMemberId]
+  );
+
+  const avatarCandidates = useMemo(() => {
+    if (!selectedMember) return [];
+    const base = `${MEMBER_AVATAR_DIR}/${selectedMember.id}`;
+    const candidates = AVATAR_EXTS.map((ext) => `${base}.${ext}`);
+    candidates.push(selectedMember.avatarUrl || DEFAULT_AVATAR);
+    candidates.push(DEFAULT_AVATAR);
+    return candidates;
+  }, [selectedMember]);
+
+  useEffect(() => {
+    if (!selectedMemberId) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    setAvatarAttempt(0);
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedMemberId(null);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [selectedMemberId]);
+
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
       <Header />
@@ -122,22 +159,107 @@ function Introduction() {
           }}
         >
           <div className="row g-2 g-md-3">
-            {MEMBERS.map((name, index) => (
-              <div key={index} className="col-6 col-sm-4 col-md-3 col-lg-2">
-                <div
-                  className="rounded text-center py-2 px-2"
+            {MEMBERS.map((member) => (
+              <div key={member.id} className="col-6 col-sm-4 col-md-3 col-lg-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setSelectedMemberId((prev) => (prev === member.id ? null : member.id))
+                  }
+                  aria-pressed={selectedMemberId === member.id}
+                  className="w-100 rounded text-center py-2 px-2"
                   style={{
-                    background: 'rgba(139,92,246,0.1)',
-                    border: '1px solid rgba(139,92,246,0.3)',
+                    background: selectedMemberId === member.id ? 'rgba(139,92,246,0.22)' : 'rgba(139,92,246,0.1)',
+                    border: selectedMemberId === member.id ? '1px solid rgba(253,224,71,0.9)' : '1px solid rgba(139,92,246,0.35)',
                     color: '#faf8f5',
                     fontSize: '0.95rem',
+                    cursor: 'pointer',
+                    outline: 'none',
                   }}
                 >
-                  {name}
-                </div>
+                  {member.name}
+                </button>
               </div>
             ))}
           </div>
+
+          {selectedMember && (
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={`Thông tin thành viên ${selectedMember.name}`}
+              onMouseDown={(e) => {
+                if (e.target === e.currentTarget) setSelectedMemberId(null);
+              }}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.78)',
+                backdropFilter: 'blur(6px)',
+                zIndex: 9999,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '24px',
+              }}
+            >
+              <div
+                className="rounded p-4 p-md-5 w-100"
+                style={{
+                  maxWidth: 960,
+                  background: 'linear-gradient(180deg, #1a1510 0%, #0f0f14 100%)',
+                  border: '2px solid rgba(139,92,246,0.55)',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
+                }}
+              >
+                <div className="d-flex align-items-start justify-content-between gap-3 flex-wrap">
+                  <div className="d-flex align-items-center gap-4 gap-md-5 flex-wrap">
+                    <img
+                      src={avatarCandidates[Math.min(avatarAttempt, Math.max(0, avatarCandidates.length - 1))]}
+                      alt={selectedMember.name}
+                      width={240}
+                      height={240}
+                      onError={() => setAvatarAttempt((v) => v + 1)}
+                      style={{
+                        borderRadius: 26,
+                        objectFit: 'cover',
+                        border: '2px solid rgba(139,92,246,0.7)',
+                        background: '#0a0a0a',
+                      }}
+                    />
+                    <div>
+                      <div className="fw-bold" style={{ fontSize: '1.9rem', lineHeight: 1.15, color: '#fde047' }}>
+                        {selectedMember.name}
+                      </div>
+                      <div style={{ color: '#faf8f5', marginTop: 12, fontSize: '1.2rem' }}>
+                        <span style={{ color: '#a78bfa', fontWeight: 800 }}>Vị trí:</span> {selectedMember.role || 'Đang cập nhật'}
+                      </div>
+                      <div style={{ color: '#faf8f5', marginTop: 8, fontSize: '1.2rem' }}>
+                        <span style={{ color: '#a78bfa', fontWeight: 800 }}>Năm sinh:</span> {selectedMember.birthYear || 'Đang cập nhật'}
+                      </div>
+                      <div className="mt-3" style={{ color: 'rgba(250,248,245,0.75)', fontSize: '0.95rem' }}>
+                        Nhấn <strong>Esc</strong> hoặc bấm ra ngoài để đóng.
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedMemberId(null)}
+                    className="btn btn-outline-light"
+                    style={{
+                      borderColor: 'rgba(139,92,246,0.75)',
+                      padding: '10px 16px',
+                      fontWeight: 800,
+                    }}
+                    aria-label="Đóng"
+                  >
+                    Đóng
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
