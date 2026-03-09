@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Modal } from "react-bootstrap";
 import { storage, auth, db } from "./firebase";
 import { ref, uploadBytes, getDownloadURL, listAll } from "firebase/storage";
 import { onAuthStateChanged } from "firebase/auth";
@@ -49,6 +50,7 @@ export default function MediaUploadPage() {
     const [loadingGallery, setLoadingGallery] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [user, setUser] = useState(null);
+    const [selectedMedia, setSelectedMedia] = useState(null);
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (u) => setUser(u));
@@ -146,18 +148,58 @@ export default function MediaUploadPage() {
                     {loadingGallery ? (
                         <p style={{ color: "#a3a3a3" }}>Đang tải...</p>
                     ) : (
-                        <div className="d-flex flex-wrap gap-3 mt-3">
+                        <div className="media-gallery-container mt-3">
                             {mediaFiles.map((item, i) => (
-                                <div key={i} style={{ width: 200 }}>
+                                <div
+                                    key={i}
+                                    className="media-gallery-item"
+                                    onClick={() => setSelectedMedia(item)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     {item.type === "image" ? (
-                                        <img src={item.url} width={200} height={200} alt="" />
+                                        <img src={item.url} alt="" />
                                     ) : (
-                                        <video src={item.url} width={200} height={200} controls />
+                                        <video src={item.url} />
                                     )}
                                 </div>
                             ))}
                         </div>
                     )}
+
+                    {/* Lightbox Modal */}
+                    <Modal
+                        show={!!selectedMedia}
+                        onHide={() => setSelectedMedia(null)}
+                        centered
+                        size="xl"
+                        contentClassName="bg-transparent border-0"
+                    >
+                        <Modal.Body className="p-0 position-relative">
+                            <button
+                                onClick={() => setSelectedMedia(null)}
+                                className="btn-close btn-close-white position-absolute top-0 end-0 m-3 shadow"
+                                style={{ zIndex: 1051 }}
+                            ></button>
+                            {selectedMedia && (
+                                <div className="text-center">
+                                    {selectedMedia.type === "image" ? (
+                                        <img
+                                            src={selectedMedia.url}
+                                            alt="Full size"
+                                            style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain' }}
+                                        />
+                                    ) : (
+                                        <video
+                                            src={selectedMedia.url}
+                                            controls
+                                            autoPlay
+                                            style={{ maxWidth: '100%', maxHeight: '90vh' }}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </Modal.Body>
+                    </Modal>
 
                     <h3 style={{ color: "#a78bfa", marginTop: 40 }}>Thành viên</h3>
 
