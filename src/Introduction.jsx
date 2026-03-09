@@ -17,7 +17,7 @@ const MEMBERS = [
   { id: 'le-minh-hieu', name: 'Lê Minh Hiếu', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
   { id: 'le-anh-tuan', name: 'Lê Anh Tuấn', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
   { id: 'nguyen-duc-huy', name: 'Nguyễn Đức Huy', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
-  { id: 'nguyen-bao-long', name: 'Nguyễn Bảo Long', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
+  { id: 'nguyen-bao-long', name: 'Nguyễn Bảo Long', role: 'Đuôi Lân', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
   { id: 'ho-nam', name: 'Hồ Nam', role: 'Đang cập nhật', birthYear: '2006', avatarUrl: '/images/Logo_full.png' },
   { id: 'nguyen-thi-tam', name: 'Nguyễn Thị Tâm', role: 'Truyền Thông', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
   { id: 'nguyen-danh-duc', name: 'Nguyễn Danh Đức', role: 'Đang cập nhật', birthYear: '2012', avatarUrl: '/images/Logo_full.png' },
