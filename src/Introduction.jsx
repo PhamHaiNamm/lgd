@@ -1,4 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Form, Button } from 'react-bootstrap';
+import { auth, db, storage } from './firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ADMIN_EMAILS } from './config';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Banner from './components/Banner';
@@ -41,9 +47,66 @@ const MEMBERS = [
 function Introduction() {
   const [selectedMemberId, setSelectedMemberId] = useState(null);
   const [avatarAttempt, setAvatarAttempt] = useState(0);
+
+  const [user, setUser] = useState(null);
+  const [isAdminMode, setIsAdminMode] = useState(false);
+  const [membersData, setMembersData] = useState(MEMBERS);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
+    return () => unsub();
+  }, []);
+
+  const isAdminUser = user && ADMIN_EMAILS.includes(user.email);
+
+  useEffect(() => {
+    let cancelled = false;
+    getDoc(doc(db, "config", "team_members"))
+      .then((snap) => {
+        if (cancelled) return;
+        if (snap.exists() && Array.isArray(snap.data().members)) {
+          setMembersData(snap.data().members);
+        }
+      })
+      .catch((err) => console.error("Lỗi tải thông tin thành viên:", err));
+    return () => { cancelled = true; };
+  }, []);
+
+  const saveToFirestore = async (newMembers) => {
+    try {
+      await setDoc(doc(db, "config", "team_members"), { members: newMembers });
+    } catch (err) {
+      alert("Lỗi khi lưu DB: " + err.message);
+    }
+  };
+
+  const handleMemberChange = (id, field, value) => {
+    setMembersData((prev) => prev.map((m) => (m.id === id ? { ...m, [field]: value } : m)));
+  };
+
+  const handleAvatarUpload = async (id, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const storageRef = ref(storage, `team_avatars/${id}-${Date.now()}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      setMembersData((prev) => {
+        const next = prev.map((m) => (m.id === id ? { ...m, avatarUrl: url } : m));
+        saveToFirestore(next);
+        return next;
+      });
+    } catch (err) {
+      alert("Lỗi upload ảnh: " + err.message);
+    }
+    setUploadingAvatar(false);
+  };
+
   const selectedMember = useMemo(
-    () => MEMBERS.find((m) => m.id === selectedMemberId) || null,
-    [selectedMemberId]
+    () => membersData.find((m) => m.id === selectedMemberId) || null,
+    [selectedMemberId, membersData]
   );
 
   const avatarCandidates = useMemo(() => {
@@ -102,9 +165,9 @@ function Introduction() {
           </div>
           <div className="p-4 p-md-5 flex-grow-1" style={{ lineHeight: 1.8, fontSize: '1.05rem' }}>
             <p className="mb-3">
-              <strong style={{ color: '#a78bfa' }}>Tiền thân của Lục Gia Đường</strong> là đội Kì Lân Khu 6, được hình thành từ những người đam mê nghệ thuật Lân – Sư – Rồng tại địa phương.
+              <strong style={{ color: 'var(--lgd-purple)' }}>Tiền thân của Lục Gia Đường</strong> là đội Kì Lân Khu 6, được hình thành từ những người đam mê nghệ thuật Lân – Sư – Rồng tại địa phương.
               Từ một đội biểu diễn mang tính cộng đồng, qua thời gian tập luyện và phát triển, đội đã mở rộng quy mô và chính thức phát triển thành
-              <strong style={{ color: '#a78bfa' }}> đoàn Lân – Sư – Rồng Lục Gia Đường</strong> như ngày nay.
+              <strong style={{ color: 'var(--lgd-purple)' }}> đoàn Lân – Sư – Rồng Lục Gia Đường</strong> như ngày nay.
             </p>
 
             <p className="mb-3">
@@ -113,7 +176,7 @@ function Introduction() {
             </p>
 
             <p className="mb-0">
-              <strong style={{ color: '#a78bfa' }}>Lục Gia Đường</strong> hiện là một đoàn Lân – Sư – Rồng chuyên nghiệp, chuyên biểu diễn phục vụ
+              <strong style={{ color: 'var(--lgd-purple)' }}>Lục Gia Đường</strong> hiện là một đoàn Lân – Sư – Rồng chuyên nghiệp, chuyên biểu diễn phục vụ
               lễ hội, khai trương, khánh thành và nhiều sự kiện khác. Chúng tôi mang đến các tiết mục
               <strong> Múa Lân, Múa Sư Tử, Múa Rồng</strong> đa dạng từ truyền thống đến hiện đại, cùng trang phục và phụ kiện chất lượng,
               phù hợp với nhiều quy mô sự kiện trong và ngoài địa bàn.
@@ -152,6 +215,30 @@ function Introduction() {
         <h2 className="text-center mb-4 fw-bold lgd-title-gold" style={{ color: '#a78bfa', textShadow: '0 0 16px var(--lgd-purple-glow)' }}>
           <DecorativeTitle showIcons={true}>Thành viên Lục Gia Đường</DecorativeTitle>
         </h2>
+
+        {isAdminUser && (
+          <div className="text-center mb-4">
+            <Button
+              variant={isAdminMode ? "outline-primary" : "primary"}
+              onClick={() => setIsAdminMode(!isAdminMode)}
+            >
+              {isAdminMode ? "Tắt chế độ Edit" : "Bật chế độ Edit"}
+            </Button>
+            {isAdminMode && (
+              <Button
+                variant="success"
+                className="ms-3"
+                onClick={() => {
+                  saveToFirestore(membersData);
+                  alert("Đã lưu thông tin tất cả thành viên!");
+                }}
+              >
+                Lưu tất cả thay đổi
+              </Button>
+            )}
+          </div>
+        )}
+
         <div
           className="rounded p-4 p-md-5"
           style={{
@@ -161,7 +248,7 @@ function Introduction() {
           }}
         >
           <div className="row g-2 g-md-3">
-            {MEMBERS.map((member) => (
+            {membersData.map((member) => (
               <div key={member.id} className="col-6 col-sm-4 col-md-3 col-lg-2">
                 <button
                   type="button"
@@ -171,12 +258,14 @@ function Introduction() {
                   aria-pressed={selectedMemberId === member.id}
                   className="w-100 rounded text-center py-2 px-2"
                   style={{
-                    background: selectedMemberId === member.id ? 'rgba(139,92,246,0.22)' : 'rgba(139,92,246,0.1)',
-                    border: selectedMemberId === member.id ? '1px solid rgba(253,224,71,0.9)' : '1px solid rgba(139,92,246,0.35)',
+                    background: selectedMemberId === member.id ? 'var(--lgd-purple-glow)' : 'rgba(139,92,246,0.1)',
+                    border: selectedMemberId === member.id ? '2px solid var(--lgd-purple)' : '1px solid var(--lgd-gray-border)',
                     color: 'var(--lgd-text)',
                     fontSize: '0.95rem',
                     cursor: 'pointer',
                     outline: 'none',
+                    fontWeight: selectedMemberId === member.id ? '700' : 'normal',
+                    transition: 'all 0.2s ease',
                   }}
                 >
                   {member.name}
@@ -229,35 +318,99 @@ function Introduction() {
                         background: 'var(--lgd-black)',
                       }}
                     />
-                    <div>
-                      <div className="fw-bold" style={{ fontSize: '1.9rem', lineHeight: 1.15, color: '#fde047' }}>
-                        {selectedMember.name}
-                      </div>
-                      <div style={{ color: 'var(--lgd-text)', marginTop: 12, fontSize: '1.2rem' }}>
-                        <span style={{ color: '#a78bfa', fontWeight: 800 }}>Vị trí:</span> {selectedMember.role || 'Đang cập nhật'}
-                      </div>
-                      <div style={{ color: 'var(--lgd-text)', marginTop: 8, fontSize: '1.2rem' }}>
-                        <span style={{ color: '#a78bfa', fontWeight: 800 }}>Năm sinh:</span> {selectedMember.birthYear || 'Đang cập nhật'}
-                      </div>
-                      <div className="mt-3" style={{ color: 'rgba(250,248,245,0.75)', fontSize: '0.95rem' }}>
-                        Nhấn <strong>Esc</strong> hoặc bấm ra ngoài để đóng.
-                      </div>
+                    <div style={{ flex: 1, minWidth: '240px' }}>
+                      {isAdminMode && isAdminUser ? (
+                        <>
+                          <Form.Group className="mb-2">
+                            <Form.Label className="small fw-bold" style={{ color: 'var(--lgd-purple)' }}>Tên</Form.Label>
+                            <Form.Control
+                              type="text"
+                              size="sm"
+                              value={selectedMember.name}
+                              onChange={(e) => handleMemberChange(selectedMember.id, "name", e.target.value)}
+                            />
+                          </Form.Group>
+                          <Form.Group className="mb-2">
+                            <Form.Label className="small fw-bold" style={{ color: 'var(--lgd-purple)' }}>Vị trí</Form.Label>
+                            <Form.Control
+                              type="text"
+                              size="sm"
+                              value={selectedMember.role}
+                              onChange={(e) => handleMemberChange(selectedMember.id, "role", e.target.value)}
+                            />
+                          </Form.Group>
+                          <Form.Group className="mb-2">
+                            <Form.Label className="small fw-bold" style={{ color: 'var(--lgd-purple)' }}>Năm sinh</Form.Label>
+                            <Form.Control
+                              type="text"
+                              size="sm"
+                              value={selectedMember.birthYear}
+                              onChange={(e) => handleMemberChange(selectedMember.id, "birthYear", e.target.value)}
+                            />
+                          </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="small fw-bold" style={{ color: 'var(--lgd-purple)' }}>Đổi ảnh đại diện</Form.Label>
+                            <Form.Control
+                              type="file"
+                              size="sm"
+                              accept="image/*"
+                              onChange={(e) => handleAvatarUpload(selectedMember.id, e)}
+                              disabled={uploadingAvatar}
+                            />
+                            {uploadingAvatar && <small style={{ color: 'var(--lgd-accent-light)' }}>Đang tải lên...</small>}
+                          </Form.Group>
+                        </>
+                      ) : (
+                        <>
+                          <div className="fw-bold" style={{ fontSize: '1.9rem', lineHeight: 1.15, color: 'var(--lgd-accent-dark)', filter: 'drop-shadow(0 0 10px var(--lgd-purple-glow))' }}>
+                            {selectedMember.name}
+                          </div>
+                          <div style={{ color: 'var(--lgd-text)', marginTop: 12, fontSize: '1.2rem' }}>
+                            <span style={{ color: 'var(--lgd-purple)', fontWeight: 800 }}>Vị trí:</span> {selectedMember.role || 'Đang cập nhật'}
+                          </div>
+                          <div style={{ color: 'var(--lgd-text)', marginTop: 8, fontSize: '1.2rem' }}>
+                            <span style={{ color: 'var(--lgd-purple)', fontWeight: 800 }}>Năm sinh:</span> {selectedMember.birthYear || 'Đang cập nhật'}
+                          </div>
+                          <div className="mt-3" style={{ color: 'var(--lgd-text-muted)', fontSize: '0.95rem' }}>
+                            Nhấn <strong>Esc</strong> hoặc bấm ra ngoài để đóng.
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setSelectedMemberId(null)}
-                    className="btn btn-outline-light"
-                    style={{
-                      borderColor: 'rgba(139,92,246,0.75)',
-                      padding: '10px 16px',
-                      fontWeight: 800,
-                    }}
-                    aria-label="Đóng"
-                  >
-                    Đóng
-                  </button>
+                  <div className="d-flex flex-column gap-2">
+                    {isAdminMode && isAdminUser && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          saveToFirestore(membersData);
+                          alert("Đã lưu thông tin thành viên!");
+                        }}
+                        className="btn btn-success text-white"
+                        style={{
+                          padding: '10px 16px',
+                          fontWeight: 800,
+                        }}
+                        aria-label="Lưu"
+                      >
+                        Lưu thông tin
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMemberId(null)}
+                      className="btn btn-outline-primary"
+                      style={{
+                        borderColor: 'rgba(139,92,246,0.75)',
+                        padding: '10px 16px',
+                        fontWeight: 800,
+                      }}
+                      aria-label="Đóng"
+                    >
+                      Đóng
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

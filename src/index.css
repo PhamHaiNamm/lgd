@@ -27,6 +27,10 @@
   --lgd-text: #171717;
   --lgd-text-muted: #525252;
   --lgd-purple-dark: #7c3aed;
+  --lgd-purple-bright: #6d28d9;
+  --lgd-accent-light: #7c3aed;
+  --lgd-accent-bright: #6d28d9;
+  --lgd-purple-glow: rgba(124, 58, 237, 0.15);
 }
 
 /* Base Bootstrap theme overrides for light/dark mode */
@@ -243,4 +247,9 @@ a:hover {
   color: var(--lgd-accent-light) !important;
   text-shadow: 0 0 20px var(--lgd-purple-glow);
   font-weight: 700;
+}
+
+.lgd-modal-content {
+  background-color: var(--lgd-black) !important;
+  color: var(--lgd-text) !important;
 }

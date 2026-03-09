@@ -86,7 +86,7 @@ function Banner() {
   }, [dragging, savePositions]);
 
   const captionStyle = { background: 'linear-gradient(transparent, rgba(0,0,0,0.92))', padding: '1.5rem', borderRadius: '0 0 8px 8px', borderTop: '2px solid rgba(139,92,246,0.5)', borderBottom: '1px solid rgba(167,139,250,0.3)' };
-  const titleStyle = { color: '#a78bfa', textShadow: '0 0 12px rgba(139,92,246,0.6), 0 2px 4px #000', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem 0.75rem', flexWrap: 'wrap' };
+  const titleStyle = { color: 'var(--lgd-accent-light)', textShadow: '0 0 12px rgba(139,92,246,0.6), 0 2px 4px #000', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem 0.75rem', flexWrap: 'wrap' };
 
   return (
     <div
@@ -126,7 +126,7 @@ function Banner() {
                     left: "50%",
                     transform: "translateX(-50%)",
                     background: "rgba(0,0,0,0.7)",
-                    color: "#a78bfa",
+                    color: "var(--lgd-accent-light)",
                     padding: "4px 10px",
                     borderRadius: 6,
                     fontSize: 12,
@@ -139,24 +139,24 @@ function Banner() {
             </div>
             <Carousel.Caption style={captionStyle}>
               <h3 className="fw-bold" style={titleStyle}>
-                <PeachBlossomIcon size={26} color="#a78bfa" />
-                <PeachBlossomIcon size={22} color="#a78bfa" />
-                <LanternIcon size={28} color="#a78bfa" />
-                <DragonIcon size={32} color="#a78bfa" />
-                <DragonIcon size={28} color="#a78bfa" />
+                <PeachBlossomIcon size={26} color="var(--lgd-accent-light)" />
+                <PeachBlossomIcon size={22} color="var(--lgd-accent-light)" />
+                <LanternIcon size={28} color="var(--lgd-accent-light)" />
+                <DragonIcon size={32} color="var(--lgd-accent-light)" />
+                <DragonIcon size={28} color="var(--lgd-accent-light)" />
                 {slide.title || "Lục Gia Đường"}
-                <DragonIcon size={28} color="#a78bfa" />
-                <DragonIcon size={32} color="#a78bfa" />
-                <LanternIcon size={28} color="#a78bfa" />
-                <PeachBlossomIcon size={22} color="#a78bfa" />
-                <PeachBlossomIcon size={26} color="#a78bfa" />
-                <LionIcon size={30} color="#a78bfa" />
+                <DragonIcon size={28} color="var(--lgd-accent-light)" />
+                <DragonIcon size={32} color="var(--lgd-accent-light)" />
+                <LanternIcon size={28} color="var(--lgd-accent-light)" />
+                <PeachBlossomIcon size={22} color="var(--lgd-accent-light)" />
+                <PeachBlossomIcon size={26} color="var(--lgd-accent-light)" />
+                <LionIcon size={30} color="var(--lgd-accent-light)" />
               </h3>
               {slide.subtitle && (
                 <p style={{ color: 'var(--lgd-text)', textShadow: '0 1px 2px #000', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <PeachBlossomIcon size={18} color="#a78bfa" />
+                  <PeachBlossomIcon size={18} color="var(--lgd-accent-light)" />
                   {slide.subtitle}
-                  <LanternIcon size={20} color="#a78bfa" />
+                  <LanternIcon size={20} color="var(--lgd-accent-light)" />
                 </p>
               )}
             </Carousel.Caption>

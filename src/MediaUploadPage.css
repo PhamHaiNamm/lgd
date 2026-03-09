@@ -55,7 +55,12 @@
 
 .media-gallery-item {
   height: 250px;
-  flex-grow: 1;
+  flex: 1 1 calc(25% - 1rem);
+  /* Cơ bản là 4 ảnh một dòng (25%) trừ đi gap */
+  min-width: 200px;
+  /* Đảm bảo ảnh không bị quá nhỏ */
+  max-width: calc(50% - 1rem);
+  /* Ngăn 1 ảnh chiếm quá nửa dòng nếu quá rộng */
   background: var(--lgd-black-card);
   border-radius: 0.75rem;
   overflow: hidden;
@@ -72,14 +77,23 @@
 .media-gallery-item img,
 .media-gallery-item video {
   height: 100%;
-  width: auto;
-  min-width: 100%;
+  width: 100%;
   object-fit: cover;
   vertical-align: bottom;
+}
+
+@media (max-width: 992px) {
+  .media-gallery-item {
+    flex: 1 1 calc(33.333% - 1rem);
+    /* 3 ảnh một dòng trên tablet */
+  }
 }
 
 @media (max-width: 768px) {
   .media-gallery-item {
     height: 180px;
+    flex: 1 1 calc(50% - 1rem);
+    /* 2 ảnh một dòng trên mobile */
+    min-width: 140px;
   }
 }

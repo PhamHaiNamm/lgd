@@ -119,7 +119,7 @@ export default function MediaUploadPage() {
                 <div className="container">
                     <FestivalStrip iconSize={22} />
 
-                    <h2 className="mb-4" style={{ color: "#a78bfa" }}>
+                    <h2 className="mb-4" style={{ color: "var(--lgd-accent-light)" }}>
                         🎬 Khu vực Media
                     </h2>
 
@@ -143,7 +143,7 @@ export default function MediaUploadPage() {
                         </p>
                     )}
 
-                    <h3 style={{ color: "#a78bfa" }}>Media thành viên</h3>
+                    <h3 style={{ color: "var(--lgd-accent-light)" }}>Media thành viên</h3>
 
                     {loadingGallery ? (
                         <p style={{ color: "#a3a3a3" }}>Đang tải...</p>
@@ -201,7 +201,7 @@ export default function MediaUploadPage() {
                         </Modal.Body>
                     </Modal>
 
-                    <h3 style={{ color: "#a78bfa", marginTop: 40 }}>Thành viên</h3>
+                    <h3 style={{ color: "var(--lgd-accent-light)", marginTop: 40 }}>Thành viên</h3>
 
                     <div className="d-flex flex-wrap gap-3 mt-3">
                         {members.map((m, i) => (

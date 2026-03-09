@@ -65,8 +65,15 @@ export default function SchedulePage() {
 
   const handleChange = (id, field, value) => {
     if (!isAdminUser) return;
+
+    // Auto-format time from "1400" to "14:00"
+    let formattedValue = value;
+    if (field === "time" && /^\d{4}$/.test(value)) {
+      formattedValue = `${value.slice(0, 2)}:${value.slice(2, 4)}`;
+    }
+
     setItems((prevItems) => {
-      const updated = prevItems.map(it => it.id === id ? { ...it, [field]: value } : it);
+      const updated = prevItems.map(it => it.id === id ? { ...it, [field]: formattedValue } : it);
       return updated;
     });
   };
@@ -82,7 +89,7 @@ export default function SchedulePage() {
       note: "",
     };
     setItems((prev) => {
-      const next = [...prev, newItem];
+      const next = [newItem, ...prev]; // Prepend new item to appear at the top
       saveToFirestore(next);
       return next;
     });
@@ -127,11 +134,15 @@ export default function SchedulePage() {
 
   // Sort items by time (later times on top, earlier times below)
   selectedItems.sort((a, b) => {
+    // Ưu tiên hiện các mục mới (chưa điền giờ) lên đầu
+    if (!a.time && b.time) return -1;
+    if (a.time && !b.time) return 1;
+
+    // Nếu cùng chưa có giờ hoặc cùng có giờ, sắp xếp theo thời gian hoặc ID
     const timeA = a.time || "";
     const timeB = b.time || "";
-    if (timeA < timeB) return 1;
-    if (timeA > timeB) return -1;
-    return 0;
+    if (timeA !== timeB) return timeA.localeCompare(timeB); // Sắp xếp giờ tăng dần (sáng -> tối)
+    return b.id - a.id; // Nếu trùng giờ, cái nào mới hơn lên đầu
   });
 
   // Format selected date nicely
@@ -153,14 +164,14 @@ export default function SchedulePage() {
             {isAdminUser && (
               <div className="d-flex align-items-center justify-content-center gap-2 mt-3 flex-wrap">
                 <Button
-                  variant={isAdminMode ? "outline-light" : "primary"}
+                  variant={isAdminMode ? "outline-primary" : "primary"}
                   onClick={() => setIsAdminMode((v) => !v)}
                 >
                   {isAdminMode ? "Tắt chế độ Admin" : "Bật chế độ Admin"}
                 </Button>
                 {isAdminMode && (
                   <>
-                    <Button variant="outline-warning" onClick={handleSave}>
+                    <Button variant="success" onClick={handleSave}>
                       Lưu tất cả thay đổi
                     </Button>
                   </>
@@ -187,9 +198,9 @@ export default function SchedulePage() {
             onHide={handleModalClose}
             size="lg"
             centered
-            contentClassName="bg-dark text-light border border-secondary"
+            contentClassName="lgd-modal-content border border-secondary"
           >
-            <Modal.Header closeButton closeVariant="white" className="border-bottom border-secondary" style={{ backgroundColor: 'var(--lgd-black-card)' }}>
+            <Modal.Header closeButton className="border-bottom border-secondary" style={{ backgroundColor: 'var(--lgd-black-card)' }}>
               <Modal.Title className="fw-bold lgd-title-gold">Lịch: {formattedSelectedDate}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="p-4" style={{ backgroundColor: 'var(--lgd-black)' }}>
@@ -213,11 +224,11 @@ export default function SchedulePage() {
                       {isAdminMode && isAdminUser ? (
                         <div className="admin-editor-form">
                           <Form.Group className="mb-2">
-                            <Form.Label className="small fw-bold text-secondary">Giờ</Form.Label>
+                            <Form.Label className="small fw-bold text-secondary">Giờ (HH:mm)</Form.Label>
                             <Form.Control
                               type="text"
                               size="sm"
-                              placeholder="Ví dụ: 18:00"
+                              placeholder="VD: 18:00"
                               value={item.time || ""}
                               onChange={(e) => handleChange(item.id, "time", e.target.value)}
                             />
@@ -263,19 +274,19 @@ export default function SchedulePage() {
                         </div>
                       ) : (
                         <>
-                          <h5 className="fw-bold mb-2" style={{ color: 'var(--lgd-accent-light)' }}>
+                          <h5 className="fw-bold mb-2" style={{ color: 'var(--lgd-accent-dark)' }}>
                             {item.content || "Chương trình biểu diễn"}
                           </h5>
-                          <div className="mb-1 text-light">
+                          <div className="mb-1" style={{ color: 'var(--lgd-text)' }}>
                             <i className="bi bi-clock me-2 text-warning"></i>
                             <strong>Giờ:</strong> {item.time || "Đang cập nhật"}
                           </div>
-                          <div className="mb-1 text-light">
+                          <div className="mb-1" style={{ color: 'var(--lgd-text)' }}>
                             <i className="bi bi-geo-alt me-2 text-success"></i>
                             <strong>Địa điểm:</strong> {item.location || "Đang cập nhật"}
                           </div>
                           {item.note && (
-                            <div className="mt-2 text-secondary small p-2 rounded" style={{ backgroundColor: 'var(--lgd-black-soft)' }}>
+                            <div className="mt-2 small p-2 rounded" style={{ backgroundColor: 'var(--lgd-black-soft)', color: 'var(--lgd-text-muted)' }}>
                               <strong>Ghi chú:</strong> {item.note}
                             </div>
                           )}
