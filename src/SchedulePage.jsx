@@ -55,15 +55,20 @@ export default function SchedulePage() {
   }, []);
 
   const saveToFirestore = useCallback((nextItems) => {
-    setDoc(doc(db, "config", CONFIG_KEY), { items: nextItems }).catch((err) =>
-      console.error("Save schedule error:", err)
-    );
+    setDoc(doc(db, "config", CONFIG_KEY), { items: nextItems }).then(() => {
+      console.log("Saved to database:", nextItems);
+    }).catch((err) => {
+      console.error("Save schedule error:", err);
+      alert("Lỗi khi lưu Firestore: " + err.message);
+    });
   }, []);
 
   const handleChange = (id, field, value) => {
     if (!isAdminUser) return;
-    const updated = items.map(it => it.id === id ? { ...it, [field]: value } : it);
-    setItems(updated);
+    setItems((prevItems) => {
+      const updated = prevItems.map(it => it.id === id ? { ...it, [field]: value } : it);
+      return updated;
+    });
   };
 
   const handleAdd = () => {
@@ -76,23 +81,40 @@ export default function SchedulePage() {
       content: "",
       note: "",
     };
-    const next = [...items, newItem];
-    setItems(next);
-    saveToFirestore(next);
+    setItems((prev) => {
+      const next = [...prev, newItem];
+      saveToFirestore(next);
+      return next;
+    });
   };
 
   const handleDelete = (id) => {
     if (!isAdminUser) return;
     if (!window.confirm("Xóa lịch này?")) return;
-    const next = items.filter((it) => it.id !== id);
-    setItems(next);
-    saveToFirestore(next);
+    setItems((prev) => {
+      const next = prev.filter((it) => it.id !== id);
+      saveToFirestore(next);
+      return next;
+    });
   };
 
   const handleSave = () => {
     if (!isAdminUser) return;
-    saveToFirestore(items);
-    alert("Đã lưu lịch biểu diễn.");
+    setItems((prev) => {
+      saveToFirestore(prev);
+      return prev;
+    });
+    alert("Đã lưu lịch biểu diễn thành công.");
+  };
+
+  const handleModalClose = () => {
+    if (isAdminMode && isAdminUser) {
+      setItems((prev) => {
+        saveToFirestore(prev);
+        return prev;
+      });
+    }
+    setShowModal(false);
   };
 
   const handleDateSelect = (date) => {
@@ -162,7 +184,7 @@ export default function SchedulePage() {
 
           <Modal
             show={showModal}
-            onHide={() => setShowModal(false)}
+            onHide={handleModalClose}
             size="lg"
             centered
             contentClassName="bg-dark text-light border border-secondary"
@@ -264,6 +286,14 @@ export default function SchedulePage() {
                 </div>
               )}
             </Modal.Body>
+            {isAdminMode && isAdminUser && (
+              <Modal.Footer className="border-secondary" style={{ backgroundColor: 'var(--lgd-black-card)' }}>
+                <Button variant="secondary" onClick={handleModalClose}>Đóng</Button>
+                <Button variant="warning" onClick={() => { handleSave(); setShowModal(false); }}>
+                  Lưu thay đổi
+                </Button>
+              </Modal.Footer>
+            )}
           </Modal>
 
         </Container>
