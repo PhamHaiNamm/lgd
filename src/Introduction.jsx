@@ -11,6 +11,7 @@ const AVATAR_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
 const MEMBERS = [
   { id: 'ho-ngoc-thao', name: 'Hồ Ngọc Thảo', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
   { id: 'pham-hai-nam', name: 'Phạm Hải Nam', role: 'Đang cập nhật', birthYear: '2004', avatarUrl: '/images/Logo_full.png' },
+  { id: 'ly-manh-hung', name: 'Lý Mạnh Hưng', role: 'Âm Thanh', birthYear: '2005', avatarUrl: '/images/Logo_full.png' },
   { id: 'ha-gia-minh', name: 'Hạ Gia Minh', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
   { id: 'le-minh-hieu', name: 'Lê Minh Hiếu', role: 'Đang cập nhật', birthYear: '2008', avatarUrl: '/images/Logo_full.png' },
   { id: 'le-anh-tuan', name: 'Lê Anh Tuấn', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
@@ -33,7 +34,7 @@ const MEMBERS = [
   { id: 'nguyen-huy', name: 'Nguyễn Huy', role: 'Đang cập nhật', birthYear: 'Đang cập nhật', avatarUrl: '/images/Logo_full.png' },
   { id: 'nguyen-tien-dung', name: 'Nguyễn Tiến Dũng', role: 'Đang cập nhật', birthYear: '2009', avatarUrl: '/images/Logo_full.png' },
   { id: 'pham-tai', name: 'Phạm Tài', role: 'Đang cập nhật', birthYear: '2010', avatarUrl: '/images/Logo_full.png' },
-  
+
 ];
 
 function Introduction() {
