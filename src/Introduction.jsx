@@ -6,6 +6,7 @@ import { DecorativeTitle, FestivalStrip } from './components/Decorations';
 
 const MEMBERS = [
   'Phạm Hải Nam',
+  'Hồ Ngọc Thảo',
   'Hạ Gia Minh',
   'Lê Minh Hiếu',
   'Lê Anh Tuấn',
@@ -28,7 +29,7 @@ const MEMBERS = [
   'Nguyễn Huy',
   'Nguyễn Tiến Dũng',
   'Phạm Tài',
-  'Hồ Ngọc Thảo',
+  
 ];
 
 function Introduction() {
