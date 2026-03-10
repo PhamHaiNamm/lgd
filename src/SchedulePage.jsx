@@ -25,9 +25,10 @@ export default function SchedulePage() {
   const [items, setItems] = useState(defaultItems);
   const [user, setUser] = useState(null);
   const [isAdminMode, setIsAdminMode] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0] // default to today
-  );
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  });
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {

@@ -102,6 +102,16 @@
     /* light purple tint */
 }
 
+.lunar-cell.today {
+    background-color: rgba(139, 92, 246, 0.1);
+    box-shadow: inset 0 0 0 1px var(--lgd-accent-bright);
+}
+
+.lunar-cell.today .solar-date {
+    color: var(--lgd-accent-bright);
+    text-shadow: 0 0 6px var(--lgd-purple-glow);
+}
+
 /* Event indicator dot */
 .lunar-cell.has-events::after {
     content: '';

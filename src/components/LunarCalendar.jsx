@@ -55,6 +55,9 @@ export default function LunarCalendar({ items = [], selectedDate, onDateSelect }
         cells.push({ type: 'empty', key: `empty-start-${i}` });
     }
 
+    const now = new Date();
+    const todayString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
     // Days in current month
     for (let idx = 1; idx <= daysInMonth; idx++) {
         const d = new Date(year, month - 1, idx);
@@ -69,6 +72,7 @@ export default function LunarCalendar({ items = [], selectedDate, onDateSelect }
         // Check events
         const hasEvents = items.some(e => e.date === dateString);
         const isSelected = selectedDate === dateString;
+        const isToday = dateString === todayString;
 
         cells.push({
             type: 'day',
@@ -80,6 +84,7 @@ export default function LunarCalendar({ items = [], selectedDate, onDateSelect }
             isSaturday: d.getDay() === 6,
             hasEvents,
             isSelected,
+            isToday,
             dayZhi
         });
     }
@@ -158,6 +163,7 @@ export default function LunarCalendar({ items = [], selectedDate, onDateSelect }
                     let cellClasses = "lunar-cell";
                     if (cell.hasEvents) cellClasses += " has-events";
                     if (cell.isSelected) cellClasses += " selected";
+                    if (cell.isToday) cellClasses += " today";
 
                     return (
                         <div
