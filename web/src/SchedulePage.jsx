@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
-import { Container, Row, Col, Button, Form, Modal, Spinner, Badge } from "react-bootstrap";
+import { Container, Row, Col, Button, Form, Modal, Spinner } from "react-bootstrap";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { AuthContext } from "./AuthContext";
@@ -7,7 +7,7 @@ import { API_BASE_URL } from "./config";
 import LunarCalendar from "./components/LunarCalendar";
 
 export default function SchedulePage() {
-  const { user, token, isAdmin } = useContext(AuthContext);
+  const { token, isAdmin } = useContext(AuthContext);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdminMode, setIsAdminMode] = useState(false);
