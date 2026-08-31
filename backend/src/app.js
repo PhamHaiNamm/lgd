@@ -45,18 +45,40 @@ if (helmet) {
 // Ghi log request
 app.use(loggerMiddleware);
 
-// Cấu hình CORS
+// Cấu hình CORS linh hoạt hỗ trợ domain chính thức và các môi trường
+const allowedOrigins = [
+  'https://lucgiaduong.online',
+  'https://www.lucgiaduong.online',
+  'https://lgd-khaki.vercel.app',
+  'http://localhost:3000',
+  config.clientUrl,
+].filter(Boolean);
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+  if (origin.endsWith('.vercel.app')) return true;
+  return false;
+};
+
 if (cors) {
   app.use(
     cors({
-      origin: config.clientUrl || '*',
+      origin: (origin, callback) => {
+        if (isOriginAllowed(origin)) {
+          callback(null, true);
+        } else {
+          callback(null, true); // Cho phép mở rộng
+        }
+      },
       credentials: true,
     })
   );
 } else {
   // CORS fallback thủ công
   app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', config.clientUrl || '*');
+    const origin = req.headers.origin;
+    res.header('Access-Control-Allow-Origin', origin || '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     res.header('Access-Control-Allow-Credentials', 'true');
