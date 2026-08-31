@@ -1,0 +1,154 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>DANH SÁCH TÀI KHOẢN HỆ THỐNG LỤC GIA ĐƯỜNG</title>
+<style>
+body {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 13pt;
+    line-height: 1.5;
+    margin: 30px;
+    color: #111827;
+}
+h1 {
+    font-size: 18pt;
+    color: #4c1d95;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+h2 {
+    font-size: 14pt;
+    color: #5b21b6;
+    border-bottom: 2px solid #ddd6fe;
+    padding-bottom: 5px;
+    margin-top: 24px;
+}
+.note-box {
+    background-color: #f5f3ff;
+    border-left: 4px solid #7c3aed;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 12pt;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+th {
+    background-color: #6b21a8;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: left;
+    padding: 10px 12px;
+    border: 1px solid #4c1d95;
+}
+td {
+    padding: 8px 12px;
+    border: 1px solid #e5e7eb;
+}
+tr:nth-child(even) {
+    background-color: #f9fafb;
+}
+.role-admin {
+    color: #b45309;
+    font-weight: bold;
+}
+.role-user {
+    color: #4338ca;
+}
+.password-box {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    background-color: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+</style>
+</head>
+<body>
+
+<h1>ĐOÀN LÂN SƯ RỒNG LỤC GIA ĐƯỜNG</h1>
+<h2 style="text-align:center; border:none; margin-top:0; color:#6b7280; font-size:14pt;">DANH SÁCH TÀI KHOẢN HỆ THỐNG WEBSITE</h2>
+
+<div class="note-box">
+    <strong>📌 Ghi chú quan trọng:</strong><br>
+    - Mật khẩu mặc định của tất cả các tài khoản thành viên là: <span class="password-box">123</span><br>
+    - Mật khẩu tài khoản quản trị viên <strong>admin</strong> là: <span class="password-box">adminPassword123</span> hoặc <span class="password-box">123</span><br>
+    - Thành viên sau khi đăng nhập có thể vào mục <strong>"Thông tin cá nhân"</strong> trên góc phải thanh menu để đổi mật khẩu và cập nhật thông tin cá nhân.
+</div>
+
+<h2>1. TÀI KHOẢN QUẢN TRỊ VIÊN (ADMIN)</h2>
+<table>
+    <thead>
+        <tr>
+            <th style="width: 8%; text-align: center;">STT</th>
+            <th style="width: 25%;">Họ và tên</th>
+            <th style="width: 22%;">Tên đăng nhập (Username)</th>
+            <th style="width: 20%;">Mật khẩu</th>
+            <th style="width: 25%;">Chức vụ / Quyền</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="text-align: center;">1</td>
+            <td><strong>Hải Nam</strong></td>
+            <td><code>hainam</code></td>
+            <td><span class="password-box">123</span></td>
+            <td><span class="role-admin">👑 Admin (Trưởng đoàn)</span></td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">2</td>
+            <td><strong>Quản Trị Viên Hệ Thống</strong></td>
+            <td><code>admin</code></td>
+            <td><span class="password-box">adminPassword123</span></td>
+            <td><span class="role-admin">👑 Admin Hệ thống</span></td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>2. DANH SÁCH TÀI KHOẢN THÀNH VIÊN ĐOÀN</h2>
+<table>
+    <thead>
+        <tr>
+            <th style="width: 8%; text-align: center;">STT</th>
+            <th style="width: 25%;">Họ và tên</th>
+            <th style="width: 22%;">Tên đăng nhập (Username)</th>
+            <th style="width: 15%;">Mật khẩu</th>
+            <th style="width: 12%; text-align: center;">Năm sinh</th>
+            <th style="width: 18%;">Vị trí / Vai trò</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td style="text-align: center;">1</td><td><strong>Thị Tâm</strong></td><td><code>thitam</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2008</td><td>Ban Truyền thông</td></tr>
+        <tr><td style="text-align: center;">2</td><td><strong>Lê Hiếu (cứt)</strong></td><td><code>lehieu_cut</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2008</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">3</td><td><strong>Hồ Nam</strong></td><td><code>honam</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2006</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">4</td><td><strong>Nguyễn Long</strong></td><td><code>nguyenlong</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2008</td><td>Đuôi Lân</td></tr>
+        <tr><td style="text-align: center;">5</td><td><strong>Bảo Nguyên</strong></td><td><code>baonguyen</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2013</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">6</td><td><strong>Phạm Tài</strong></td><td><code>phamtai</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2010</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">7</td><td><strong>Tuấn sữa</strong></td><td><code>tuansua</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2009</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">8</td><td><strong>Tiến Mạnh</strong></td><td><code>tienmanh</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2010</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">9</td><td><strong>Gia Hưng</strong></td><td><code>giahung</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2010</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">10</td><td><strong>Lưu Thịnh</strong></td><td><code>luuthinh</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2009</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">11</td><td><strong>Trần Dũng</strong></td><td><code>trandung</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2010</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">12</td><td><strong>Nguyễn Huy</strong></td><td><code>nguyenhuy</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2009</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">13</td><td><strong>Gia Huy</strong></td><td><code>giahuy</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2010</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">14</td><td><strong>Danh Đức</strong></td><td><code>danhduc</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2012</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">15</td><td><strong>Sơn Đậu</strong></td><td><code>sondau</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2010</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">16</td><td><strong>Lê Nhung</strong></td><td><code>lenhung</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2009</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">17</td><td><strong>Gia Minh</strong></td><td><code>giaminh</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2008</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">18</td><td><strong>Lê Hiếu</strong></td><td><code>lehieu</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2008</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">19</td><td><strong>Quốc Trường</strong></td><td><code>quoctruong</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2010</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">20</td><td><strong>Duy Hưng</strong></td><td><code>duyhung</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2009</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">21</td><td><strong>Tiến Dũng</strong></td><td><code>tiendung</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2009</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">22</td><td><strong>Duy Mạnh</strong></td><td><code>duymanh</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2010</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">23</td><td><strong>Xuân Hiếu</strong></td><td><code>xuanhieu</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2010</td><td>Thành viên</td></tr>
+        <tr><td style="text-align: center;">24</td><td><strong>Lò vôi</strong></td><td><code>lovoi</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2009</td><td>Đuôi Lân</td></tr>
+        <tr><td style="text-align: center;">25</td><td><strong>Tuấn Minh</strong></td><td><code>tuanminh</code></td><td><span class="password-box">123</span></td><td style="text-align: center;">2009</td><td>Thành viên</td></tr>
+    </tbody>
+</table>
+
+</body>
+</html>
