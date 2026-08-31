@@ -10,7 +10,7 @@ import { DecorativeTitle, FestivalStrip } from './components/Decorations';
 const DEFAULT_AVATAR = 'https://res.cloudinary.com/lucgiaduong/image/upload/v1/default-avatar.png';
 
 function Introduction() {
-  const { user, token, isAdmin } = useContext(AuthContext);
+  const { token, isAdmin } = useContext(AuthContext);
 
   const [selectedMemberId, setSelectedMemberId] = useState(null);
   const [isAdminMode, setIsAdminMode] = useState(false);
