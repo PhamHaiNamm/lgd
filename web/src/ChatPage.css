@@ -391,6 +391,29 @@
   margin: 0;
 }
 
+.members-toggle-container {
+  padding: 8px 16px 16px 16px;
+  text-align: center;
+}
+
+.btn-toggle-members-sidebar {
+  width: 100%;
+  padding: 8px 12px;
+  background: #f0f2f5;
+  border: 1px solid #e4e6eb;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6d28d9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle-members-sidebar:hover {
+  background: #ede9fe;
+  border-color: #8b5cf6;
+}
+
 /* Empty State */
 .chat-empty-box {
   flex: 1;

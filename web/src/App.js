@@ -10,6 +10,7 @@ import SchedulePage from './SchedulePage';
 import SocialFeedPage from './SocialFeedPage';
 import ChatPage from './ChatPage';
 import ProfilePage from './ProfilePage';
+import FloatingChatBubble from './components/FloatingChatBubble';
 import { SupportKnowledgeProvider } from './SupportKnowledgeContext';
 
 function App() {
@@ -30,6 +31,9 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
+
+        {/* Bong bóng chat nổi trên toàn bộ website */}
+        <FloatingChatBubble />
       </div>
     </SupportKnowledgeProvider>
   );

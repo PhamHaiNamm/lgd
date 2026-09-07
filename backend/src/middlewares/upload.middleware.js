@@ -13,13 +13,15 @@ try {
 // Cấu hình lưu trữ bộ nhớ RAM tạm thời
 const storage = multer ? multer.memoryStorage() : null;
 
-// Bộ lọc định dạng file ảnh hợp lệ
+// Bộ lọc định dạng file ảnh hợp lệ (hỗ trợ đầy đủ định dạng ảnh điện thoại bao gồm HEIC/HEIF)
 const imageFileFilter = (req, file, cb) => {
-  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
-  if (allowedMimeTypes.includes(file.mimetype)) {
+  if (
+    file.mimetype.startsWith('image/') ||
+    /\.(jpe?g|png|webp|gif|svg|heic|heif|bmp|tiff)$/i.test(file.originalname)
+  ) {
     cb(null, true);
   } else {
-    cb(new Error('Chỉ chấp nhận các file ảnh định dạng JPEG, PNG, WEBP, GIF, SVG.'), false);
+    cb(new Error('Chỉ chấp nhận các file định dạng hình ảnh.'), false);
   }
 };
 

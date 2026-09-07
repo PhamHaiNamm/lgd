@@ -16,6 +16,16 @@ export default function SocialFeedPage() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isPosting, setIsPosting] = useState(false);
+  const [viewingImage, setViewingImage] = useState(null);
+
+  const formatImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://localhost:5000')) {
+      const backendBase = API_BASE_URL.replace('/api/v1', '');
+      return url.replace('http://localhost:5000', backendBase);
+    }
+    return url;
+  };
 
   // States Modal Profile
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -557,12 +567,29 @@ export default function SocialFeedPage() {
 
                   {/* Ảnh bài viết */}
                   {post.imageUrl && (
-                    <div className="post-image-container">
+                    <div
+                      className="post-image-container"
+                      onClick={() =>
+                        setViewingImage({
+                          url: formatImageUrl(post.imageUrl),
+                          caption: post.caption,
+                          author: post.authorName,
+                        })
+                      }
+                      style={{ cursor: 'pointer' }}
+                      title="Chạm / Nhấn để phóng to ảnh"
+                    >
                       <img
-                        src={post.imageUrl}
+                        src={formatImageUrl(post.imageUrl)}
                         alt={post.caption || 'Bài đăng'}
                         className="post-image"
                         loading="lazy"
+                        onError={(e) => {
+                          if (!e.target.dataset.triedFallback) {
+                            e.target.dataset.triedFallback = 'true';
+                            e.target.src = 'https://res.cloudinary.com/lucgiaduong/image/upload/v1/default-post.png';
+                          }
+                        }}
                       />
                     </div>
                   )}
@@ -692,7 +719,82 @@ export default function SocialFeedPage() {
         </div>
       )}
 
-      {/* MODAL 2: Admin Quản Trị Thành Viên (Sửa tất cả) */}
+      {/* MODAL 3: Lightbox xem ảnh toàn màn hình khi chạm vào ảnh bài đăng */}
+      {viewingImage && (
+        <div
+          className="modal-overlay"
+          style={{
+            background: 'rgba(0, 0, 0, 0.94)',
+            zIndex: 11000,
+            cursor: 'zoom-out',
+            padding: '12px',
+          }}
+          onClick={() => setViewingImage(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxWidth: '96vw',
+              maxHeight: '94vh',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'default',
+            }}
+          >
+            <button
+              type="button"
+              className="btn-close-modal"
+              onClick={() => setViewingImage(null)}
+              style={{
+                position: 'absolute',
+                top: '-14px',
+                right: '-14px',
+                background: '#ffffff',
+                color: '#000',
+                fontWeight: 'bold',
+                zIndex: 10,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.6)',
+              }}
+            >
+              ✕
+            </button>
+
+            <img
+              src={viewingImage.url}
+              alt={viewingImage.caption || 'Ảnh bài đăng'}
+              style={{
+                maxWidth: '100%',
+                maxHeight: '82vh',
+                objectFit: 'contain',
+                borderRadius: '12px',
+                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.9)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+              }}
+            />
+
+            {viewingImage.caption && (
+              <div
+                style={{
+                  color: '#ffffff',
+                  marginTop: '12px',
+                  fontSize: '0.95rem',
+                  fontWeight: '600',
+                  textAlign: 'center',
+                  maxWidth: '600px',
+                  background: 'rgba(0, 0, 0, 0.6)',
+                  padding: '6px 16px',
+                  borderRadius: '20px',
+                }}
+              >
+                {viewingImage.caption}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {showAdminModal && (
         <div className="modal-overlay">
           <div className="modal-content-card modal-content-large">

@@ -16,13 +16,28 @@ export default function ChatPage() {
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
+  const [showAllMembers, setShowAllMembers] = useState(false);
+  const [viewingChatImage, setViewingChatImage] = useState(null);
+
+  const formatImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://localhost:5000')) {
+      const backendBase = API_BASE_URL.replace('/api/v1', '');
+      return url.replace('http://localhost:5000', backendBase);
+    }
+    return url;
+  };
 
   const messagesEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
   const fileInputRef = useRef(null);
+  const isInitialLoadRef = useRef(true);
 
-  // Cuộn xuống tin nhắn mới nhất
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // Cuộn xuống cuối (chỉ khi cần thiết)
+  const scrollToBottom = (smooth = true) => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' });
+    }
   };
 
   // Tải danh sách tin nhắn nhóm chung
@@ -33,8 +48,27 @@ export default function ChatPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      if (data.success) {
-        setMessages(data.data || []);
+      if (data.success && Array.isArray(data.data)) {
+        setMessages((prevMessages) => {
+          const newMessages = data.data;
+
+          // Kiểm tra xem có tin nhắn mới không
+          if (newMessages.length > prevMessages.length) {
+            const container = chatContainerRef.current;
+            if (isInitialLoadRef.current) {
+              setTimeout(() => scrollToBottom(false), 50);
+              isInitialLoadRef.current = false;
+            } else if (container) {
+              // Chỉ tự động cuộn nếu người dùng đang ở gần đáy (không kéo lên xem tin cũ)
+              const isNearBottom =
+                container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+              if (isNearBottom) {
+                setTimeout(() => scrollToBottom(true), 50);
+              }
+            }
+          }
+          return newMessages;
+        });
       }
     } catch (err) {
       console.error('Lỗi tải tin nhắn nhóm:', err);
@@ -59,21 +93,18 @@ export default function ChatPage() {
     }
   }, [token]);
 
-  // Tự động tải tin nhắn và polling thời gian thực mỗi 2.5s
+  // Tự động tải tin nhắn và polling thời gian thực mỗi 3s
   useEffect(() => {
+    isInitialLoadRef.current = true;
     fetchMessages();
     fetchMembers();
 
     const interval = setInterval(() => {
       fetchMessages();
-    }, 2500);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [fetchMessages, fetchMembers]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
 
   // Chọn ảnh đính kèm
   const handleSelectImage = (e) => {
@@ -120,7 +151,7 @@ export default function ChatPage() {
         setMessageText('');
         handleRemoveImage();
         setMessages((prev) => [...prev, data.data]);
-        scrollToBottom();
+        setTimeout(() => scrollToBottom(true), 50);
       } else {
         alert(data.message || 'Lỗi khi gửi tin nhắn.');
       }
@@ -152,6 +183,8 @@ export default function ChatPage() {
       alert('Lỗi: ' + err.message);
     }
   };
+
+  const visibleMembers = showAllMembers ? members : members.slice(0, 6);
 
   return (
     <div className="group-chat-page">
@@ -203,7 +236,7 @@ export default function ChatPage() {
               </div>
 
               {/* Danh sách tin nhắn */}
-              <div className="chat-messages-container">
+              <div className="chat-messages-container" ref={chatContainerRef}>
                 {loading ? (
                   <div className="chat-empty-box">
                     <p>Đang tải lịch sử tin nhắn...</p>
@@ -251,10 +284,12 @@ export default function ChatPage() {
                             {msg.content && <div>{msg.content}</div>}
                             {msg.imageUrl && (
                               <img
-                                src={msg.imageUrl}
+                                src={formatImageUrl(msg.imageUrl)}
                                 alt="Hình ảnh đính kèm"
                                 className="chat-attached-image"
-                                onClick={() => window.open(msg.imageUrl, '_blank')}
+                                onClick={() => setViewingChatImage(formatImageUrl(msg.imageUrl))}
+                                title="Chạm để xem ảnh toàn màn hình"
+                                style={{ cursor: 'pointer' }}
                               />
                             )}
                           </div>
@@ -336,7 +371,7 @@ export default function ChatPage() {
               </div>
 
               <div className="members-sidebar-list">
-                {members.map((m) => (
+                {visibleMembers.map((m) => (
                   <div className="member-list-item" key={m._id}>
                     <img
                       src={m.avatar || 'https://via.placeholder.com/150'}
@@ -358,11 +393,94 @@ export default function ChatPage() {
                     </div>
                   </div>
                 ))}
+
+                {members.length > 6 && (
+                  <div className="members-toggle-container">
+                    <button
+                      type="button"
+                      className="btn-toggle-members-sidebar"
+                      onClick={() => setShowAllMembers(!showAllMembers)}
+                    >
+                      {showAllMembers
+                        ? '▲ Thu gọn danh sách'
+                        : `▼ Xem thêm (${members.length - 6} thành viên khác)`}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Lightbox xem ảnh chat toàn màn hình */}
+      {viewingChatImage && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.94)',
+            zIndex: 11000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            cursor: 'zoom-out',
+          }}
+          onClick={() => setViewingChatImage(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              position: 'relative',
+              maxWidth: '96vw',
+              maxHeight: '94vh',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              cursor: 'default',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setViewingChatImage(null)}
+              style={{
+                position: 'absolute',
+                top: '-14px',
+                right: '-14px',
+                background: '#ffffff',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                color: '#000',
+                fontWeight: 'bold',
+                zIndex: 10,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.6)',
+                cursor: 'pointer',
+              }}
+            >
+              ✕
+            </button>
+
+            <img
+              src={viewingChatImage}
+              alt="Ảnh đính kèm"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '86vh',
+                objectFit: 'contain',
+                borderRadius: '12px',
+                boxShadow: '0 12px 40px rgba(0, 0, 0, 0.9)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

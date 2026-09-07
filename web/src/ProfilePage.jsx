@@ -74,12 +74,6 @@ export default function ProfilePage() {
     setAvatarPreview(URL.createObjectURL(file));
   };
 
-  const handleTriggerFileInput = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setAlertInfo({ show: false, type: '', message: '' });
@@ -211,20 +205,22 @@ export default function ProfilePage() {
                       e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.name || 'User') + '&background=6b21a8&color=fff';
                     }}
                   />
-                  <div
+                  <label
+                    htmlFor="profile-avatar-upload"
                     className="profile-avatar-btn"
-                    onClick={handleTriggerFileInput}
                     title="Đổi ảnh đại diện"
+                    style={{ cursor: 'pointer' }}
                   >
                     <i className="bi bi-camera-fill">📷</i>
-                  </div>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleAvatarFileSelect}
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                  />
+                    <input
+                      id="profile-avatar-upload"
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleAvatarFileSelect}
+                      accept="image/*"
+                      style={{ position: 'absolute', opacity: 0, width: 0, height: 0, pointerEvents: 'none' }}
+                    />
+                  </label>
                 </div>
 
                 <div className="text-center mb-4">

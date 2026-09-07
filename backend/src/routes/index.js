@@ -5,9 +5,10 @@ const postRoutes = require('./post.routes');
 const messageRoutes = require('./message.routes');
 const uploadRoutes = require('./upload.routes');
 const scheduleRoutes = require('./schedule.routes');
+const bookingRoutes = require('./booking.routes');
 const healthRoutes = require('./health.routes');
-const exampleRoutes = require('./example.routes');
 const itemRoutes = require('./item.routes');
+const exampleRoutes = require('./example.routes');
 
 const router = express.Router();
 
@@ -18,6 +19,7 @@ router.use('/posts', postRoutes);
 router.use('/messages', messageRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/schedules', scheduleRoutes);
+router.use('/bookings', bookingRoutes);
 router.use('/health', healthRoutes);
 router.use('/items', itemRoutes);
 router.use('/example', exampleRoutes);

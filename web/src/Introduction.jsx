@@ -55,6 +55,15 @@ function Introduction() {
     fetchMembers();
   }, [fetchMembers]);
 
+  const formatImageUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://localhost:5000')) {
+      const backendBase = API_BASE_URL.replace('/api/v1', '');
+      return url.replace('http://localhost:5000', backendBase);
+    }
+    return url;
+  };
+
   const selectedMember = useMemo(
     () => membersData.find((m) => (m._id === selectedMemberId || m.id === selectedMemberId)) || null,
     [selectedMemberId, membersData]
@@ -104,20 +113,25 @@ function Introduction() {
   const handleSaveMember = async (member) => {
     if (!isAdmin || !token) return;
     try {
+      const payload = {
+        name: member.name,
+        role: member.role,
+        birthYear: member.birthYear ? Number(member.birthYear) : null,
+        location: member.location,
+        bio: member.bio,
+        avatar: member.avatar,
+      };
+      if (member.newPassword && member.newPassword.trim()) {
+        payload.password = member.newPassword.trim();
+      }
+
       const res = await fetch(`${API_BASE_URL}/users/${member._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          name: member.name,
-          role: member.role,
-          birthYear: member.birthYear ? Number(member.birthYear) : null,
-          location: member.location,
-          bio: member.bio,
-          avatar: member.avatar,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (data.success) {
@@ -410,7 +424,7 @@ function Introduction() {
                   <div className="d-flex align-items-center gap-4 gap-md-5 flex-wrap w-100">
                     <div className="text-center">
                       <img
-                        src={selectedMember.avatar || DEFAULT_AVATAR}
+                        src={formatImageUrl(selectedMember.avatar) || DEFAULT_AVATAR}
                         alt={selectedMember.name}
                         width={180}
                         height={180}
@@ -483,6 +497,18 @@ function Introduction() {
                               size="sm"
                               value={selectedMember.bio || ''}
                               onChange={(e) => handleMemberFieldChange('bio', e.target.value)}
+                              style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                            />
+                          </Form.Group>
+
+                          <Form.Group className="mb-2">
+                            <Form.Label className="small fw-bold" style={{ color: '#a78bfa' }}>🔑 Đặt lại mật khẩu mới (để trống nếu không đổi)</Form.Label>
+                            <Form.Control
+                              type="text"
+                              size="sm"
+                              placeholder="Nhập mật khẩu mới..."
+                              value={selectedMember.newPassword || ''}
+                              onChange={(e) => handleMemberFieldChange('newPassword', e.target.value)}
                               style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
                             />
                           </Form.Group>

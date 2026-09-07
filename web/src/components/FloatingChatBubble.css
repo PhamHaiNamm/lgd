@@ -1,0 +1,326 @@
+/* ===================================================
+   FLOATING CHAT BUBBLE WIDGET - LỤC GIA ĐƯỜNG
+   =================================================== */
+
+.lgd-floating-bubble-wrapper {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  font-family: inherit;
+}
+
+/* Tooltip / Greeting Balloon */
+.lgd-bubble-greeting {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #2d1854 0%, #1a132f 100%);
+  border: 1.5px solid rgba(167, 139, 250, 0.6);
+  color: #ffffff;
+  padding: 8px 14px;
+  border-radius: 18px 18px 4px 18px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(139, 92, 246, 0.4);
+  margin-bottom: 12px;
+  margin-left: auto;
+  max-width: 240px;
+  cursor: pointer;
+  animation: lgdGreetingFadeIn 0.35s ease-out;
+}
+
+@keyframes lgdGreetingFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Floating Trigger Button */
+.lgd-bubble-trigger-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid rgba(245, 158, 11, 0.7);
+  background: linear-gradient(135deg, #8b5cf6 0%, #5b21b6 50%, #1e103a 100%);
+  color: #ffffff;
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(91, 33, 182, 0.6), 0 0 20px rgba(139, 92, 246, 0.5);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  outline: none;
+}
+
+.lgd-bubble-trigger-btn:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 12px 30px rgba(91, 33, 182, 0.8), 0 0 25px rgba(245, 158, 11, 0.7);
+  border-color: #f59e0b;
+}
+
+.lgd-bubble-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  background: #ef4444;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: lgdPulseDot 1.8s infinite ease-in-out;
+}
+
+@keyframes lgdPulseDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.8;
+  }
+}
+
+/* Chat Panel */
+.lgd-chat-panel {
+  position: absolute;
+  bottom: 74px;
+  right: 0;
+  width: min(390px, calc(100vw - 32px));
+  height: 540px;
+  max-height: calc(100vh - 120px);
+  background: linear-gradient(180deg, #1b1233 0%, #100a20 100%);
+  border: 2px solid rgba(139, 92, 246, 0.5);
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(139, 92, 246, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: lgdPanelOpen 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes lgdPanelOpen {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Panel Header */
+.lgd-panel-header {
+  padding: 12px 16px;
+  background: linear-gradient(90deg, #2d1854 0%, #1f143d 100%);
+  border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lgd-panel-title-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lgd-panel-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #f6e05e;
+}
+
+.lgd-panel-sub {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.lgd-panel-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #e2e8f0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.lgd-panel-close-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+/* Panel Tabs */
+.lgd-panel-tabs {
+  display: flex;
+  background: #120b24;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.lgd-panel-tab {
+  flex: 1;
+  padding: 10px 8px;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+}
+
+.lgd-panel-tab.active {
+  color: #a78bfa;
+  background: rgba(139, 92, 246, 0.12);
+  border-bottom-color: #f59e0b;
+}
+
+/* Messages Area */
+.lgd-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Mini Message Bubble */
+.lgd-mini-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 82%;
+  font-size: 0.85rem;
+}
+
+.lgd-mini-msg.incoming {
+  align-self: flex-start;
+}
+
+.lgd-mini-msg.outgoing {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.lgd-mini-bubble {
+  padding: 8px 12px;
+  border-radius: 14px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.lgd-mini-msg.incoming .lgd-mini-bubble {
+  background: #251b42;
+  color: #f1f5f9;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-bottom-left-radius: 2px;
+}
+
+.lgd-mini-msg.outgoing .lgd-mini-bubble {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  color: #ffffff;
+  border-bottom-right-radius: 2px;
+}
+
+.lgd-mini-author {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #f59e0b;
+  margin-bottom: 2px;
+}
+
+.lgd-mini-time {
+  font-size: 0.65rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Panel Footer Input */
+.lgd-panel-footer {
+  padding: 10px 12px;
+  background: #150e2c;
+  border-top: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.lgd-panel-form {
+  display: flex;
+  gap: 6px;
+}
+
+.lgd-panel-input {
+  flex: 1;
+  background: #0f0a1c;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  color: #ffffff;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.lgd-panel-input:focus {
+  border-color: #f59e0b;
+}
+
+.lgd-panel-send-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  border: none;
+  color: #ffffff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.15s;
+}
+
+.lgd-panel-send-btn:hover {
+  transform: scale(1.08);
+}
+
+.lgd-panel-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 576px) {
+  .lgd-floating-bubble-wrapper {
+    right: 16px;
+    bottom: 16px;
+  }
+
+  .lgd-bubble-trigger-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 22px;
+  }
+
+  .lgd-chat-panel {
+    width: calc(100vw - 24px);
+    height: 480px;
+    bottom: 66px;
+  }
+}

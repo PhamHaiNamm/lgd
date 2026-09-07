@@ -40,8 +40,8 @@ function saveLocalFile(fileBuffer, originalname = '') {
 
   fs.writeFileSync(filePath, fileBuffer);
 
-  const port = config.port || 5000;
-  const baseUrl = `http://localhost:${port}`;
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER;
+  const baseUrl = isProduction ? 'https://lgd-backend.onrender.com' : `http://localhost:${config.port || 5000}`;
   const fileUrl = `${baseUrl}/uploads/${randomName}`;
 
   return {
