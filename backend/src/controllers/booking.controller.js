@@ -1,15 +1,112 @@
 const Booking = require('../models/booking.model');
+const Schedule = require('../models/schedule.model');
 const { sendSuccess, sendError } = require('../utils/responseHandler');
+
+/**
+ * Helper: Kiểm tra xem ngày và giờ đã có lịch đặt hoặc lịch diễn chưa
+ */
+async function findBookingConflict(eventDate, eventTime, excludeBookingId = null) {
+  if (!eventDate || !eventTime) return null;
+
+  const cleanDate = eventDate.trim();
+  const cleanTime = eventTime.trim();
+
+  if (!cleanDate || !cleanTime) return null;
+
+  // 1. Kiểm tra trong danh sách Đặt lịch của khách (loại trừ các đơn đã huỷ hoặc chính đơn đang cập nhật)
+  const bookingQuery = {
+    eventDate: cleanDate,
+    eventTime: cleanTime,
+    status: { $in: ['pending', 'contacted', 'confirmed'] },
+  };
+  if (excludeBookingId) {
+    bookingQuery._id = { $ne: excludeBookingId };
+  }
+
+  const existingBooking = await Booking.findOne(bookingQuery);
+  if (existingBooking) {
+    return {
+      type: 'booking',
+      message: `Khung giờ ${cleanTime} ngày ${cleanDate} đã có khách hàng đặt lịch (${existingBooking.serviceType} tại ${existingBooking.location || 'địa điểm khách chọn'}).`,
+      detail: existingBooking,
+    };
+  }
+
+  // 2. Kiểm tra trong danh sách Lịch biểu diễn chính thức của đoàn
+  const existingSchedule = await Schedule.findOne({
+    date: cleanDate,
+    time: cleanTime,
+  });
+  if (existingSchedule) {
+    return {
+      type: 'schedule',
+      message: `Khung giờ ${cleanTime} ngày ${cleanDate} trùng với lịch biểu diễn của đoàn (${existingSchedule.description} tại ${existingSchedule.location}).`,
+      detail: existingSchedule,
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Public: Kiểm tra nhanh xem khung giờ có trống không (Real-time check)
+ */
+async function checkAvailability(req, res, next) {
+  try {
+    const { eventDate, eventTime } = req.query;
+
+    if (!eventDate || !eventTime) {
+      return sendSuccess(res, { available: true }, 'Vui lòng chọn đầy đủ ngày và giờ.');
+    }
+
+    const conflict = await findBookingConflict(eventDate, eventTime);
+
+    if (conflict) {
+      return sendSuccess(
+        res,
+        {
+          available: false,
+          conflictType: conflict.type,
+          message: conflict.message,
+        },
+        'Khung giờ đã có người đặt hoặc trùng lịch.'
+      );
+    }
+
+    return sendSuccess(
+      res,
+      {
+        available: true,
+        message: 'Khung giờ này còn trống, bạn có thể đặt lịch!',
+      },
+      'Khung giờ còn trống.'
+    );
+  } catch (error) {
+    next(error);
+  }
+}
 
 /**
  * Public: Khách hàng gửi form yêu cầu liên hệ / đặt lịch
  */
 async function createBooking(req, res, next) {
   try {
-    const { fullName, phone, serviceType, eventDate, location, note } = req.body;
+    const { fullName, phone, serviceType, eventDate, eventTime, location, note } = req.body;
 
     if (!fullName || !phone) {
       return sendError(res, 'Vui lòng cung cấp đầy đủ Họ tên và Số điện thoại liên hệ.', 400);
+    }
+
+    // Kiểm tra trùng giờ nếu có cung cấp ngày và giờ
+    if (eventDate && eventTime) {
+      const conflict = await findBookingConflict(eventDate, eventTime);
+      if (conflict) {
+        return sendError(
+          res,
+          `⚠️ ĐÃ TRÙNG LỊCH: ${conflict.message} Quý khách vui lòng chọn khung giờ khác hoặc liên hệ trực tiếp hotline để được hỗ trợ!`,
+          409
+        );
+      }
     }
 
     const newBooking = await Booking.create({
@@ -17,6 +114,7 @@ async function createBooking(req, res, next) {
       phone: phone.trim(),
       serviceType: serviceType ? serviceType.trim() : 'Múa Lân Khai Trương',
       eventDate: eventDate ? eventDate.trim() : '',
+      eventTime: eventTime ? eventTime.trim() : '',
       location: location ? location.trim() : '',
       note: note ? note.trim() : '',
       status: 'pending',
@@ -93,6 +191,7 @@ async function deleteBooking(req, res, next) {
 }
 
 module.exports = {
+  checkAvailability,
   createBooking,
   getAllBookings,
   updateBookingStatus,

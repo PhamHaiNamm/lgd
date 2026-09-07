@@ -31,6 +31,11 @@ const bookingSchema = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    eventTime: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     location: {
       type: String,
       default: '',

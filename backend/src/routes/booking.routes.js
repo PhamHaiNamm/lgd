@@ -1,5 +1,6 @@
 const express = require('express');
 const {
+  checkAvailability,
   createBooking,
   getAllBookings,
   updateBookingStatus,
@@ -8,6 +9,9 @@ const {
 const { verifyToken, requireAdmin } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
+
+// Public: Kiểm tra khung giờ trống
+router.get('/check-availability', checkAvailability);
 
 // Public: Gửi form đặt lịch
 router.post('/', createBooking);
