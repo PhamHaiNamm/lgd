@@ -94,22 +94,31 @@
 }
 
 .lunar-cell.selected {
-    background-color: var(--lgd-purple-dark) !important;
+    background-color: #7c3aed !important;
+}
+
+.lunar-cell.selected .solar-date,
+.lunar-cell.selected .lunar-date {
+    color: #ffffff !important;
+}
+
+.lunar-cell.selected.has-events::after {
+    background-color: #ffffff !important;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.9);
 }
 
 .lunar-cell.has-events {
-    background-color: rgba(139, 92, 246, 0.15);
-    /* light purple tint */
+    background-color: #f5f3ff;
 }
 
 .lunar-cell.today {
-    background-color: rgba(139, 92, 246, 0.1);
-    box-shadow: inset 0 0 0 1px var(--lgd-accent-bright);
+    background-color: #ede9fe;
+    box-shadow: inset 0 0 0 2px #7c3aed;
 }
 
 .lunar-cell.today .solar-date {
-    color: var(--lgd-accent-bright);
-    text-shadow: 0 0 6px var(--lgd-purple-glow);
+    color: #7c3aed;
+    font-weight: 800;
 }
 
 /* Event indicator dot */
@@ -119,11 +128,11 @@
     bottom: 8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 6px;
-    height: 6px;
-    background-color: var(--lgd-accent-bright);
+    width: 8px;
+    height: 8px;
+    background-color: #7c3aed;
     border-radius: 50%;
-    box-shadow: 0 0 5px var(--lgd-purple-glow);
+    box-shadow: 0 0 6px rgba(124, 58, 237, 0.5);
 }
 
 .solar-date {
