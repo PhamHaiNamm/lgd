@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
 import { DragonIcon, PeachBlossomIcon, FestivalStrip } from './Decorations';
@@ -7,16 +7,11 @@ import './Header.css';
 function Header() {
   const { user, logout } = useContext(AuthContext);
   const location = useLocation();
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.removeItem('theme');
+  }, []);
 
   const displayName = user?.name || user?.username || '';
   const isAdmin = user?.role === 'admin';
@@ -126,18 +121,6 @@ function Header() {
                     >
                       <span>Liên hệ / Đặt lịch</span>
                     </Link>
-                  </li>
-
-                  {/* Nút đổi theme Sáng/Tối */}
-                  <li className="lgd-nav-item ms-lg-1">
-                    <button
-                      onClick={toggleTheme}
-                      className="lgd-theme-btn"
-                      title={theme === 'dark' ? 'Chuyển sang giao diện Sáng' : 'Chuyển sang giao diện Tối'}
-                      aria-label="Đổi giao diện"
-                    >
-                      {theme === 'dark' ? '☀️' : '🌙'}
-                    </button>
                   </li>
                 </ul>
               </div>

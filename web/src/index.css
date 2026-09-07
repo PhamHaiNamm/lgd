@@ -32,24 +32,7 @@
   --lgd-text-muted: #64748b;
 }
 
-[data-theme="dark"] {
-  --lgd-black: #0f0a1c;
-  --lgd-black-soft: #1a132f;
-  --lgd-black-card: #1e1638;
-  --lgd-gray: #2d214f;
-  --lgd-gray-border: #3d2e6b;
-  --lgd-text: #f8fafc;
-  --lgd-text-muted: #94a3b8;
-  --lgd-purple: #8b5cf6;
-  --lgd-purple-light: #a78bfa;
-  --lgd-purple-bright: #c4b5fd;
-  --lgd-purple-dark: #7c3aed;
-  --lgd-purple-glow: rgba(139, 92, 246, 0.25);
-  --lgd-accent: #a78bfa;
-  --lgd-accent-light: #c4b5fd;
-  --lgd-accent-bright: #ddd6fe;
-  --lgd-accent-dark: #7c3aed;
-}
+
 
 /* Base resets & typography */
 * {
