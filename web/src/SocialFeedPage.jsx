@@ -587,7 +587,7 @@ export default function SocialFeedPage() {
                         onError={(e) => {
                           if (!e.target.dataset.triedFallback) {
                             e.target.dataset.triedFallback = 'true';
-                            e.target.src = 'https://res.cloudinary.com/lucgiaduong/image/upload/v1/default-post.png';
+                            e.target.src = '/images/Logo_full.png';
                           }
                         }}
                       />

@@ -177,27 +177,27 @@ export default function SchedulePage() {
     : "";
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--lgd-black, #0f0a1c)", color: "var(--lgd-text, #f1f5f9)" }}>
+    <div style={{ minHeight: "100vh", background: "#f8f9fc", color: "#1e1b4b" }}>
       <Header />
 
       <section className="performance-section pb-5 pt-5">
         <Container>
-          <div className="text-center mb-4 lgd-pattern-bg">
-            <h2 className="display-4 fw-bold mb-3" style={{ color: "var(--lgd-title-gold, #f6e05e)" }}>
+          <div className="text-center mb-4">
+            <h2 className="display-5 fw-bold mb-3" style={{ color: "#7c3aed" }}>
               LỊCH BIỂU DIỄN
             </h2>
-            <p className="text-secondary mx-auto mb-4" style={{ maxWidth: "640px" }}>
+            <p className="text-muted mx-auto mb-4" style={{ maxWidth: "640px" }}>
               Xem các lịch biểu diễn dự kiến của Đoàn Lân Sư Rồng Lục Gia Đường. Chọn một ngày trên lịch để xem chi tiết.
             </p>
 
             {isAdmin && (
               <div className="d-flex align-items-center justify-content-center gap-3 mt-3 flex-wrap">
                 <Button
-                  variant={isAdminMode ? "outline-warning" : "warning"}
+                  variant={isAdminMode ? "outline-primary" : "primary"}
                   className="fw-bold"
                   onClick={() => setIsAdminMode((v) => !v)}
                 >
-                  {isAdminMode ? "🔒 Tắt chế độ Admin" : "⚙️ Bật chế độ Quản trị lịch"}
+                  {isAdminMode ? "🔒 Tắt chế độ Admin" : "⚙️ Quản trị lịch"}
                 </Button>
 
                 {isAdminMode && (
@@ -215,10 +215,10 @@ export default function SchedulePage() {
 
           <Row className="g-4">
             <Col lg={10} xl={8} className="mx-auto">
-              <div className="bg-dark rounded shadow" style={{ border: "1px solid var(--lgd-gray-border, #332757)" }}>
+              <div className="bg-white rounded shadow-sm p-3" style={{ border: "1px solid #e9d5ff" }}>
                 {loading ? (
                   <div className="text-center py-5 text-secondary">
-                    <Spinner animation="border" variant="warning" />
+                    <Spinner animation="border" variant="primary" />
                     <p className="mt-2">Đang tải dữ liệu lịch...</p>
                   </div>
                 ) : (
@@ -238,16 +238,15 @@ export default function SchedulePage() {
             onHide={() => setShowModal(false)}
             size="lg"
             centered
-            contentClassName="border border-secondary"
           >
-            <Modal.Header closeButton className="border-bottom border-secondary" style={{ backgroundColor: "#1a132f" }}>
-              <Modal.Title className="fw-bold" style={{ color: "#f6e05e" }}>
+            <Modal.Header closeButton style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e9d5ff" }}>
+              <Modal.Title className="fw-bold" style={{ color: "#7c3aed" }}>
                 📅 Lịch: {formattedSelectedDate}
               </Modal.Title>
             </Modal.Header>
-            <Modal.Body className="p-4" style={{ backgroundColor: "#0f0a1c" }}>
+            <Modal.Body className="p-4" style={{ backgroundColor: "#ffffff" }}>
               {isAdmin && isAdminMode && (
-                <div className="mb-4 text-center pb-3 border-bottom border-secondary">
+                <div className="mb-4 text-center pb-3 border-bottom" style={{ borderColor: "#f1f5f9" }}>
                   <Button
                     variant="success"
                     onClick={() => {
@@ -261,7 +260,7 @@ export default function SchedulePage() {
               )}
 
               {selectedItems.length === 0 ? (
-                <div className="text-center py-4 text-secondary">
+                <div className="text-center py-4 text-muted">
                   <p className="mb-0">Không có lịch biểu diễn nào trong ngày này.</p>
                 </div>
               ) : (
@@ -270,17 +269,17 @@ export default function SchedulePage() {
                     <div
                       key={item._id || item.id}
                       className="p-3 rounded shadow-sm"
-                      style={{ backgroundColor: "#1a132f", border: "1px solid #332757" }}
+                      style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0" }}
                     >
                       <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
-                        <h5 className="fw-bold mb-2" style={{ color: "#f6e05e" }}>
+                        <h5 className="fw-bold mb-2" style={{ color: "#7c3aed" }}>
                           {item.description || item.content || "Chương trình biểu diễn"}
                         </h5>
                         {isAdmin && isAdminMode && (
                           <div className="d-flex gap-2">
                             <Button
                               size="sm"
-                              variant="outline-info"
+                              variant="outline-primary"
                               onClick={() => {
                                 setShowModal(false);
                                 handleOpenEditModal(item);
@@ -299,18 +298,18 @@ export default function SchedulePage() {
                         )}
                       </div>
 
-                      <div className="mb-1 text-light">
-                        <i className="bi bi-clock me-2 text-warning"></i>
+                      <div className="mb-1" style={{ color: "#334155" }}>
+                        <i className="bi bi-clock me-2 text-primary"></i>
                         <strong>Giờ:</strong> {item.time || "Chưa xác định"}
                       </div>
-                      <div className="mb-1 text-light">
+                      <div className="mb-1" style={{ color: "#334155" }}>
                         <i className="bi bi-geo-alt me-2 text-success"></i>
                         <strong>Địa điểm:</strong> {item.location || "Đang cập nhật"}
                       </div>
                       {item.note && (
                         <div
                           className="mt-2 small p-2 rounded"
-                          style={{ backgroundColor: "#120b24", color: "#94a3b8" }}
+                          style={{ backgroundColor: "#f1f5f9", color: "#64748b" }}
                         >
                           <strong>Ghi chú:</strong> {item.note}
                         </div>
@@ -320,7 +319,7 @@ export default function SchedulePage() {
                 </div>
               )}
             </Modal.Body>
-            <Modal.Footer className="border-secondary" style={{ backgroundColor: "#1a132f" }}>
+            <Modal.Footer style={{ backgroundColor: "#ffffff", borderTop: "1px solid #e9d5ff" }}>
               <Button variant="secondary" onClick={() => setShowModal(false)}>
                 Đóng
               </Button>
@@ -332,79 +331,78 @@ export default function SchedulePage() {
             show={showEditModal}
             onHide={() => setShowEditModal(false)}
             centered
-            contentClassName="border border-secondary"
           >
-            <Modal.Header closeButton className="border-bottom border-secondary" style={{ backgroundColor: "#1a132f" }}>
-              <Modal.Title className="fw-bold" style={{ color: "#f6e05e" }}>
+            <Modal.Header closeButton style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e9d5ff" }}>
+              <Modal.Title className="fw-bold" style={{ color: "#7c3aed" }}>
                 {editingItem ? "✏️ Chỉnh sửa Lịch Biểu Diễn" : "➕ Thêm Lịch Biểu Diễn Mới"}
               </Modal.Title>
             </Modal.Header>
             <Form onSubmit={handleSaveSchedule}>
-              <Modal.Body className="p-4" style={{ backgroundColor: "#0f0a1c" }}>
+              <Modal.Body className="p-4" style={{ backgroundColor: "#ffffff" }}>
                 <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold text-secondary">Ngày biểu diễn (YYYY-MM-DD) *</Form.Label>
+                  <Form.Label className="small fw-bold text-muted">Ngày biểu diễn (YYYY-MM-DD) *</Form.Label>
                   <Form.Control
                     type="date"
                     required
                     value={scheduleForm.date}
                     onChange={(e) => setScheduleForm({ ...scheduleForm, date: e.target.value })}
-                    style={{ backgroundColor: "#120b24", borderColor: "#3b2c64", color: "#f1f5f9" }}
+                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
                   />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold text-secondary">Giờ biểu diễn (HH:mm)</Form.Label>
+                  <Form.Label className="small fw-bold text-muted">Giờ biểu diễn (HH:mm)</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="VD: 18:00, 08:30..."
                     value={scheduleForm.time}
                     onChange={(e) => setScheduleForm({ ...scheduleForm, time: e.target.value })}
-                    style={{ backgroundColor: "#120b24", borderColor: "#3b2c64", color: "#f1f5f9" }}
+                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
                   />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold text-secondary">Địa điểm biểu diễn *</Form.Label>
+                  <Form.Label className="small fw-bold text-muted">Địa điểm biểu diễn *</Form.Label>
                   <Form.Control
                     type="text"
                     required
                     placeholder="VD: 123 Hoàn Kiếm, Hà Nội / Trung tâm Hội nghị..."
                     value={scheduleForm.location}
                     onChange={(e) => setScheduleForm({ ...scheduleForm, location: e.target.value })}
-                    style={{ backgroundColor: "#120b24", borderColor: "#3b2c64", color: "#f1f5f9" }}
+                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
                   />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold text-secondary">Mô tả / Tên chương trình *</Form.Label>
+                  <Form.Label className="small fw-bold text-muted">Mô tả / Tên chương trình *</Form.Label>
                   <Form.Control
                     type="text"
                     required
-                    placeholder="VD: Biểu diễn Khai Trương, Lễ Hội Trung Thu..."
+                    placeholder="VD: Khai trương cửa hàng ABC, biểu diễn 2 Lân..."
                     value={scheduleForm.description}
                     onChange={(e) => setScheduleForm({ ...scheduleForm, description: e.target.value })}
-                    style={{ backgroundColor: "#120b24", borderColor: "#3b2c64", color: "#f1f5f9" }}
+                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
                   />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold text-secondary">Ghi chú thêm (Đội hình, trang phục, yêu cầu...)</Form.Label>
+                  <Form.Label className="small fw-bold text-muted">Ghi chú thêm</Form.Label>
                   <Form.Control
                     as="textarea"
-                    rows={3}
-                    placeholder="VD: Đội hình 4 lân đỏ vàng + 1 rồng, tập trung lúc 16:30..."
+                    rows={2}
+                    placeholder="VD: Đem theo trang phục Lân đỏ, chuẩn bị trước 30p..."
                     value={scheduleForm.note}
                     onChange={(e) => setScheduleForm({ ...scheduleForm, note: e.target.value })}
-                    style={{ backgroundColor: "#120b24", borderColor: "#3b2c64", color: "#f1f5f9" }}
+                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
                   />
                 </Form.Group>
               </Modal.Body>
 
-              <Modal.Footer className="border-secondary" style={{ backgroundColor: "#1a132f" }}>
+              <Modal.Footer style={{ backgroundColor: "#ffffff", borderTop: "1px solid #e9d5ff" }}>
                 <Button variant="secondary" onClick={() => setShowEditModal(false)}>
                   Hủy
                 </Button>
-                <Button variant="warning" type="submit" disabled={isSaving} className="fw-bold">
+                <Button variant="primary" type="submit" disabled={isSaving} className="fw-bold" style={{ backgroundColor: "#7c3aed", borderColor: "#7c3aed" }}>
                   {isSaving ? (
                     <>
                       <Spinner animation="border" size="sm" className="me-2" />

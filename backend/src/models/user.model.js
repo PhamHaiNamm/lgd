@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: 'https://res.cloudinary.com/lucgiaduong/image/upload/v1/default-avatar.png',
+      default: '',
     },
     location: {
       type: String,

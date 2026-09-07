@@ -171,26 +171,26 @@ function ContactPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--lgd-black, #0f0a1c)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--lgd-black, #f8f9fc)' }}>
       <Header />
 
-      <section className="container my-5 lgd-section lgd-pattern-bg">
+      <section className="container my-5 lgd-section">
         <FestivalStrip iconSize={22} />
-        <h2 className="text-center mb-4 fw-bold" style={{ color: '#a78bfa', textShadow: '0 0 16px var(--lgd-purple-glow)' }}>
+        <h2 className="text-center mb-4 fw-bold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Liên hệ & Đặt lịch biểu diễn</DecorativeTitle>
         </h2>
 
         {isAdmin && (
           <div className="text-center mb-4 d-flex justify-content-center gap-2">
             <Button
-              variant={activeTab === 'contact' ? 'warning' : 'outline-warning'}
+              variant={activeTab === 'contact' ? 'primary' : 'outline-primary'}
               className="fw-bold"
               onClick={() => setActiveTab('contact')}
             >
               📝 Trang Liên hệ & Form Đặt lịch
             </Button>
             <Button
-              variant={activeTab === 'admin_bookings' ? 'warning' : 'outline-warning'}
+              variant={activeTab === 'admin_bookings' ? 'primary' : 'outline-primary'}
               className="fw-bold"
               onClick={() => setActiveTab('admin_bookings')}
             >
@@ -205,12 +205,11 @@ function ContactPage() {
             {/* Cột 1: Thông tin Trực tiếp & Nút Zalo / Điện thoại */}
             <div className="col-lg-5">
               <div
-                className="rounded p-4 h-100 d-flex flex-column justify-content-between"
+                className="rounded p-4 h-100 d-flex flex-column justify-content-between shadow-sm"
                 style={{
-                  background: 'linear-gradient(180deg, var(--lgd-black-card, #1a132f) 0%, var(--lgd-black-soft, #100a20) 100%)',
-                  border: '2px solid var(--lgd-purple-glow, rgba(139,92,246,0.4))',
-                  color: 'var(--lgd-text, #f1f5f9)',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                  background: '#ffffff',
+                  border: '1px solid #e9d5ff',
+                  color: 'var(--lgd-text, #1e1b4b)',
                 }}
               >
                 <div>
@@ -220,32 +219,31 @@ function ContactPage() {
                       alt={CONTACT_INFO.fullName}
                       className="rounded-circle"
                       style={{
-                        width: '130px',
-                        height: '130px',
+                        width: '120px',
+                        height: '120px',
                         objectFit: 'cover',
-                        border: '3px solid #f59e0b',
-                        boxShadow: '0 0 16px rgba(245,158,11,0.5)',
+                        border: '3px solid #7c3aed',
                       }}
                       onError={(e) => {
                         e.target.src = '/images/Logo_full.png';
                       }}
                     />
-                    <h4 className="fw-bold mt-3 mb-1" style={{ color: '#f6e05e' }}>
+                    <h4 className="fw-bold mt-3 mb-1" style={{ color: '#1e1b4b' }}>
                       {CONTACT_INFO.fullName}
                     </h4>
-                    <p className="text-secondary small mb-0">{CONTACT_INFO.position}</p>
+                    <p className="text-muted small mb-0">{CONTACT_INFO.position}</p>
                   </div>
 
-                  <hr style={{ borderColor: 'rgba(139,92,246,0.3)' }} />
+                  <hr style={{ borderColor: '#f1f5f9' }} />
 
                   <div className="mb-3">
-                    <span className="text-secondary small d-block">📍 Đại bản doanh:</span>
+                    <span className="text-muted small d-block">📍 Đại bản doanh:</span>
                     <strong style={{ fontSize: '0.95rem' }}>{CONTACT_INFO.address}</strong>
                   </div>
 
                   <div className="mb-4">
-                    <span className="text-secondary small d-block">📞 Hotline trực tiếp:</span>
-                    <strong style={{ fontSize: '1.25rem', color: '#38bdf8' }}>{CONTACT_INFO.phone}</strong>
+                    <span className="text-muted small d-block">📞 Hotline trực tiếp:</span>
+                    <strong style={{ fontSize: '1.25rem', color: '#7c3aed' }}>{CONTACT_INFO.phone}</strong>
                   </div>
                 </div>
 
@@ -259,28 +257,24 @@ function ContactPage() {
                     style={{
                       background: '#0068ff',
                       color: '#ffffff',
-                      borderRadius: '10px',
-                      fontSize: '1rem',
-                      boxShadow: '0 4px 14px rgba(0,104,255,0.4)',
+                      borderRadius: '8px',
+                      fontSize: '0.95rem',
                     }}
                   >
-                    <span style={{ fontSize: '1.2rem' }}>💬</span>
-                    <span>Nhắn Zalo ngay (0345422378)</span>
+                    <span>💬 Nhắn Zalo ngay (0345422378)</span>
                   </a>
 
                   <a
                     href={`tel:${CONTACT_INFO.phone}`}
                     className="btn w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2"
                     style={{
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      background: '#10b981',
                       color: '#ffffff',
-                      borderRadius: '10px',
-                      fontSize: '1rem',
-                      boxShadow: '0 4px 14px rgba(16,185,129,0.3)',
+                      borderRadius: '8px',
+                      fontSize: '0.95rem',
                     }}
                   >
-                    <span style={{ fontSize: '1.2rem' }}>📞</span>
-                    <span>Gọi điện trực tiếp</span>
+                    <span>📞 Gọi điện trực tiếp</span>
                   </a>
                 </div>
               </div>
@@ -289,18 +283,17 @@ function ContactPage() {
             {/* Cột 2: Form Điền thông tin đặt lịch gửi về cho Admin */}
             <div className="col-lg-7">
               <div
-                className="rounded p-4 p-md-5"
+                className="rounded p-4 p-md-5 shadow-sm"
                 style={{
-                  background: 'linear-gradient(180deg, var(--lgd-black-card, #1a132f) 0%, var(--lgd-black-soft, #100a20) 100%)',
-                  border: '2px solid var(--lgd-purple-glow, rgba(139,92,246,0.4))',
-                  color: 'var(--lgd-text, #f1f5f9)',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                  background: '#ffffff',
+                  border: '1px solid #e9d5ff',
+                  color: 'var(--lgd-text, #1e1b4b)',
                 }}
               >
-                <h3 className="fw-bold mb-3" style={{ color: '#a78bfa' }}>
+                <h3 className="fw-bold mb-3" style={{ color: '#7c3aed' }}>
                   📝 Gửi yêu cầu đặt lịch biểu diễn
                 </h3>
-                <p className="text-secondary small mb-4">
+                <p className="text-muted small mb-4">
                   Vui lòng điền thông tin sự kiện của bạn vào form dưới đây. Trưởng đoàn sẽ tiếp nhận và liên hệ tư vấn báo giá ngay!
                 </p>
 
@@ -322,28 +315,28 @@ function ContactPage() {
                   <div className="row g-3">
                     <div className="col-md-6">
                       <Form.Group className="mb-3">
-                        <Form.Label className="small fw-bold text-secondary">Họ và tên quý khách *</Form.Label>
+                        <Form.Label className="small fw-bold text-muted">Họ và tên quý khách *</Form.Label>
                         <Form.Control
                           type="text"
                           required
                           placeholder="VD: Nguyễn Văn A"
                           value={formData.fullName}
                           onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                          style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                          style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                         />
                       </Form.Group>
                     </div>
 
                     <div className="col-md-6">
                       <Form.Group className="mb-3">
-                        <Form.Label className="small fw-bold text-secondary">Số điện thoại liên hệ *</Form.Label>
+                        <Form.Label className="small fw-bold text-muted">Số điện thoại liên hệ *</Form.Label>
                         <Form.Control
                           type="tel"
                           required
                           placeholder="VD: 0987654321"
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                          style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                         />
                       </Form.Group>
                     </div>
@@ -352,11 +345,11 @@ function ContactPage() {
                   <div className="row g-3">
                     <div className="col-md-6">
                       <Form.Group className="mb-3">
-                        <Form.Label className="small fw-bold text-secondary">Dịch vụ quan tâm</Form.Label>
+                        <Form.Label className="small fw-bold text-muted">Dịch vụ quan tâm</Form.Label>
                         <Form.Select
                           value={formData.serviceType}
                           onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
-                          style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                          style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                         >
                           {SERVICE_OPTIONS.map((s, idx) => (
                             <option key={idx} value={s}>
@@ -369,38 +362,38 @@ function ContactPage() {
 
                     <div className="col-md-6">
                       <Form.Group className="mb-3">
-                        <Form.Label className="small fw-bold text-secondary">Ngày giờ dự kiến sự kiện</Form.Label>
+                        <Form.Label className="small fw-bold text-muted">Ngày giờ dự kiến sự kiện</Form.Label>
                         <Form.Control
                           type="text"
                           placeholder="VD: 15/09/2026 - 08:30 sáng"
                           value={formData.eventDate}
                           onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-                          style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                          style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                         />
                       </Form.Group>
                     </div>
                   </div>
 
                   <Form.Group className="mb-3">
-                    <Form.Label className="small fw-bold text-secondary">Địa điểm tổ chức sự kiện</Form.Label>
+                    <Form.Label className="small fw-bold text-muted">Địa điểm tổ chức sự kiện</Form.Label>
                     <Form.Control
                       type="text"
                       placeholder="VD: Hạ Long, Quảng Ninh / Cẩm Phả / Uông Bí..."
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                      style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                     />
                   </Form.Group>
 
                   <Form.Group className="mb-4">
-                    <Form.Label className="small fw-bold text-secondary">Ghi chú / Yêu cầu chi tiết</Form.Label>
+                    <Form.Label className="small fw-bold text-muted">Ghi chú / Yêu cầu chi tiết</Form.Label>
                     <Form.Control
                       as="textarea"
                       rows={3}
                       placeholder="VD: Yêu cầu 2 Lân 1 Rồng, có trống hội và ông địa..."
                       value={formData.note}
                       onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                      style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                      style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                     />
                   </Form.Group>
 
@@ -409,11 +402,11 @@ function ContactPage() {
                     disabled={isSubmitting}
                     className="w-100 py-3 fw-bold"
                     style={{
-                      background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-                      border: '1px solid #a78bfa',
-                      borderRadius: '10px',
-                      fontSize: '1.05rem',
-                      boxShadow: '0 4px 16px rgba(139,92,246,0.4)',
+                      background: '#7c3aed',
+                      border: '1px solid #6d28d9',
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      color: '#ffffff',
                     }}
                   >
                     {isSubmitting ? (

@@ -37,14 +37,14 @@ function Login() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--lgd-black)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--lgd-black, #f8f9fc)' }}>
       <Header />
       <div className="container my-5">
         <div className="row justify-content-center">
           <div className="col-md-6 col-lg-4">
-            <div className="card shadow lgd-border-gold" style={{ backgroundColor: 'var(--lgd-black-card)', border: '2px solid var(--lgd-purple-glow)' }}>
-              <div className="card-body p-4">
-                <h2 className="text-center mb-4 lgd-title-gold" style={{ color: '#a78bfa', textShadow: '0 0 12px var(--lgd-purple-glow)' }}>
+            <div className="card shadow-sm" style={{ backgroundColor: '#ffffff', border: '1px solid #e9d5ff', borderRadius: '16px' }}>
+              <div className="card-body p-4 p-md-5">
+                <h2 className="text-center mb-4 fw-bold" style={{ color: '#7c3aed' }}>
                   Đăng nhập hệ thống
                 </h2>
 
@@ -56,7 +56,7 @@ function Login() {
 
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
-                    <label style={{ color: '#fafafa' }}>Tên đăng nhập</label>
+                    <label className="form-label fw-bold small text-muted">Tên đăng nhập</label>
                     <input
                       type="text"
                       name="username"
@@ -69,7 +69,7 @@ function Login() {
                   </div>
 
                   <div className="mb-3">
-                    <label style={{ color: '#fafafa' }}>Mật khẩu</label>
+                    <label className="form-label fw-bold small text-muted">Mật khẩu</label>
                     <input
                       type="password"
                       name="password"
@@ -82,16 +82,16 @@ function Login() {
                   </div>
 
                   <button
-                    className="btn w-100 fw-bold py-2 mt-2"
+                    className="btn w-100 fw-bold py-2 mt-3"
                     disabled={loading}
-                    style={{ background: 'linear-gradient(180deg, #8b5cf6 0%, #5b21b6 100%)', border: '1px solid #a78bfa', color: '#fff' }}
+                    style={{ background: '#7c3aed', borderColor: '#7c3aed', color: '#fff', borderRadius: '8px' }}
                   >
                     {loading ? 'Đang xử lý...' : 'Đăng nhập'}
                   </button>
                 </form>
 
-                <p className="text-center mt-3" style={{ color: '#a3a3a3' }}>
-                  Chưa có tài khoản? <Link to="/register" style={{ color: '#a78bfa', fontWeight: 'bold' }}>Đăng ký ngay</Link>
+                <p className="text-center mt-4 mb-0 text-muted small">
+                  Chưa có tài khoản? <Link to="/register" style={{ color: '#7c3aed', fontWeight: 'bold' }}>Đăng ký ngay</Link>
                 </p>
               </div>
             </div>

@@ -7,7 +7,7 @@ import Footer from './components/Footer';
 import Banner from './components/Banner';
 import { DecorativeTitle, FestivalStrip } from './components/Decorations';
 
-const DEFAULT_AVATAR = 'https://res.cloudinary.com/lucgiaduong/image/upload/v1/default-avatar.png';
+const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?name=LGD&background=7c3aed&color=fff';
 
 function Introduction() {
   const { token, isAdmin } = useContext(AuthContext);
@@ -236,22 +236,22 @@ function Introduction() {
   }, [selectedMemberId]);
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--lgd-black, #0f0a1c)' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--lgd-black, #f8f9fc)' }}>
       <Header />
       <Banner />
 
       {/* Giới thiệu chung về đoàn */}
-      <section className="container my-5 lgd-section lgd-pattern-bg">
+      <section className="container my-5 lgd-section">
         <FestivalStrip iconSize={22} />
-        <h2 className="text-center mb-4 fw-bold" style={{ color: '#a78bfa', textShadow: '0 0 16px var(--lgd-purple-glow)' }}>
+        <h2 className="text-center mb-4 fw-bold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Giới thiệu về đoàn</DecorativeTitle>
         </h2>
         <div
-          className="rounded overflow-hidden d-flex flex-column flex-md-row mx-auto"
+          className="rounded overflow-hidden d-flex flex-column flex-md-row mx-auto shadow-sm"
           style={{
             maxWidth: '960px',
-            background: 'linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black-soft) 100%)',
-            border: '2px solid var(--lgd-purple-glow)',
+            background: '#ffffff',
+            border: '1px solid #e9d5ff',
             color: 'var(--lgd-text)',
           }}
         >
@@ -289,17 +289,17 @@ function Introduction() {
       </section>
 
       {/* Thành tích nổi bật */}
-      <section className="container my-5 lgd-section lgd-pattern-bg">
+      <section className="container my-5 lgd-section">
         <FestivalStrip iconSize={22} />
-        <h2 className="text-center mb-4 fw-bold" style={{ color: '#a78bfa', textShadow: '0 0 16px var(--lgd-purple-glow)' }}>
+        <h2 className="text-center mb-4 fw-bold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Thành tích nổi bật</DecorativeTitle>
         </h2>
         <div
-          className="rounded p-4 p-md-5"
+          className="rounded p-4 p-md-5 shadow-sm"
           style={{
-            background: 'linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black-soft) 100%)',
-            border: '2px solid var(--lgd-purple-glow)',
-            borderLeft: '4px solid #8b5cf6',
+            background: '#ffffff',
+            border: '1px solid #e9d5ff',
+            borderLeft: '4px solid #7c3aed',
             color: 'var(--lgd-text)',
           }}
         >
@@ -314,20 +314,20 @@ function Introduction() {
       </section>
 
       {/* Thành viên Lục Gia Đường (Lấy từ Database) */}
-      <section className="container my-5 lgd-section lgd-pattern-bg">
+      <section className="container my-5 lgd-section">
         <FestivalStrip iconSize={22} />
-        <h2 className="text-center mb-4 fw-bold lgd-title-gold" style={{ color: '#a78bfa', textShadow: '0 0 16px var(--lgd-purple-glow)' }}>
+        <h2 className="text-center mb-4 fw-bold lgd-title-gold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Thành viên Lục Gia Đường ({membersData.length})</DecorativeTitle>
         </h2>
 
         {isAdmin && (
           <div className="text-center mb-4 d-flex justify-content-center gap-3 flex-wrap">
             <Button
-              variant={isAdminMode ? 'outline-warning' : 'warning'}
+              variant={isAdminMode ? 'outline-primary' : 'primary'}
               className="fw-bold"
               onClick={() => setIsAdminMode(!isAdminMode)}
             >
-              {isAdminMode ? '🔒 Tắt chế độ Quản trị' : '⚙️ Bật chế độ Quản trị Thành viên'}
+              {isAdminMode ? '🔒 Tắt chế độ Quản trị' : '⚙️ Quản trị Thành viên'}
             </Button>
 
             {isAdminMode && (
@@ -336,24 +336,24 @@ function Introduction() {
                 className="fw-bold"
                 onClick={() => setShowCreateModal(true)}
               >
-                ➕ Tạo tài khoản thành viên mới
+                ➕ Tạo tài khoản mới
               </Button>
             )}
           </div>
         )}
 
         <div
-          className="rounded p-4 p-md-5"
+          className="rounded p-4 p-md-5 shadow-sm"
           style={{
-            background: 'linear-gradient(180deg, var(--lgd-black-card) 0%, var(--lgd-black-soft) 100%)',
-            border: '2px solid var(--lgd-purple-glow)',
+            background: '#ffffff',
+            border: '1px solid #e9d5ff',
             color: 'var(--lgd-text)',
           }}
         >
           {loadingMembers ? (
             <div className="text-center py-5 text-secondary">
-              <Spinner animation="border" variant="warning" />
-              <p className="mt-2">Đang tải danh sách thành viên từ Database...</p>
+              <Spinner animation="border" variant="primary" />
+              <p className="mt-2">Đang tải danh sách thành viên...</p>
             </div>
           ) : (
             <div className="row g-2 g-md-3">
@@ -367,20 +367,20 @@ function Introduction() {
                     aria-pressed={selectedMemberId === member._id}
                     className="w-100 rounded text-center py-2 px-2 d-flex flex-column align-items-center justify-content-center"
                     style={{
-                      background: selectedMemberId === member._id ? 'var(--lgd-purple-glow)' : 'rgba(139,92,246,0.1)',
-                      border: selectedMemberId === member._id ? '2px solid var(--lgd-purple)' : '1px solid var(--lgd-gray-border)',
-                      color: 'var(--lgd-text)',
+                      background: selectedMemberId === member._id ? '#f5f3ff' : '#ffffff',
+                      border: selectedMemberId === member._id ? '2px solid #7c3aed' : '1px solid #e2e8f0',
+                      color: selectedMemberId === member._id ? '#7c3aed' : '#1e1b4b',
                       fontSize: '0.95rem',
                       cursor: 'pointer',
                       outline: 'none',
-                      fontWeight: selectedMemberId === member._id ? '700' : 'normal',
+                      fontWeight: selectedMemberId === member._id ? '700' : '500',
                       transition: 'all 0.2s ease',
                       minHeight: '60px',
                     }}
                   >
                     <span>{member.name}</span>
                     {member.role === 'admin' && (
-                      <span style={{ fontSize: '0.7rem', color: '#f59e0b' }}>👑 Admin</span>
+                      <span style={{ fontSize: '0.7rem', color: '#7c3aed' }}>👑 Admin</span>
                     )}
                   </button>
                 </div>
@@ -400,8 +400,8 @@ function Introduction() {
               style={{
                 position: 'fixed',
                 inset: 0,
-                background: 'rgba(0,0,0,0.85)',
-                backdropFilter: 'blur(6px)',
+                background: 'rgba(15, 23, 42, 0.6)',
+                backdropFilter: 'blur(4px)',
                 zIndex: 9999,
                 display: 'flex',
                 alignItems: 'center',
@@ -410,14 +410,14 @@ function Introduction() {
               }}
             >
               <div
-                className="rounded p-4 p-md-5 w-100"
+                className="rounded p-4 p-md-5 w-100 shadow-lg"
                 style={{
                   maxWidth: 800,
                   maxHeight: '90vh',
                   overflowY: 'auto',
-                  background: 'linear-gradient(180deg, #1a132f 0%, #0f0a1c 100%)',
-                  border: '2px solid rgba(139,92,246,0.55)',
-                  boxShadow: '0 20px 60px rgba(0,0,0,0.7)',
+                  background: '#ffffff',
+                  border: '1px solid #e9d5ff',
+                  color: '#1e1b4b',
                 }}
               >
                 <div className="d-flex align-items-start justify-content-between gap-3 flex-wrap">
@@ -426,16 +426,16 @@ function Introduction() {
                       <img
                         src={formatImageUrl(selectedMember.avatar) || DEFAULT_AVATAR}
                         alt={selectedMember.name}
-                        width={180}
-                        height={180}
+                        width={160}
+                        height={160}
                         onError={(e) => {
                           e.target.src = DEFAULT_AVATAR;
                         }}
                         style={{
                           borderRadius: '50%',
                           objectFit: 'cover',
-                          border: '3px solid #8b5cf6',
-                          background: '#0f0a1c',
+                          border: '3px solid #7c3aed',
+                          background: '#f5f3ff',
                         }}
                       />
                     </div>
@@ -444,23 +444,23 @@ function Introduction() {
                       {isAdminMode && isAdmin ? (
                         <>
                           <Form.Group className="mb-2">
-                            <Form.Label className="small fw-bold" style={{ color: '#a78bfa' }}>Họ và tên</Form.Label>
+                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Họ và tên</Form.Label>
                             <Form.Control
                               type="text"
                               size="sm"
                               value={selectedMember.name || ''}
                               onChange={(e) => handleMemberFieldChange('name', e.target.value)}
-                              style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                              style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                             />
                           </Form.Group>
 
                           <Form.Group className="mb-2">
-                            <Form.Label className="small fw-bold" style={{ color: '#a78bfa' }}>Quyền hạn (Role)</Form.Label>
+                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Quyền hạn (Role)</Form.Label>
                             <Form.Select
                               size="sm"
                               value={selectedMember.role || 'user'}
                               onChange={(e) => handleMemberFieldChange('role', e.target.value)}
-                              style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                              style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                             >
                               <option value="user">Thành viên (User)</option>
                               <option value="admin">Quản trị viên (Admin)</option>
@@ -468,96 +468,97 @@ function Introduction() {
                           </Form.Group>
 
                           <Form.Group className="mb-2">
-                            <Form.Label className="small fw-bold" style={{ color: '#a78bfa' }}>Năm sinh</Form.Label>
+                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Năm sinh</Form.Label>
                             <Form.Control
                               type="number"
                               size="sm"
                               value={selectedMember.birthYear || ''}
                               onChange={(e) => handleMemberFieldChange('birthYear', e.target.value)}
-                              style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                              style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                             />
                           </Form.Group>
 
                           <Form.Group className="mb-2">
-                            <Form.Label className="small fw-bold" style={{ color: '#a78bfa' }}>Khu vực / Tỉnh thành</Form.Label>
+                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Khu vực / Tỉnh thành</Form.Label>
                             <Form.Control
                               type="text"
                               size="sm"
                               value={selectedMember.location || ''}
                               onChange={(e) => handleMemberFieldChange('location', e.target.value)}
-                              style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                              style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                             />
                           </Form.Group>
 
                           <Form.Group className="mb-2">
-                            <Form.Label className="small fw-bold" style={{ color: '#a78bfa' }}>Tiểu sử / Giới thiệu</Form.Label>
+                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Tiểu sử / Giới thiệu</Form.Label>
                             <Form.Control
                               as="textarea"
                               rows={2}
                               size="sm"
                               value={selectedMember.bio || ''}
                               onChange={(e) => handleMemberFieldChange('bio', e.target.value)}
-                              style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                              style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                             />
                           </Form.Group>
 
                           <Form.Group className="mb-2">
-                            <Form.Label className="small fw-bold" style={{ color: '#a78bfa' }}>🔑 Đặt lại mật khẩu mới (để trống nếu không đổi)</Form.Label>
+                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>🔑 Đặt lại mật khẩu mới (để trống nếu không đổi)</Form.Label>
                             <Form.Control
                               type="text"
                               size="sm"
                               placeholder="Nhập mật khẩu mới..."
                               value={selectedMember.newPassword || ''}
                               onChange={(e) => handleMemberFieldChange('newPassword', e.target.value)}
-                              style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                              style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                             />
                           </Form.Group>
 
                           <Form.Group className="mb-3">
-                            <Form.Label className="small fw-bold" style={{ color: '#a78bfa' }}>Đổi ảnh đại diện</Form.Label>
+                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Đổi ảnh đại diện</Form.Label>
                             <Form.Control
                               type="file"
                               size="sm"
                               accept="image/*"
                               onChange={(e) => handleAvatarUpload(selectedMember._id, e)}
                               disabled={uploadingAvatar}
-                              style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                              style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                             />
-                            {uploadingAvatar && <small className="text-warning">Đang tải ảnh lên...</small>}
+                            {uploadingAvatar && <small className="text-primary">Đang tải ảnh lên...</small>}
                           </Form.Group>
                         </>
                       ) : (
                         <>
-                          <div className="fw-bold mb-1" style={{ fontSize: '1.8rem', color: '#f6e05e' }}>
+                          <div className="fw-bold mb-1" style={{ fontSize: '1.6rem', color: '#1e1b4b' }}>
                             {selectedMember.name}
                           </div>
                           <div className="mb-2">
-                            <span className="text-secondary small">@{selectedMember.username}</span>
+                            <span className="text-muted small">@{selectedMember.username}</span>
                             <span
                               className="badge ms-2"
                               style={{
-                                background: selectedMember.role === 'admin' ? '#f59e0b' : '#8b5cf6',
+                                background: selectedMember.role === 'admin' ? '#7c3aed' : '#e2e8f0',
+                                color: selectedMember.role === 'admin' ? '#ffffff' : '#475569',
                               }}
                             >
                               {selectedMember.role === 'admin' ? '👑 Quản trị viên' : '👤 Thành viên'}
                             </span>
                           </div>
 
-                          <div style={{ color: 'var(--lgd-text)', marginTop: 8, fontSize: '1.05rem' }}>
-                            <strong style={{ color: '#a78bfa' }}>Năm sinh:</strong> {selectedMember.birthYear || 'Đang cập nhật'}
+                          <div style={{ color: 'var(--lgd-text)', marginTop: 8, fontSize: '1rem' }}>
+                            <strong style={{ color: '#7c3aed' }}>Năm sinh:</strong> {selectedMember.birthYear || 'Đang cập nhật'}
                           </div>
 
-                          <div style={{ color: 'var(--lgd-text)', marginTop: 6, fontSize: '1.05rem' }}>
-                            <strong style={{ color: '#a78bfa' }}>Khu vực:</strong> {selectedMember.location || 'Quảng Ninh'}
+                          <div style={{ color: 'var(--lgd-text)', marginTop: 6, fontSize: '1rem' }}>
+                            <strong style={{ color: '#7c3aed' }}>Khu vực:</strong> {selectedMember.location || 'Quảng Ninh'}
                           </div>
 
                           {selectedMember.bio && (
-                            <div style={{ color: 'var(--lgd-text)', marginTop: 6, fontSize: '1.05rem' }}>
-                              <strong style={{ color: '#a78bfa' }}>Tiểu sử:</strong> {selectedMember.bio}
+                            <div style={{ color: 'var(--lgd-text)', marginTop: 6, fontSize: '1rem' }}>
+                              <strong style={{ color: '#7c3aed' }}>Tiểu sử:</strong> {selectedMember.bio}
                             </div>
                           )}
 
-                          <div className="mt-4 text-secondary small">
+                          <div className="mt-4 text-muted small">
                             Nhấn <strong>Esc</strong> hoặc bấm ra ngoài để đóng.
                           </div>
                         </>
@@ -565,22 +566,24 @@ function Introduction() {
                     </div>
                   </div>
 
-                  <div className="d-flex justify-content-end gap-2 w-100 pt-3 border-top border-secondary">
+                  <div className="d-flex justify-content-end gap-2 w-100 pt-3 border-top" style={{ borderColor: '#f1f5f9' }}>
                     {isAdminMode && isAdmin && (
                       <>
                         <Button
                           variant="danger"
                           size="sm"
                           onClick={() => handleDeleteMember(selectedMember)}
+                          style={{ backgroundColor: '#ef4444', borderColor: '#ef4444' }}
                         >
                           🗑️ Xóa tài khoản
                         </Button>
                         <Button
-                          variant="success"
+                          variant="primary"
                           size="sm"
                           onClick={() => handleSaveMember(selectedMember)}
+                          style={{ backgroundColor: '#7c3aed', borderColor: '#7c3aed' }}
                         >
-                          💾 Lưu thông tin vào Database
+                          💾 Lưu thông tin
                         </Button>
                       </>
                     )}
@@ -604,59 +607,58 @@ function Introduction() {
         show={showCreateModal}
         onHide={() => setShowCreateModal(false)}
         centered
-        contentClassName="border border-secondary"
       >
-        <Modal.Header closeButton style={{ backgroundColor: '#1a132f' }} className="border-secondary">
-          <Modal.Title className="fw-bold" style={{ color: '#f6e05e' }}>
+        <Modal.Header closeButton style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #e9d5ff' }}>
+          <Modal.Title className="fw-bold" style={{ color: '#7c3aed' }}>
             ➕ Tạo Tài Khoản Thành Viên Mới
           </Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleCreateUserSubmit}>
-          <Modal.Body style={{ backgroundColor: '#0f0a1c' }} className="p-4">
+          <Modal.Body style={{ backgroundColor: '#ffffff' }} className="p-4">
             <Form.Group className="mb-3">
-              <Form.Label className="small fw-bold text-secondary">Họ và tên *</Form.Label>
+              <Form.Label className="small fw-bold text-muted">Họ và tên *</Form.Label>
               <Form.Control
                 type="text"
                 required
                 placeholder="VD: Nguyễn Văn A"
                 value={newMemberForm.name}
                 onChange={(e) => setNewMemberForm({ ...newMemberForm, name: e.target.value })}
-                style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label className="small fw-bold text-secondary">Tên đăng nhập (Username) *</Form.Label>
+              <Form.Label className="small fw-bold text-muted">Tên đăng nhập (Username) *</Form.Label>
               <Form.Control
                 type="text"
                 required
                 placeholder="VD: nguyenvana (viết liền không dấu)"
                 value={newMemberForm.username}
                 onChange={(e) => setNewMemberForm({ ...newMemberForm, username: e.target.value })}
-                style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label className="small fw-bold text-secondary">Mật khẩu ban đầu *</Form.Label>
+              <Form.Label className="small fw-bold text-muted">Mật khẩu ban đầu *</Form.Label>
               <Form.Control
                 type="text"
                 required
                 placeholder="Mặc định: 123"
                 value={newMemberForm.password}
                 onChange={(e) => setNewMemberForm({ ...newMemberForm, password: e.target.value })}
-                style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
               />
             </Form.Group>
 
             <div className="row g-3 mb-3">
               <div className="col-md-6">
                 <Form.Group>
-                  <Form.Label className="small fw-bold text-secondary">Quyền hạn</Form.Label>
+                  <Form.Label className="small fw-bold text-muted">Quyền hạn</Form.Label>
                   <Form.Select
                     value={newMemberForm.role}
                     onChange={(e) => setNewMemberForm({ ...newMemberForm, role: e.target.value })}
-                    style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                    style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                   >
                     <option value="user">Thành viên (User)</option>
                     <option value="admin">Quản trị viên (Admin)</option>
@@ -666,47 +668,47 @@ function Introduction() {
 
               <div className="col-md-6">
                 <Form.Group>
-                  <Form.Label className="small fw-bold text-secondary">Năm sinh</Form.Label>
+                  <Form.Label className="small fw-bold text-muted">Năm sinh</Form.Label>
                   <Form.Control
                     type="number"
                     placeholder="VD: 2008"
                     value={newMemberForm.birthYear}
                     onChange={(e) => setNewMemberForm({ ...newMemberForm, birthYear: e.target.value })}
-                    style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                    style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
                   />
                 </Form.Group>
               </div>
             </div>
 
             <Form.Group className="mb-3">
-              <Form.Label className="small fw-bold text-secondary">Khu vực / Tỉnh thành</Form.Label>
+              <Form.Label className="small fw-bold text-muted">Khu vực / Tỉnh thành</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="VD: Quảng Ninh..."
                 value={newMemberForm.location}
                 onChange={(e) => setNewMemberForm({ ...newMemberForm, location: e.target.value })}
-                style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
               />
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label className="small fw-bold text-secondary">Tiểu sử / Giới thiệu</Form.Label>
+              <Form.Label className="small fw-bold text-muted">Tiểu sử / Giới thiệu</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={2}
                 placeholder="VD: Thành viên đội múa Lân..."
                 value={newMemberForm.bio}
                 onChange={(e) => setNewMemberForm({ ...newMemberForm, bio: e.target.value })}
-                style={{ backgroundColor: '#120b24', borderColor: '#3b2c64', color: '#f1f5f9' }}
+                style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
               />
             </Form.Group>
           </Modal.Body>
 
-          <Modal.Footer style={{ backgroundColor: '#1a132f' }} className="border-secondary">
+          <Modal.Footer style={{ backgroundColor: '#ffffff', borderTop: '1px solid #e9d5ff' }}>
             <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
               Hủy
             </Button>
-            <Button variant="warning" type="submit" disabled={isCreating} className="fw-bold">
+            <Button variant="primary" type="submit" disabled={isCreating} className="fw-bold" style={{ backgroundColor: '#7c3aed', borderColor: '#7c3aed' }}>
               {isCreating ? (
                 <>
                   <Spinner animation="border" size="sm" className="me-2" />

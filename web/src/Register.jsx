@@ -44,22 +44,23 @@ export default function Register() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--lgd-black)" }}>
+    <div style={{ minHeight: "100vh", background: "var(--lgd-black, #f8f9fc)" }}>
       <Header />
       <div className="container my-5">
         <div className="row justify-content-center">
           <div className="col-md-7 col-lg-5">
             <div
-              className="card shadow"
+              className="card shadow-sm"
               style={{
-                backgroundColor: "var(--lgd-black-card)",
-                border: "2px solid var(--lgd-purple-glow)",
+                backgroundColor: "#ffffff",
+                border: "1px solid #e9d5ff",
+                borderRadius: "16px",
               }}
             >
-              <div className="card-body p-4">
+              <div className="card-body p-4 p-md-5">
                 <h2
-                  className="text-center mb-4 lgd-title-gold"
-                  style={{ color: "#a78bfa", textShadow: "0 0 12px var(--lgd-purple-glow)" }}
+                  className="text-center mb-4 fw-bold"
+                  style={{ color: "#7c3aed" }}
                 >
                   Đăng ký tài khoản
                 </h2>
@@ -72,7 +73,7 @@ export default function Register() {
 
                 <form onSubmit={handleRegister}>
                   <div className="mb-3">
-                    <label style={{ color: "#fafafa" }}>Họ và tên *</label>
+                    <label className="form-label fw-bold small text-muted">Họ và tên *</label>
                     <input
                       type="text"
                       name="name"
@@ -85,7 +86,7 @@ export default function Register() {
                   </div>
 
                   <div className="mb-3">
-                    <label style={{ color: "#fafafa" }}>Tên đăng nhập *</label>
+                    <label className="form-label fw-bold small text-muted">Tên đăng nhập *</label>
                     <input
                       type="text"
                       name="username"
@@ -98,7 +99,7 @@ export default function Register() {
                   </div>
 
                   <div className="mb-3">
-                    <label style={{ color: "#fafafa" }}>Mật khẩu *</label>
+                    <label className="form-label fw-bold small text-muted">Mật khẩu *</label>
                     <input
                       type="password"
                       name="password"
@@ -113,7 +114,7 @@ export default function Register() {
 
                   <div className="row">
                     <div className="col-md-6 mb-3">
-                      <label style={{ color: "#fafafa" }}>Năm sinh</label>
+                      <label className="form-label fw-bold small text-muted">Năm sinh</label>
                       <input
                         type="number"
                         name="birthYear"
@@ -124,7 +125,7 @@ export default function Register() {
                       />
                     </div>
                     <div className="col-md-6 mb-3">
-                      <label style={{ color: "#fafafa" }}>Vị trí / Quê quán</label>
+                      <label className="form-label fw-bold small text-muted">Vị trí / Quê quán</label>
                       <input
                         type="text"
                         name="location"
@@ -137,7 +138,7 @@ export default function Register() {
                   </div>
 
                   <div className="mb-3">
-                    <label style={{ color: "#fafafa" }}>Giới thiệu ngắn (Bio)</label>
+                    <label className="form-label fw-bold small text-muted">Giới thiệu ngắn (Bio)</label>
                     <textarea
                       name="bio"
                       rows="2"
@@ -150,21 +151,22 @@ export default function Register() {
 
                   <button
                     type="submit"
-                    className="btn w-100 fw-bold py-2 mt-2"
+                    className="btn w-100 fw-bold py-2 mt-3"
                     disabled={loading}
                     style={{
-                      background: "linear-gradient(180deg, #8b5cf6 0%, #5b21b6 100%)",
-                      border: "1px solid #a78bfa",
+                      background: "#7c3aed",
+                      border: "1px solid #7c3aed",
                       color: "#fff",
+                      borderRadius: "8px",
                     }}
                   >
                     {loading ? "Đang tạo tài khoản..." : "Đăng ký"}
                   </button>
                 </form>
 
-                <p className="text-center mt-3" style={{ color: "#a3a3a3" }}>
+                <p className="text-center mt-4 mb-0 text-muted small">
                   Đã có tài khoản?{" "}
-                  <Link to="/login" style={{ color: "#a78bfa", fontWeight: "bold" }}>
+                  <Link to="/login" style={{ color: "#7c3aed", fontWeight: "bold" }}>
                     Đăng nhập
                   </Link>
                 </p>

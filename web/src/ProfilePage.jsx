@@ -47,7 +47,7 @@ export default function ProfilePage() {
         bio: user.bio || '',
         avatar: user.avatar || '',
       });
-      setAvatarPreview(user.avatar || 'https://res.cloudinary.com/lucgiaduong/image/upload/v1/default-avatar.png');
+      setAvatarPreview(user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=7c3aed&color=fff`);
     }
   }, [user, navigate]);
 
@@ -198,11 +198,11 @@ export default function ProfilePage() {
                 {/* Avatar Section */}
                 <div className="profile-avatar-wrapper text-center">
                   <img
-                    src={avatarPreview || 'https://res.cloudinary.com/lucgiaduong/image/upload/v1/default-avatar.png'}
+                    src={avatarPreview || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name || 'User')}&background=7c3aed&color=fff`}
                     alt="Avatar"
                     className="profile-avatar-img"
                     onError={(e) => {
-                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.name || 'User') + '&background=6b21a8&color=fff';
+                      e.target.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(formData.name || 'User') + '&background=7c3aed&color=fff';
                     }}
                   />
                   <label
