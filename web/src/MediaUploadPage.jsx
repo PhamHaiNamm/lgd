@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import { formatImageUrl } from "./config";
 import "./MediaUploadPage.css";
 
 const IMAGE_EXT = /\.(jpg|jpeg|png|gif|webp|bmp)$/i;
@@ -203,7 +204,7 @@ export default function MediaUploadPage() {
                     <div className="d-flex flex-wrap gap-3 mt-3">
                         {members.map((m, i) => (
                             <div key={i} style={{ textAlign: "center" }}>
-                                <img src={m.avatar} alt={m.name ? `Avatar ${m.name}` : ""} width={120} height={120} style={{ borderRadius: "50%" }} />
+                                <img src={formatImageUrl(m.avatar) || '/images/Logo_full.png'} alt={m.name ? `Avatar ${m.name}` : ""} width={120} height={120} style={{ borderRadius: "50%", objectFit: "cover" }} />
                                 <p style={{ color: "#fafafa", marginTop: 8 }}>{m.name}</p>
                             </div>
                         ))}

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthContext } from './AuthContext';
-import { API_BASE_URL } from './config';
+import { API_BASE_URL, formatImageUrl } from './config';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -47,7 +47,10 @@ export default function ProfilePage() {
         bio: user.bio || '',
         avatar: user.avatar || '',
       });
-      setAvatarPreview(user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=7c3aed&color=fff`);
+      setAvatarPreview(
+        formatImageUrl(user.avatar) ||
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=7c3aed&color=fff`
+      );
     }
   }, [user, navigate]);
 
@@ -246,7 +249,7 @@ export default function ProfilePage() {
                 {/* Avatar Section */}
                 <div className="profile-avatar-wrapper text-center">
                   <img
-                    src={avatarPreview || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name || 'User')}&background=7c3aed&color=fff`}
+                    src={formatImageUrl(avatarPreview) || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name || 'User')}&background=7c3aed&color=fff`}
                     alt="Avatar"
                     className="profile-avatar-img"
                     onError={(e) => {

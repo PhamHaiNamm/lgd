@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
-import { API_BASE_URL } from './config';
+import { API_BASE_URL, formatImageUrl } from './config';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import './SocialFeedPage.css';
@@ -17,15 +17,6 @@ export default function SocialFeedPage() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isPosting, setIsPosting] = useState(false);
   const [viewingImage, setViewingImage] = useState(null);
-
-  const formatImageUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http://localhost:5000')) {
-      const backendBase = API_BASE_URL.replace('/api/v1', '');
-      return url.replace('http://localhost:5000', backendBase);
-    }
-    return url;
-  };
 
   // States Modal Profile
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -416,7 +407,7 @@ export default function SocialFeedPage() {
             {user ? (
               <>
                 <img
-                  src={user.avatar || 'https://via.placeholder.com/150'}
+                  src={formatImageUrl(user.avatar) || 'https://via.placeholder.com/150'}
                   alt={user.name}
                   className="user-mini-avatar"
                 />
@@ -465,7 +456,7 @@ export default function SocialFeedPage() {
           <div className="create-post-card">
             <div className="create-post-header">
               <img
-                src={user.avatar || 'https://via.placeholder.com/150'}
+                src={formatImageUrl(user.avatar) || 'https://via.placeholder.com/150'}
                 alt={user.name}
                 className="user-mini-avatar"
               />
@@ -540,7 +531,7 @@ export default function SocialFeedPage() {
                   <div className="post-card-header">
                     <div className="post-author-box">
                       <img
-                        src={post.authorAvatar || 'https://via.placeholder.com/150'}
+                        src={formatImageUrl(post.authorAvatar) || 'https://via.placeholder.com/150'}
                         alt={post.authorName}
                         className="post-author-avatar"
                       />
@@ -626,7 +617,7 @@ export default function SocialFeedPage() {
                 {/* Chọn Avatar */}
                 <div className="avatar-edit-preview">
                   <img
-                    src={avatarPreview || profileForm.avatar || 'https://via.placeholder.com/150'}
+                    src={avatarPreview ? avatarPreview : (formatImageUrl(profileForm.avatar) || 'https://via.placeholder.com/150')}
                     alt="Avatar"
                     className="avatar-preview-img"
                   />
@@ -1037,7 +1028,7 @@ export default function SocialFeedPage() {
                           <tr key={u._id}>
                             <td>
                               <img
-                                src={u.avatar || 'https://via.placeholder.com/150'}
+                                src={formatImageUrl(u.avatar) || 'https://via.placeholder.com/150'}
                                 alt={u.username}
                                 className="table-avatar"
                               />

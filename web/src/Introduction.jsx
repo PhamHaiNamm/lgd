@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useContext, useCallback } from 'react';
 import { Form, Button, Modal, Spinner } from 'react-bootstrap';
 import { AuthContext } from './AuthContext';
-import { API_BASE_URL } from './config';
+import { API_BASE_URL, formatImageUrl } from './config';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Banner from './components/Banner';
@@ -54,15 +54,6 @@ function Introduction() {
   useEffect(() => {
     fetchMembers();
   }, [fetchMembers]);
-
-  const formatImageUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http://localhost:5000')) {
-      const backendBase = API_BASE_URL.replace('/api/v1', '');
-      return url.replace('http://localhost:5000', backendBase);
-    }
-    return url;
-  };
 
   const selectedMember = useMemo(
     () => membersData.find((m) => (m._id === selectedMemberId || m.id === selectedMemberId)) || null,

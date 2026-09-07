@@ -3,7 +3,7 @@ import { Form, Button, Spinner, Table, Badge, Alert } from 'react-bootstrap';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthContext } from './AuthContext';
-import { API_BASE_URL } from './config';
+import { API_BASE_URL, formatImageUrl } from './config';
 import { DecorativeTitle } from './components/Decorations';
 
 const CONTACT_INFO = {
@@ -40,7 +40,7 @@ function ContactPage() {
             (u) => u.role === 'admin' || (u.name && u.name.toLowerCase().includes('hải nam'))
           );
           if (leader && leader.avatar) {
-            setLeaderAvatar(leader.avatar);
+            setLeaderAvatar(formatImageUrl(leader.avatar));
           }
         }
       })

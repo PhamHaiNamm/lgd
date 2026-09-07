@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
-import { API_BASE_URL } from './config';
+import { API_BASE_URL, formatImageUrl } from './config';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import './ChatPage.css';
@@ -18,15 +18,6 @@ export default function ChatPage() {
   const [isSending, setIsSending] = useState(false);
   const [showAllMembers, setShowAllMembers] = useState(false);
   const [viewingChatImage, setViewingChatImage] = useState(null);
-
-  const formatImageUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http://localhost:5000')) {
-      const backendBase = API_BASE_URL.replace('/api/v1', '');
-      return url.replace('http://localhost:5000', backendBase);
-    }
-    return url;
-  };
 
   const messagesEndRef = useRef(null);
   const chatContainerRef = useRef(null);
@@ -260,7 +251,7 @@ export default function ChatPage() {
                       >
                         {!isOutgoing && (
                           <img
-                            src={msg.senderAvatar || 'https://via.placeholder.com/150'}
+                            src={formatImageUrl(msg.senderAvatar) || 'https://via.placeholder.com/150'}
                             alt={msg.senderName}
                             className="chat-msg-avatar"
                           />
@@ -374,7 +365,7 @@ export default function ChatPage() {
                 {visibleMembers.map((m) => (
                   <div className="member-list-item" key={m._id}>
                     <img
-                      src={m.avatar || 'https://via.placeholder.com/150'}
+                      src={formatImageUrl(m.avatar) || 'https://via.placeholder.com/150'}
                       alt={m.name}
                       className="member-item-avatar"
                     />
