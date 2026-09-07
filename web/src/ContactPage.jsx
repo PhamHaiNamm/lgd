@@ -15,12 +15,15 @@ const CONTACT_INFO = {
 };
 
 const SERVICE_OPTIONS = [
-  'Múa Lân Khai Trương / Khánh Thành',
-  'Múa Lân - Sư - Rồng Trọn Gói',
-  'Múa Rồng Lễ Hội / Đình Làng',
-  'Múa Sư Tử & Trống Hội',
-  'Biểu diễn Tết Trung Thu / Khai Giảng',
-  'Biểu diễn Sự kiện / Tiệc Cưới theo yêu cầu',
+  { id: '2_lan', name: '2 Lân biểu diễn (Song Lân)', icon: '🦁' },
+  { id: '3_lan', name: '3 Lân (Tam Tinh / Phúc Lộc Thọ)', icon: '🦁' },
+  { id: '4_lan', name: '4 Lân (Tứ Quý Hưng Long)', icon: '🦁' },
+  { id: 'dia_buu', name: 'Múa Lân Địa Bửu', icon: '🎋' },
+  { id: 'mai_hoa_thung', name: 'Múa Lân Mai Hoa Thung', icon: '⛩️' },
+  { id: 'mua_rong', name: 'Múa Rồng Lễ Hội / Đình Làng', icon: '🐉' },
+  { id: 'trong_hoi', name: 'Dàn Trống Hội & Trống Trận', icon: '🥁' },
+  { id: 'than_tai', name: 'Thần Tài - Thổ Địa - Chú Tễu', icon: '🎭' },
+  { id: 'tron_goi', name: 'Trọn gói Khai Trương / Khánh Thành', icon: '🎉' },
 ];
 
 function ContactPage() {
@@ -30,7 +33,7 @@ function ContactPage() {
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
-    serviceType: SERVICE_OPTIONS[0],
+    serviceTypes: ['2 Lân biểu diễn (Song Lân)', 'Múa Lân Địa Bửu'],
     eventDate: '',
     eventTime: '08:00',
     location: 'Quảng Ninh',
@@ -111,6 +114,24 @@ function ContactPage() {
     }
   }, [isAdmin, activeTab, fetchBookings]);
 
+  // Chọn / Bỏ chọn nhiều dịch vụ
+  const toggleService = (serviceName) => {
+    setFormData((prev) => {
+      const current = prev.serviceTypes || [];
+      const exists = current.includes(serviceName);
+      let updated;
+      if (exists) {
+        updated = current.filter((s) => s !== serviceName);
+      } else {
+        updated = [...current, serviceName];
+      }
+      return {
+        ...prev,
+        serviceTypes: updated.length > 0 ? updated : [serviceName],
+      };
+    });
+  };
+
   // Gửi Form Đặt lịch
   const handleSubmitBooking = async (e) => {
     e.preventDefault();
@@ -119,6 +140,11 @@ function ContactPage() {
 
     if (!formData.fullName.trim() || !formData.phone.trim()) {
       setSubmitError('Vui lòng nhập đầy đủ Họ tên và Số điện thoại liên hệ.');
+      return;
+    }
+
+    if (!formData.serviceTypes || formData.serviceTypes.length === 0) {
+      setSubmitError('Vui lòng chọn ít nhất một dịch vụ biểu diễn quan tâm.');
       return;
     }
 
@@ -139,7 +165,10 @@ function ContactPage() {
       const res = await fetch(`${API_BASE_URL}/bookings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          serviceType: formData.serviceTypes.join(' + '),
+        }),
       });
 
       const data = await res.json();
@@ -148,7 +177,7 @@ function ContactPage() {
         setFormData({
           fullName: '',
           phone: '',
-          serviceType: SERVICE_OPTIONS[0],
+          serviceTypes: ['2 Lân biểu diễn (Song Lân)', 'Múa Lân Địa Bửu'],
           eventDate: '',
           eventTime: '08:00',
           location: 'Quảng Ninh',
@@ -450,21 +479,58 @@ function ContactPage() {
                     </div>
                   </div>
 
-                  <div className="mb-3">
-                    <Form.Group>
-                      <Form.Label className="small fw-bold text-muted">Dịch vụ quan tâm</Form.Label>
-                      <Form.Select
-                        value={formData.serviceType}
-                        onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
-                        style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
-                      >
-                        {SERVICE_OPTIONS.map((s, idx) => (
-                          <option key={idx} value={s}>
-                            {s}
-                          </option>
-                        ))}
-                      </Form.Select>
-                    </Form.Group>
+                  {/* Chọn Nhiều Dịch Vụ Quan Tâm */}
+                  <div className="mb-4">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <Form.Label className="small fw-bold text-muted mb-0">
+                        🎭 Dịch vụ quan tâm (Chọn nhiều mục cùng lúc):
+                      </Form.Label>
+                      <span className="badge" style={{ backgroundColor: '#f3e8ff', color: '#7c3aed' }}>
+                        Đã chọn: {formData.serviceTypes?.length || 0} dịch vụ
+                      </span>
+                    </div>
+
+                    <div className="d-flex flex-wrap gap-2">
+                      {SERVICE_OPTIONS.map((item) => {
+                        const isSelected = formData.serviceTypes?.includes(item.name);
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => toggleService(item.name)}
+                            className="btn btn-sm d-flex align-items-center gap-2 py-2 px-3 rounded-3 text-start"
+                            style={{
+                              backgroundColor: isSelected ? '#7c3aed' : '#ffffff',
+                              color: isSelected ? '#ffffff' : '#334155',
+                              border: isSelected ? '1.5px solid #6d28d9' : '1px solid #e2e8f0',
+                              boxShadow: isSelected ? '0 4px 12px rgba(124, 58, 237, 0.2)' : 'none',
+                              fontSize: '0.85rem',
+                              fontWeight: isSelected ? 600 : 500,
+                              transition: 'all 0.15s ease',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <span>{item.icon}</span>
+                            <span>{item.name}</span>
+                            {isSelected ? (
+                              <span
+                                className="badge rounded-circle p-1 ms-1"
+                                style={{ backgroundColor: '#ffffff', color: '#7c3aed', fontSize: '0.65rem' }}
+                              >
+                                ✓
+                              </span>
+                            ) : (
+                              <span
+                                className="badge rounded-circle p-1 ms-1 text-muted"
+                                style={{ backgroundColor: '#f1f5f9', fontSize: '0.65rem' }}
+                              >
+                                +
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   <div className="row g-3">

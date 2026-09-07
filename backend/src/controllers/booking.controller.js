@@ -91,10 +91,20 @@ async function checkAvailability(req, res, next) {
  */
 async function createBooking(req, res, next) {
   try {
-    const { fullName, phone, serviceType, eventDate, eventTime, location, note } = req.body;
+    const { fullName, phone, serviceType, serviceTypes, eventDate, eventTime, location, note } = req.body;
 
     if (!fullName || !phone) {
       return sendError(res, 'Vui lòng cung cấp đầy đủ Họ tên và Số điện thoại liên hệ.', 400);
+    }
+
+    // Xử lý danh sách dịch vụ (chuỗi hoặc mảng chọn nhiều)
+    let selectedServices = 'Múa Lân Khai Trương';
+    if (Array.isArray(serviceTypes) && serviceTypes.length > 0) {
+      selectedServices = serviceTypes.join(' + ');
+    } else if (Array.isArray(serviceType) && serviceType.length > 0) {
+      selectedServices = serviceType.join(' + ');
+    } else if (typeof serviceType === 'string' && serviceType.trim()) {
+      selectedServices = serviceType.trim();
     }
 
     // Kiểm tra trùng giờ nếu có cung cấp ngày và giờ
@@ -112,7 +122,7 @@ async function createBooking(req, res, next) {
     const newBooking = await Booking.create({
       fullName: fullName.trim(),
       phone: phone.trim(),
-      serviceType: serviceType ? serviceType.trim() : 'Múa Lân Khai Trương',
+      serviceType: selectedServices,
       eventDate: eventDate ? eventDate.trim() : '',
       eventTime: eventTime ? eventTime.trim() : '',
       location: location ? location.trim() : '',
