@@ -270,36 +270,88 @@ function ContactPage() {
               >
                 <div>
                   <div className="text-center mb-3">
-                    <img
-                      src="/images/trưởng_đoàn.jpg"
-                      alt={CONTACT_INFO.fullName}
-                      className="rounded-circle"
-                      style={{
-                        width: '120px',
-                        height: '120px',
-                        objectFit: 'cover',
-                        border: '3px solid #7c3aed',
-                      }}
-                      onError={(e) => {
-                        e.target.src = '/images/Logo_full.png';
-                      }}
-                    />
-                    <h4 className="fw-bold mt-3 mb-1" style={{ color: '#1e1b4b' }}>
+                    <div className="d-inline-block position-relative">
+                      <img
+                        src="/images/trưởng_đoàn.jpg"
+                        alt={CONTACT_INFO.fullName}
+                        className="rounded-circle shadow"
+                        style={{
+                          width: '160px',
+                          height: '160px',
+                          objectFit: 'cover',
+                          border: '4px solid #7c3aed',
+                          boxShadow: '0 8px 24px rgba(124, 58, 237, 0.25)',
+                        }}
+                        onError={(e) => {
+                          e.target.src = '/images/Logo_full.png';
+                        }}
+                      />
+                      <span
+                        className="position-absolute bottom-0 end-0 badge rounded-pill px-2 py-1"
+                        style={{ backgroundColor: '#10b981', border: '2px solid #ffffff', fontSize: '0.75rem' }}
+                      >
+                        🟢 Online
+                      </span>
+                    </div>
+                    <h4 className="fw-bold mt-3 mb-1" style={{ color: '#1e1b4b', fontSize: '1.4rem' }}>
                       {CONTACT_INFO.fullName}
                     </h4>
-                    <p className="text-muted small mb-0">{CONTACT_INFO.position}</p>
+                    <span
+                      className="badge px-3 py-1 rounded-pill"
+                      style={{ backgroundColor: '#f3e8ff', color: '#7c3aed', fontSize: '0.85rem' }}
+                    >
+                      👑 {CONTACT_INFO.position}
+                    </span>
                   </div>
 
                   <hr style={{ borderColor: '#f1f5f9' }} />
 
-                  <div className="mb-3">
-                    <span className="text-muted small d-block">📍 Đại bản doanh:</span>
-                    <strong style={{ fontSize: '0.95rem' }}>{CONTACT_INFO.address}</strong>
-                  </div>
+                  <div className="d-flex flex-column gap-3 mb-4">
+                    <div className="d-flex align-items-start gap-2">
+                      <span style={{ fontSize: '1.2rem' }}>📍</span>
+                      <div>
+                        <span className="text-muted small d-block">Đại bản doanh:</span>
+                        <strong style={{ fontSize: '0.95rem', color: '#1e1b4b' }}>{CONTACT_INFO.address}</strong>
+                      </div>
+                    </div>
 
-                  <div className="mb-4">
-                    <span className="text-muted small d-block">📞 Hotline trực tiếp:</span>
-                    <strong style={{ fontSize: '1.25rem', color: '#7c3aed' }}>{CONTACT_INFO.phone}</strong>
+                    <div className="d-flex align-items-start gap-2">
+                      <span style={{ fontSize: '1.2rem' }}>📞</span>
+                      <div>
+                        <span className="text-muted small d-block">Hotline trực tiếp & Zalo:</span>
+                        <a
+                          href={`tel:${CONTACT_INFO.phone}`}
+                          style={{ fontSize: '1.35rem', color: '#7c3aed', fontWeight: 'bold', textDecoration: 'none' }}
+                        >
+                          {CONTACT_INFO.phone}
+                        </a>
+                      </div>
+                    </div>
+
+                    {/* Phần thông tin bổ sung để lấp đầy khoảng trống */}
+                    <div
+                      className="p-3 rounded-3"
+                      style={{ backgroundColor: '#faf5ff', border: '1px solid #e9d5ff' }}
+                    >
+                      <div className="small mb-2 d-flex align-items-center gap-2" style={{ color: '#6d28d9', fontWeight: 600 }}>
+                        <span>⚡</span>
+                        <span>Cam kết dịch vụ Lục Gia Đường:</span>
+                      </div>
+                      <ul className="list-unstyled mb-0 small text-muted d-flex flex-column gap-2" style={{ fontSize: '0.85rem' }}>
+                        <li className="d-flex align-items-center gap-2">
+                          <span style={{ color: '#10b981' }}>✓</span>
+                          <span><strong>Tư vấn 24/7:</strong> Luôn sẵn sàng tiếp nhận & xếp lịch</span>
+                        </li>
+                        <li className="d-flex align-items-center gap-2">
+                          <span style={{ color: '#10b981' }}>✓</span>
+                          <span><strong>Khu vực:</strong> Toàn tỉnh Quảng Ninh & các tỉnh lân cận</span>
+                        </li>
+                        <li className="d-flex align-items-center gap-2">
+                          <span style={{ color: '#10b981' }}>✓</span>
+                          <span><strong>Chuyên nghiệp:</strong> Trang phục mới đẹp, đúng giờ hoàng đạo</span>
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
 
