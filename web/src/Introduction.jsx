@@ -5,7 +5,7 @@ import { API_BASE_URL } from './config';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Banner from './components/Banner';
-import { DecorativeTitle, FestivalStrip } from './components/Decorations';
+import { DecorativeTitle } from './components/Decorations';
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?name=LGD&background=7c3aed&color=fff';
 
@@ -76,7 +76,7 @@ function Introduction() {
     );
   };
 
-  // Upload Avatar cho thành viên
+  // Upload Avatar cho thành viên & tự động lưu ngay vào DB
   const handleAvatarUpload = async (memberId, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -95,12 +95,32 @@ function Introduction() {
 
       if (data.success && data.data?.url) {
         const newAvatarUrl = data.data.url;
-        setMembersData((prev) =>
-          prev.map((m) => (m._id === memberId ? { ...m, avatar: newAvatarUrl } : m))
-        );
-        alert('Đã tải ảnh lên! Nhấn "Lưu thông tin" để cập nhật vào database.');
+
+        // Tự động lưu ngay vào database
+        const saveRes = await fetch(`${API_BASE_URL}/users/${memberId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ avatar: newAvatarUrl }),
+        });
+        const saveData = await saveRes.json();
+
+        if (saveData.success) {
+          setMembersData((prev) =>
+            prev.map((m) => (m._id === memberId ? { ...m, avatar: newAvatarUrl } : m))
+          );
+          alert('🎉 Đã tải ảnh lên và lưu vào hệ thống thành công!');
+          fetchMembers();
+        } else {
+          setMembersData((prev) =>
+            prev.map((m) => (m._id === memberId ? { ...m, avatar: newAvatarUrl } : m))
+          );
+          alert('Ảnh đã tải lên! Hãy nhấn "Lưu thông tin" để lưu vào hệ thống.');
+        }
       } else {
-        alert(data.message || 'Lỗi tải ảnh đại diện.');
+        alert(data.message || 'Lỗi tải ảnh đại diện lên máy chủ.');
       }
     } catch (err) {
       alert('Lỗi upload ảnh: ' + err.message);
@@ -242,7 +262,6 @@ function Introduction() {
 
       {/* Giới thiệu chung về đoàn */}
       <section className="container my-5 lgd-section">
-        <FestivalStrip iconSize={22} />
         <h2 className="text-center mb-4 fw-bold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Giới thiệu về đoàn</DecorativeTitle>
         </h2>
@@ -290,7 +309,6 @@ function Introduction() {
 
       {/* Thành tích nổi bật */}
       <section className="container my-5 lgd-section">
-        <FestivalStrip iconSize={22} />
         <h2 className="text-center mb-4 fw-bold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Thành tích nổi bật</DecorativeTitle>
         </h2>
@@ -315,7 +333,6 @@ function Introduction() {
 
       {/* Thành viên Lục Gia Đường (Lấy từ Database) */}
       <section className="container my-5 lgd-section">
-        <FestivalStrip iconSize={22} />
         <h2 className="text-center mb-4 fw-bold lgd-title-gold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Thành viên Lục Gia Đường ({membersData.length})</DecorativeTitle>
         </h2>

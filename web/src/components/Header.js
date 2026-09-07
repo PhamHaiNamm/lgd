@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
-import { DragonIcon, PeachBlossomIcon, FestivalStrip } from './Decorations';
+import { DragonIcon, PeachBlossomIcon } from './Decorations';
 import './Header.css';
 
 function Header() {
@@ -26,9 +26,6 @@ function Header() {
 
   return (
     <div className="lgd-header-wrapper">
-      {/* Dải Tết hoa đào & rồng */}
-      <FestivalStrip iconSize={24} />
-
       {/* Main Header Bar */}
       <header className="lgd-header-main">
         <div className="d-flex align-items-center justify-content-between flex-nowrap w-100 gap-2">

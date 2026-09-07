@@ -51,6 +51,15 @@ const bookingSchema = new mongoose.Schema(
       enum: ['pending', 'contacted', 'confirmed', 'cancelled'],
       default: 'pending',
     },
+    isScheduled: {
+      type: Boolean,
+      default: false,
+    },
+    scheduleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Schedule',
+      default: null,
+    },
   },
   {
     timestamps: true,

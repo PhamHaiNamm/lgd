@@ -61,7 +61,7 @@ export default function ProfilePage() {
     setPasswordData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAvatarFileSelect = (e) => {
+  const handleAvatarFileSelect = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -70,8 +70,56 @@ export default function ProfilePage() {
       return;
     }
 
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
+    try {
+      setUploadingAvatar(true);
+      setAlertInfo({ show: false, type: '', message: '' });
+      setAvatarPreview(URL.createObjectURL(file));
+
+      const uploadFormData = new FormData();
+      uploadFormData.append('image', file);
+
+      const uploadRes = await fetch(`${API_BASE_URL}/upload/single`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: uploadFormData,
+      });
+
+      const uploadJson = await uploadRes.json();
+      if (uploadJson.success && uploadJson.data?.url) {
+        const newUrl = uploadJson.data.url;
+        setFormData((prev) => ({ ...prev, avatar: newUrl }));
+        setAvatarPreview(newUrl);
+
+        // Lưu trực tiếp vào Database
+        const updateRes = await fetch(`${API_BASE_URL}/users/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ avatar: newUrl }),
+        });
+        const updateData = await updateRes.json();
+        if (updateData.success) {
+          updateUserData(updateData.data);
+          setAlertInfo({
+            show: true,
+            type: 'success',
+            message: '🎉 Đã cập nhật ảnh đại diện mới thành công!',
+          });
+        }
+      } else {
+        throw new Error(uploadJson.message || 'Lỗi khi tải ảnh lên máy chủ.');
+      }
+    } catch (err) {
+      setAlertInfo({
+        show: true,
+        type: 'danger',
+        message: 'Lỗi tải ảnh: ' + (err.message || 'Không thể kết nối đến máy chủ.'),
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const handleSubmit = async (e) => {

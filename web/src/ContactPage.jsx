@@ -4,36 +4,54 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthContext } from './AuthContext';
 import { API_BASE_URL } from './config';
-import { DecorativeTitle, FestivalStrip } from './components/Decorations';
+import { DecorativeTitle } from './components/Decorations';
 
 const CONTACT_INFO = {
   fullName: 'Phạm Hải Nam',
   phone: '0345422378',
   zaloUrl: 'https://zalo.me/0345422378',
+  facebookUrl: 'https://www.facebook.com/profile.php?id=100092666694525',
+  messengerUrl: 'https://m.me/100092666694525',
   position: 'Trưởng đoàn Lục Gia Đường',
   address: 'Khu Trới 6, phường Hoành Bồ, tỉnh Quảng Ninh',
 };
 
 const SERVICE_OPTIONS = [
-  { id: '2_lan', name: '2 Lân biểu diễn (Song Lân)', icon: '🦁' },
-  { id: '3_lan', name: '3 Lân (Tam Tinh / Phúc Lộc Thọ)', icon: '🦁' },
-  { id: '4_lan', name: '4 Lân (Tứ Quý Hưng Long)', icon: '🦁' },
-  { id: 'dia_buu', name: 'Múa Lân Địa Bửu', icon: '🎋' },
-  { id: 'mai_hoa_thung', name: 'Múa Lân Mai Hoa Thung', icon: '⛩️' },
-  { id: 'mua_rong', name: 'Múa Rồng Lễ Hội / Đình Làng', icon: '🐉' },
-  { id: 'trong_hoi', name: 'Dàn Trống Hội & Trống Trận', icon: '🥁' },
-  { id: 'than_tai', name: 'Thần Tài - Thổ Địa - Chú Tễu', icon: '🎭' },
-  { id: 'tron_goi', name: 'Trọn gói Khai Trương / Khánh Thành', icon: '🎉' },
+  { id: '2_lan', name: '2 Lân', icon: '🦁' },
+  { id: '3_lan', name: '3 Lân', icon: '🦁' },
+  { id: '4_lan', name: '4 Lân', icon: '🦁' },
+  { id: '5_lan', name: '5 Lân', icon: '🦁' },
+  { id: 'dia_buu', name: 'Địa Bửu', icon: '🎋' },
+  { id: 'mua_rong', name: 'Múa Rồng', icon: '🐉' },
 ];
 
 function ContactPage() {
   const { token, isAdmin } = useContext(AuthContext);
 
+  // Dynamic Leader Avatar
+  const [leaderAvatar, setLeaderAvatar] = useState('/images/trưởng_đoàn.jpg');
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/users`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data)) {
+          const leader = data.data.find(
+            (u) => u.role === 'admin' || (u.name && u.name.toLowerCase().includes('hải nam'))
+          );
+          if (leader && leader.avatar) {
+            setLeaderAvatar(leader.avatar);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Form State
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
-    serviceTypes: ['2 Lân biểu diễn (Song Lân)', 'Múa Lân Địa Bửu'],
+    serviceTypes: ['2 Lân'],
     eventDate: '',
     eventTime: '08:00',
     location: 'Quảng Ninh',
@@ -177,7 +195,7 @@ function ContactPage() {
         setFormData({
           fullName: '',
           phone: '',
-          serviceTypes: ['2 Lân biểu diễn (Song Lân)', 'Múa Lân Địa Bửu'],
+          serviceTypes: ['2 Lân'],
           eventDate: '',
           eventTime: '08:00',
           location: 'Quảng Ninh',
@@ -218,6 +236,43 @@ function ContactPage() {
     }
   };
 
+  // Admin: Duyệt yêu cầu và tự động thêm thẳng vào Lịch Biểu Diễn
+  const handleApproveBooking = async (booking) => {
+    if (!booking.eventDate) {
+      alert('Yêu cầu này chưa có ngày diễn, không thể tự động thêm vào lịch biểu diễn.');
+      return;
+    }
+
+    const confirmMsg = `Xác nhận DUYỆT yêu cầu đặt lịch của khách hàng "${booking.fullName}" (${booking.phone}) vào ngày ${booking.eventDate}${booking.eventTime ? ' lúc ' + booking.eventTime : ''} và THÊM THẲNG VÀO LỊCH BIỂU DIỄN chính thức của đoàn?`;
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/bookings/${booking._id}/approve`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        alert('🎉 Đã duyệt yêu cầu và tự động thêm vào Lịch Biểu Diễn thành công! Khán giả và thành viên có thể theo dõi trực tiếp tại trang Lịch Biểu Diễn.');
+        setBookings((prev) =>
+          prev.map((b) =>
+            b._id === booking._id
+              ? { ...b, status: 'confirmed', isScheduled: true, scheduleId: data.data?.schedule?._id }
+              : b
+          )
+        );
+      } else {
+        alert(data.message || 'Lỗi khi duyệt đặt lịch.');
+      }
+    } catch (err) {
+      alert('Lỗi kết nối: ' + err.message);
+    }
+  };
+
   // Admin: Xóa yêu cầu
   const handleDeleteBooking = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa yêu cầu đặt lịch này?')) return;
@@ -242,16 +297,24 @@ function ContactPage() {
       ? bookings
       : bookings.filter((b) => b.status === statusFilter);
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (status, isScheduled) => {
+    if (isScheduled || status === 'confirmed') {
+      return (
+        <span className="d-inline-flex flex-column gap-1">
+          <Badge bg="success" className="px-2 py-1">✅ Đã chốt lịch</Badge>
+          <Badge bg="primary" style={{ backgroundColor: '#7c3aed' }} className="px-2 py-1">
+            📅 Đã lên lịch
+          </Badge>
+        </span>
+      );
+    }
     switch (status) {
-      case 'confirmed':
-        return <Badge bg="success">✅ Đã chốt lịch</Badge>;
       case 'contacted':
-        return <Badge bg="info" className="text-dark">📞 Đã liên hệ</Badge>;
+        return <Badge bg="info" className="text-dark px-2 py-1">📞 Đã liên hệ</Badge>;
       case 'cancelled':
-        return <Badge bg="danger">❌ Đã hủy</Badge>;
+        return <Badge bg="secondary" className="px-2 py-1">❌ Đã hủy</Badge>;
       default:
-        return <Badge bg="warning" className="text-dark">⏳ Chờ liên hệ</Badge>;
+        return <Badge bg="warning" className="text-dark px-2 py-1">⏳ Chờ duyệt</Badge>;
     }
   };
 
@@ -260,7 +323,6 @@ function ContactPage() {
       <Header />
 
       <section className="container my-5 lgd-section">
-        <FestivalStrip iconSize={22} />
         <h2 className="text-center mb-4 fw-bold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Liên hệ & Đặt lịch biểu diễn</DecorativeTitle>
         </h2>
@@ -301,7 +363,7 @@ function ContactPage() {
                   <div className="text-center mb-3">
                     <div className="d-inline-block position-relative">
                       <img
-                        src="/images/trưởng_đoàn.jpg"
+                        src={leaderAvatar || '/images/trưởng_đoàn.jpg'}
                         alt={CONTACT_INFO.fullName}
                         className="rounded-circle shadow"
                         style={{
@@ -402,6 +464,21 @@ function ContactPage() {
                   </a>
 
                   <a
+                    href={CONTACT_INFO.messengerUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2 text-white"
+                    style={{
+                      background: 'linear-gradient(135deg, #00B2FF 0%, #006AFF 50%, #A033FF 100%)',
+                      borderRadius: '8px',
+                      fontSize: '0.95rem',
+                      boxShadow: '0 4px 12px rgba(0, 106, 255, 0.25)',
+                    }}
+                  >
+                    <span>⚡ Nhắn Messenger Fanpage</span>
+                  </a>
+
+                  <a
                     href={`tel:${CONTACT_INFO.phone}`}
                     className="btn w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2"
                     style={{
@@ -411,7 +488,7 @@ function ContactPage() {
                       fontSize: '0.95rem',
                     }}
                   >
-                    <span>📞 Gọi điện trực tiếp</span>
+                    <span>📞 Gọi điện trực tiếp ({CONTACT_INFO.phone})</span>
                   </a>
                 </div>
               </div>
@@ -797,9 +874,44 @@ function ContactPage() {
                         </td>
                         <td>{b.location || '—'}</td>
                         <td style={{ maxWidth: '200px', fontSize: '0.85rem' }}>{b.note || '—'}</td>
-                        <td>{getStatusBadge(b.status)}</td>
+                        <td>{getStatusBadge(b.status, b.isScheduled)}</td>
                         <td>
-                          <div className="d-flex gap-1 flex-wrap">
+                          <div className="d-flex gap-2 flex-wrap align-items-center">
+                            {/* Khi đã duyệt thì hiển thị huy hiệu cố định thông báo đã duyệt, chưa duyệt thì hiển thị nút bấm duyệt */}
+                            {b.isScheduled || b.status === 'confirmed' ? (
+                              <span
+                                className="badge d-inline-flex align-items-center gap-1 py-2 px-2"
+                                style={{
+                                  backgroundColor: '#ecfdf5',
+                                  color: '#059669',
+                                  border: '1px solid #a7f3d0',
+                                  fontSize: '0.78rem',
+                                  fontWeight: '600',
+                                  whiteSpace: 'nowrap',
+                                }}
+                                title="Đơn này đã được duyệt và đã tự động thêm vào Lịch Biểu Diễn của đoàn"
+                              >
+                                ✓ Đã duyệt vào lịch
+                              </span>
+                            ) : (
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => handleApproveBooking(b)}
+                                title="Duyệt yêu cầu và tự động đưa vào Lịch Biểu Diễn chính thức."
+                                style={{
+                                  fontSize: '0.78rem',
+                                  fontWeight: '600',
+                                  whiteSpace: 'nowrap',
+                                  backgroundColor: '#7c3aed',
+                                  borderColor: '#7c3aed',
+                                  color: '#ffffff',
+                                }}
+                              >
+                                ⚡ Duyệt & Lên lịch
+                              </Button>
+                            )}
+
                             <Form.Select
                               size="sm"
                               value={b.status}

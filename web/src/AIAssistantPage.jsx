@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { DecorativeTitle, FestivalStrip, LanternIcon } from './components/Decorations';
+import { DecorativeTitle, LanternIcon } from './components/Decorations';
 import { useSupportKnowledge } from './SupportKnowledgeContext';
 import './AIAssistantPage.css';
 
@@ -163,7 +163,6 @@ function AIAssistantPage() {
       <Header />
 
       <section className="container my-5 lgd-section lgd-pattern-bg">
-        <FestivalStrip iconSize={22} />
         <div className="ai-hero-card rounded-4 p-4 p-lg-5">
           <div className="row g-4 align-items-center justify-content-center">
             <div className="col-lg-8 text-center mx-auto">

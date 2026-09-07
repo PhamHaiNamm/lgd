@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { DragonIcon, LionIcon, PeachBlossomIcon, LanternIcon, FestivalStrip } from "./components/Decorations";
+import { DragonIcon, LionIcon, PeachBlossomIcon, LanternIcon } from "./components/Decorations";
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -192,7 +192,6 @@ export default function PerformanceServices() {
             <section className="performance-section">
                 <Container>
                     <div className="text-center mb-5 lgd-pattern-bg">
-                        <FestivalStrip iconSize={24} />
                         <h2 className="display-4 fw-bold mb-4 d-flex align-items-center justify-content-center gap-2 flex-wrap">
                             <PeachBlossomIcon size={34} color="#a78bfa" />
                             <PeachBlossomIcon size={28} color="#a78bfa" />

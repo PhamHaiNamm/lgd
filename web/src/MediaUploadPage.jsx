@@ -6,7 +6,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, setDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { FestivalStrip } from "./components/Decorations";
 import "./MediaUploadPage.css";
 
 const IMAGE_EXT = /\.(jpg|jpeg|png|gif|webp|bmp)$/i;
@@ -117,8 +116,6 @@ export default function MediaUploadPage() {
             <Header />
             <div className="media-upload-section">
                 <div className="container">
-                    <FestivalStrip iconSize={22} />
-
                     <h2 className="mb-4" style={{ color: "var(--lgd-accent-light)" }}>
                         🎬 Khu vực Media
                     </h2>

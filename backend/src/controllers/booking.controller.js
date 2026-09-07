@@ -183,6 +183,60 @@ async function updateBookingStatus(req, res, next) {
 }
 
 /**
+ * Admin: Duyệt yêu cầu đặt lịch & tự động thêm thẳng vào Lịch Biểu Diễn
+ */
+async function approveBookingToSchedule(req, res, next) {
+  try {
+    const { id } = req.params;
+    const booking = await Booking.findById(id);
+
+    if (!booking) {
+      return sendError(res, 'Không tìm thấy yêu cầu đặt lịch.', 404);
+    }
+
+    if (!booking.eventDate) {
+      return sendError(res, 'Yêu cầu này chưa có ngày diễn, không thể tự động thêm vào lịch.', 400);
+    }
+
+    // Chuẩn bị thông tin lịch biểu diễn
+    const schedulePayload = {
+      date: booking.eventDate.trim(),
+      time: booking.eventTime ? booking.eventTime.trim() : '',
+      location: booking.location ? booking.location.trim() : 'Quảng Ninh',
+      description: `[Duyệt Đặt Lịch] ${booking.serviceType} - ${booking.fullName}`,
+      note: `Khách hàng: ${booking.fullName} - SĐT: ${booking.phone}${booking.note ? ` | Ghi chú: ${booking.note}` : ''}`,
+      createdBy: req.user?._id,
+    };
+
+    let scheduleItem;
+    if (booking.scheduleId) {
+      scheduleItem = await Schedule.findByIdAndUpdate(
+        booking.scheduleId,
+        schedulePayload,
+        { new: true }
+      );
+    }
+
+    if (!scheduleItem) {
+      scheduleItem = await Schedule.create(schedulePayload);
+    }
+
+    booking.status = 'confirmed';
+    booking.isScheduled = true;
+    booking.scheduleId = scheduleItem._id;
+    await booking.save();
+
+    return sendSuccess(
+      res,
+      { booking, schedule: scheduleItem },
+      '🎉 Đã duyệt yêu cầu và tự động thêm vào Lịch Biểu Diễn của đoàn!'
+    );
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
  * Admin: Xóa yêu cầu đặt lịch
  */
 async function deleteBooking(req, res, next) {
@@ -205,5 +259,6 @@ module.exports = {
   createBooking,
   getAllBookings,
   updateBookingStatus,
+  approveBookingToSchedule,
   deleteBooking,
 };
