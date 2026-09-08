@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import { AuthContext } from "./AuthContext";
 import { API_BASE_URL } from "./config";
 import LunarCalendar from "./components/LunarCalendar";
+import "./SchedulePage.css";
 
 export default function SchedulePage() {
   const { token, isAdmin } = useContext(AuthContext);
@@ -373,11 +374,10 @@ export default function SchedulePage() {
                   {selectedItems.map((item) => (
                     <div
                       key={item._id || item.id}
-                      className="p-3 rounded shadow-sm"
-                      style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0" }}
+                      className="schedule-card mb-1"
                     >
-                      <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
-                        <h5 className="fw-bold mb-2" style={{ color: "#7c3aed" }}>
+                      <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                        <h5 className="fw-bold mb-0" style={{ color: "#7c3aed" }}>
                           {item.description || item.content || "Chương trình biểu diễn"}
                         </h5>
                         {isAdmin && isAdminMode && (
@@ -407,37 +407,37 @@ export default function SchedulePage() {
                         <i className="bi bi-clock me-2 text-primary"></i>
                         <strong>Giờ:</strong> {item.time || "Chưa xác định"}
                       </div>
-                      <div className="mb-2 d-flex align-items-center justify-content-between flex-wrap gap-2" style={{ color: "#334155" }}>
-                        <div>
-                          <i className="bi bi-geo-alt me-2 text-danger"></i>
-                          <strong>Địa điểm:</strong> {item.location || "Đang cập nhật"}
+
+                      <div className="mb-2 d-flex align-items-center justify-content-between flex-wrap gap-3" style={{ color: "#334155" }}>
+                        <div className="d-flex align-items-center">
+                          <i className="bi bi-geo-alt-fill me-2 text-danger fs-5"></i>
+                          <div>
+                            <strong>Địa điểm:</strong> {item.location || "Đang cập nhật"}
+                          </div>
                         </div>
                         {getDirectionsUrl(item) && (
                           <a
                             href={getDirectionsUrl(item)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="btn btn-sm d-inline-flex align-items-center gap-1 shadow-sm text-decoration-none"
-                            style={{
-                              backgroundColor: "#2563eb",
-                              color: "#ffffff",
-                              borderRadius: "6px",
-                              fontSize: "0.8rem",
-                              padding: "4px 10px",
-                              fontWeight: "600",
-                              border: "none",
-                              transition: "all 0.2s ease",
-                            }}
+                            className="btn-google-maps"
                             title="Mở Google Maps để chỉ đường đến địa điểm này"
                           >
-                            <span>🧭 Chỉ đường Google Maps</span>
+                            <span className="map-icon-box">
+                              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                                <polygon points="3 11 22 2 13 21 11 13 3 11" />
+                              </svg>
+                            </span>
+                            <span className="map-text">Chỉ đường Google Maps</span>
+                            <span className="map-arrow">➔</span>
                           </a>
                         )}
                       </div>
+
                       {item.note && (
                         <div
                           className="mt-2 small p-2 rounded"
-                          style={{ backgroundColor: "#f1f5f9", color: "#64748b" }}
+                          style={{ backgroundColor: "#f8fafc", color: "#64748b", border: "1px dashed #cbd5e1" }}
                         >
                           <strong>Ghi chú:</strong> {item.note}
                         </div>
