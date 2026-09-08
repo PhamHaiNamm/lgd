@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Banner from './components/Banner';
 import { DecorativeTitle } from './components/Decorations';
+import { compressImage } from './utils/imageCompressor';
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?name=LGD&background=7c3aed&color=fff';
 
@@ -36,8 +37,9 @@ function Introduction() {
 
     try {
       setUploadingIntroImage(true);
+      const processedFile = await compressImage(file, { maxWidth: 2560, maxHeight: 2560, quality: 0.88 });
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('image', processedFile);
 
       const res = await fetch(`${API_BASE_URL}/upload/single`, {
         method: 'POST',
@@ -149,8 +151,9 @@ function Introduction() {
 
     try {
       setUploadingAvatar(true);
+      const processedFile = await compressImage(file, { maxWidth: 1024, maxHeight: 1024, quality: 0.88 });
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('image', processedFile);
 
       const res = await fetch(`${API_BASE_URL}/upload/single`, {
         method: 'POST',

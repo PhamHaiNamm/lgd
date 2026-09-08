@@ -4,6 +4,7 @@ import { AuthContext } from './AuthContext';
 import { API_BASE_URL, formatImageUrl } from './config';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import { compressImage } from './utils/imageCompressor';
 import './SocialFeedPage.css';
 
 export default function SocialFeedPage() {
@@ -108,8 +109,9 @@ export default function SocialFeedPage() {
 
     try {
       setIsPosting(true);
+      const processedFile = await compressImage(selectedFile, { maxWidth: 2048, maxHeight: 2048, quality: 0.88 });
       const formData = new FormData();
-      formData.append('image', selectedFile);
+      formData.append('image', processedFile);
       formData.append('caption', caption);
 
       const res = await fetch(`${API_BASE_URL}/posts`, {
@@ -217,8 +219,9 @@ export default function SocialFeedPage() {
 
       // Nếu có chọn ảnh avatar mới thì upload lên Cloudinary trước
       if (avatarFile) {
+        const processedFile = await compressImage(avatarFile, { maxWidth: 1024, maxHeight: 1024, quality: 0.88 });
         const formData = new FormData();
-        formData.append('image', avatarFile);
+        formData.append('image', processedFile);
         const uploadRes = await fetch(`${API_BASE_URL}/upload/single`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },

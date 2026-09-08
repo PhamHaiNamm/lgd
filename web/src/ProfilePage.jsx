@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthContext } from './AuthContext';
 import { API_BASE_URL, formatImageUrl } from './config';
+import { compressImage } from './utils/imageCompressor';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -78,8 +79,9 @@ export default function ProfilePage() {
       setAlertInfo({ show: false, type: '', message: '' });
       setAvatarPreview(URL.createObjectURL(file));
 
+      const processedFile = await compressImage(file, { maxWidth: 1024, maxHeight: 1024, quality: 0.88 });
       const uploadFormData = new FormData();
-      uploadFormData.append('image', file);
+      uploadFormData.append('image', processedFile);
 
       const uploadRes = await fetch(`${API_BASE_URL}/upload/single`, {
         method: 'POST',
@@ -153,8 +155,9 @@ export default function ProfilePage() {
       // Nếu có chọn file ảnh đại diện mới thì tải lên server
       if (avatarFile) {
         setUploadingAvatar(true);
+        const processedFile = await compressImage(avatarFile, { maxWidth: 1024, maxHeight: 1024, quality: 0.88 });
         const uploadFormData = new FormData();
-        uploadFormData.append('image', avatarFile);
+        uploadFormData.append('image', processedFile);
 
         const uploadRes = await fetch(`${API_BASE_URL}/upload/single`, {
           method: 'POST',

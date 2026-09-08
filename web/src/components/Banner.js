@@ -3,6 +3,7 @@ import Carousel from "react-bootstrap/Carousel";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import { AuthContext } from "../AuthContext";
 import { API_BASE_URL, formatImageUrl } from "../config";
+import { compressImage } from "../utils/imageCompressor";
 import "./Banner.css";
 
 const DEFAULT_SLIDES = [
@@ -112,8 +113,9 @@ function Banner() {
     }
     try {
       setUploadingIndex(index);
+      const processedFile = await compressImage(file, { maxWidth: 2560, maxHeight: 2560, quality: 0.88 });
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("image", processedFile);
 
       const res = await fetch(`${API_BASE_URL}/upload/single`, {
         method: "POST",
