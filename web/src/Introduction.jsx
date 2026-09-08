@@ -16,7 +16,45 @@ function Introduction() {
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [membersData, setMembersData] = useState([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
+  const [introImage, setIntroImage] = useState(() => {
+    try {
+      return localStorage.getItem('lgd_intro_image') || '/images/gioi_thieu_doan.jpg';
+    } catch {
+      return '/images/gioi_thieu_doan.jpg';
+    }
+  });
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingIntroImage, setUploadingIntroImage] = useState(false);
+
+  const handleIntroImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingIntroImage(true);
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const res = await fetch(`${API_BASE_URL}/upload/single`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (data.success && data.data?.url) {
+        setIntroImage(data.data.url);
+        localStorage.setItem('lgd_intro_image', data.data.url);
+        alert('🎉 Đã cập nhật ảnh giới thiệu thành công!');
+      } else {
+        alert(data.message || 'Lỗi tải ảnh lên máy chủ.');
+      }
+    } catch (err) {
+      alert('Lỗi upload ảnh: ' + err.message);
+    } finally {
+      setUploadingIntroImage(false);
+    }
+  };
 
   // Modal tạo tài khoản mới
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -294,16 +332,48 @@ function Introduction() {
             color: 'var(--lgd-text)',
           }}
         >
-          <div className="flex-shrink-0" style={{ width: '100%', maxWidth: '360px' }}>
+          <div className="flex-shrink-0 position-relative" style={{ width: '100%', maxWidth: '360px', minHeight: '260px' }}>
             <img
-              src="/images/gioi_thieu_doan.jpg"
+              src={formatImageUrl(introImage)}
               alt="Giới thiệu đoàn Lục Gia Đường"
               className="w-100 h-100"
-              style={{ objectFit: 'cover', minHeight: '260px' }}
+              style={{ objectFit: 'cover', minHeight: '260px', display: 'block' }}
               onError={(e) => {
                 e.target.src = '/images/Logo_full.png';
               }}
             />
+            {isAdmin && (
+              <label
+                htmlFor="intro-img-upload-input"
+                className="btn btn-sm position-absolute"
+                style={{
+                  bottom: '12px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: 'rgba(124, 58, 237, 0.92)',
+                  color: '#ffffff',
+                  border: '1px solid rgba(255, 255, 255, 0.4)',
+                  boxShadow: '0 4px 14px rgba(0,0,0,0.35)',
+                  borderRadius: '20px',
+                  padding: '5px 14px',
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  zIndex: 5,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {uploadingIntroImage ? '⏳ Đang tải ảnh...' : '📷 Đổi ảnh giới thiệu (Admin)'}
+                <input
+                  id="intro-img-upload-input"
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  disabled={uploadingIntroImage}
+                  onChange={handleIntroImageUpload}
+                />
+              </label>
+            )}
           </div>
           <div className="p-3 p-md-4 flex-grow-1" style={{ lineHeight: 1.8, fontSize: '1rem' }}>
             <p className="mb-3">
