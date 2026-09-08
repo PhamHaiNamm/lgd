@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { API_BASE_URL } from './config';
 
 const SupportKnowledgeContext = createContext({
   aiContext: null,
@@ -22,7 +21,7 @@ function normalizeScheduleItems(items) {
       date: item.date || '',
       time: item.time || '',
       location: item.location || '',
-      content: item.content || '',
+      content: item.description || item.content || '',
       note: item.note || '',
     }));
 }
@@ -54,29 +53,22 @@ export function SupportKnowledgeProvider({ children }) {
 
     async function loadKnowledge() {
       try {
-        const [membersSnap, scheduleSnap] = await Promise.all([
-          getDoc(doc(db, 'config', 'team_members')),
-          getDoc(doc(db, 'config', 'schedule')),
+        const [membersRes, scheduleRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/users/members`).then((r) => r.json()).catch(() => ({ data: [] })),
+          fetch(`${API_BASE_URL}/schedules`).then((r) => r.json()).catch(() => ({ data: [] })),
         ]);
 
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
 
-        const membersData = membersSnap.exists() && Array.isArray(membersSnap.data().members)
-          ? membersSnap.data().members
-          : [];
-
-        const scheduleData = scheduleSnap.exists() && Array.isArray(scheduleSnap.data().items)
-          ? scheduleSnap.data().items
-          : [];
+        const membersData = Array.isArray(membersRes?.data) ? membersRes.data : [];
+        const scheduleData = Array.isArray(scheduleRes?.data) ? scheduleRes.data : [];
 
         setMembers(
           membersData.map((member) => ({
-            id: member.id || '',
+            id: member._id || member.id || '',
             name: member.name || '',
-            role: member.role || 'Đang cập nhật',
-            birthYear: member.birthYear || 'Đang cập nhật',
+            role: member.role === 'admin' ? 'Quản trị viên / Trưởng đoàn' : (member.bio || 'Thành viên đoàn'),
+            birthYear: member.birthYear ? String(member.birthYear) : 'Đang cập nhật',
           }))
         );
         setSchedule(normalizeScheduleItems(scheduleData));

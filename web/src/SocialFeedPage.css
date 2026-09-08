@@ -521,3 +521,35 @@
   color: #050505;
   margin-bottom: 8px;
 }
+
+@media (max-width: 576px) {
+  .social-container {
+    padding: 12px 8px;
+  }
+
+  .social-topbar {
+    padding: 10px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .social-topbar-actions {
+    justify-content: flex-end;
+  }
+
+  .create-post-card {
+    padding: 12px 14px;
+  }
+
+  .post-card-header,
+  .post-card-footer {
+    padding: 10px 14px;
+  }
+
+  .post-caption {
+    padding: 0 14px 10px;
+    font-size: 14px;
+  }
+}
+

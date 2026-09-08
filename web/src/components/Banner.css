@@ -1,0 +1,181 @@
+/* ===================================================
+   HERO BANNER COMPONENT - LỤC GIA ĐƯỜNG
+   =================================================== */
+
+.lgd-banner-container {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  overflow: hidden;
+  background-color: #0f172a;
+}
+
+.lgd-banner-slide {
+  height: 500px;
+  width: 100%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Dark overlay to ensure text is always crystal clear on any background */
+.lgd-banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.15) 0%,
+    rgba(15, 23, 42, 0.35) 45%,
+    rgba(15, 23, 42, 0.85) 100%
+  );
+  pointer-events: none;
+}
+
+/* Floating Caption Box */
+.lgd-banner-caption {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 780px;
+  background: rgba(15, 23, 42, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 16px 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  text-align: center;
+  z-index: 5;
+  transition: all 0.3s ease;
+}
+
+.lgd-banner-title {
+  color: #ffffff !important;
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0 0 6px 0;
+  text-align: center;
+}
+
+.lgd-banner-title-text {
+  color: #ffffff !important;
+  display: inline-block;
+  font-weight: 800;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.lgd-banner-subtitle {
+  color: #e2e8f0 !important;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.lgd-banner-admin-hint {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.85);
+  color: #c4b5fd;
+  border: 1px solid rgba(196, 181, 253, 0.4);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom Carousel Indicators & Controls */
+.lgd-banner-container .carousel-indicators [data-bs-target] {
+  width: 24px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: rgba(255, 255, 255, 0.45);
+  border: none;
+  margin: 0 4px;
+  transition: all 0.25s ease;
+}
+
+.lgd-banner-container .carousel-indicators .active {
+  background-color: #ffffff;
+  width: 36px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive Media Queries */
+@media (max-width: 991px) {
+  .lgd-banner-slide {
+    height: 420px;
+  }
+
+  .lgd-banner-title {
+    font-size: 1.5rem;
+    gap: 6px 10px;
+  }
+
+  .lgd-banner-subtitle {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .lgd-banner-slide {
+    height: 360px;
+  }
+
+  .lgd-banner-caption {
+    bottom: 22px;
+    width: 94%;
+    padding: 12px 16px;
+    border-radius: 14px;
+  }
+
+  .lgd-banner-title {
+    font-size: 1.25rem;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .lgd-banner-subtitle {
+    font-size: 0.85rem;
+    gap: 4px;
+  }
+
+  /* Hide excessive decorative icons on mobile to prevent chaotic multi-line wrapping */
+  .banner-icon-extra {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .lgd-banner-slide {
+    height: 320px;
+  }
+
+  .lgd-banner-caption {
+    bottom: 16px;
+    padding: 10px 12px;
+  }
+
+  .lgd-banner-title {
+    font-size: 1.15rem;
+  }
+
+  .lgd-banner-subtitle {
+    font-size: 0.8rem;
+  }
+}

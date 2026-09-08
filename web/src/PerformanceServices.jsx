@@ -1,12 +1,9 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useContext } from "react";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { DragonIcon, LionIcon, PeachBlossomIcon, LanternIcon } from "./components/Decorations";
-import { auth, db } from "./firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { ADMIN_EMAILS } from "./config";
+import { DecorativeTitle } from "./components/Decorations";
+import { AuthContext } from "./AuthContext";
 import "./PerformanceServices.css";
 
 const withPosition = (s) => ({ ...s, position: s.position ?? { x: 50, y: 50 } });
@@ -84,30 +81,21 @@ const defaultServices = [
 const CONFIG_KEY = "performanceServices";
 
 export default function PerformanceServices() {
-    const [services, setServices] = useState(defaultServices);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [user, setUser] = useState(null);
-    const [activeTab, setActiveTab] = useState(0);
-
-    useEffect(() => {
-        const unsub = onAuthStateChanged(auth, (u) => setUser(u));
-        return () => unsub();
-    }, []);
-
-    useEffect(() => {
-        let cancelled = false;
-        getDoc(doc(db, "config", CONFIG_KEY))
-            .then((snapshot) => {
-                if (cancelled) return;
-                if (snapshot.exists() && Array.isArray(snapshot.data().services) && snapshot.data().services.length > 0) {
-                    setServices(snapshot.data().services.map(withPosition));
+    const { isAdmin: isAdminUser } = useContext(AuthContext) || {};
+    const [services, setServices] = useState(() => {
+        try {
+            const saved = localStorage.getItem(CONFIG_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    return parsed.map(withPosition);
                 }
-            })
-            .catch(() => setServices(defaultServices));
-        return () => { cancelled = true; };
-    }, []);
-
-    const isAdminUser = user && ADMIN_EMAILS.includes(user.email);
+            }
+        } catch {}
+        return defaultServices;
+    });
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [activeTab, setActiveTab] = useState(0);
 
     const handleChange = (index, field, value) => {
         if (!isAdminUser) return;
@@ -116,15 +104,17 @@ export default function PerformanceServices() {
         setServices(updated);
     };
 
-    const saveToFirestore = useCallback((nextServices) => {
-        setDoc(doc(db, "config", CONFIG_KEY), { services: nextServices }).catch((err) =>
-            console.error("Save performance services error:", err)
-        );
+    const saveServicesLocal = useCallback((nextServices) => {
+        try {
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(nextServices));
+        } catch (err) {
+            console.error("Save performance services error:", err);
+        }
     }, []);
 
     const handleSave = () => {
         if (!isAdminUser) return;
-        saveToFirestore(services);
+        saveServicesLocal(services);
         alert("Đã lưu.");
     };
 
@@ -133,7 +123,7 @@ export default function PerformanceServices() {
         const newService = { title: "Dịch vụ mới", img: "/images/sư_tử.jpg", position: { x: 50, y: 50 } };
         const next = [...services, newService];
         setServices(next);
-        saveToFirestore(next);
+        saveServicesLocal(next);
     };
 
     const [dragService, setDragService] = useState(null);
@@ -165,7 +155,7 @@ export default function PerformanceServices() {
         };
         const handleUp = () => {
             setServices((prev) => {
-                saveToFirestore(prev);
+                saveServicesLocal(prev);
                 return prev;
             });
             setDragService(null);
@@ -176,14 +166,14 @@ export default function PerformanceServices() {
             window.removeEventListener("mousemove", handleMove);
             window.removeEventListener("mouseup", handleUp);
         };
-    }, [dragService, saveToFirestore]);
+    }, [dragService, saveServicesLocal]);
 
     const handleDelete = (index) => {
         if (!isAdminUser) return;
         if (!window.confirm("Xóa dịch vụ này?")) return;
         const next = services.filter((_, i) => i !== index);
         setServices(next);
-        saveToFirestore(next.length ? next : defaultServices);
+        saveServicesLocal(next.length ? next : defaultServices);
     };
 
     return (
@@ -191,22 +181,11 @@ export default function PerformanceServices() {
             <Header />
             <section className="performance-section">
                 <Container>
-                    <div className="text-center mb-5 lgd-pattern-bg">
-                        <h2 className="display-4 fw-bold mb-4 d-flex align-items-center justify-content-center gap-2 flex-wrap">
-                            <PeachBlossomIcon size={34} color="#a78bfa" />
-                            <PeachBlossomIcon size={28} color="#a78bfa" />
-                            <LanternIcon size={36} color="#a78bfa" />
-                            <DragonIcon size={40} color="#a78bfa" />
-                            <DragonIcon size={36} color="#a78bfa" />
-                            DỊCH VỤ BIỂU DIỄN
-                            <DragonIcon size={36} color="#a78bfa" />
-                            <DragonIcon size={40} color="#a78bfa" />
-                            <LanternIcon size={36} color="#a78bfa" />
-                            <PeachBlossomIcon size={28} color="#a78bfa" />
-                            <PeachBlossomIcon size={34} color="#a78bfa" />
-                            <LionIcon size={38} color="#a78bfa" />
+                    <div className="text-center mb-4">
+                        <h2 className="text-center mb-3 fw-bold" style={{ color: '#7c3aed' }}>
+                            <DecorativeTitle showIcons={true} iconSize={26}>DỊCH VỤ BIỂU DIỄN</DecorativeTitle>
                         </h2>
-                        <p className="text-secondary mx-auto" style={{ maxWidth: "600px" }}>
+                        <p className="text-secondary mx-auto mb-0" style={{ maxWidth: "600px", fontSize: '1rem', lineHeight: 1.7 }}>
                             Các tiết mục Lân – Sư – Rồng chuyên nghiệp, phù hợp lễ hội, khai trương, sự kiện và chương trình nghệ thuật.
                         </p>
 

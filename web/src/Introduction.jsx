@@ -55,9 +55,38 @@ function Introduction() {
     fetchMembers();
   }, [fetchMembers]);
 
+  // Khử trùng lặp và sắp xếp: Duy nhất "Hải Nam" là Trưởng đoàn đứng đầu danh sách
+  const sortedMembers = useMemo(() => {
+    const rawList = Array.isArray(membersData) ? membersData : [];
+
+    // Loại bỏ các bản ghi trùng lặp theo tên
+    const uniqueMap = new Map();
+    for (const m of rawList) {
+      if (!m || !m.name) continue;
+      const lowerName = m.name.trim().toLowerCase();
+      // Bỏ qua tài khoản placeholder "admin" hoặc "quản trị viên trưởng"
+      if (m.username === 'admin' || lowerName === 'quản trị viên trưởng') {
+        continue;
+      }
+      if (!uniqueMap.has(lowerName)) {
+        uniqueMap.set(lowerName, m);
+      }
+    }
+
+    const uniqueList = Array.from(uniqueMap.values());
+
+    return uniqueList.sort((a, b) => {
+      const aIsTruongDoan = a.username === 'hainam' || a.name?.toLowerCase().includes('hải nam');
+      const bIsTruongDoan = b.username === 'hainam' || b.name?.toLowerCase().includes('hải nam');
+      if (aIsTruongDoan && !bIsTruongDoan) return -1;
+      if (!aIsTruongDoan && bIsTruongDoan) return 1;
+      return (a.name || '').localeCompare(b.name || '');
+    });
+  }, [membersData]);
+
   const selectedMember = useMemo(
-    () => membersData.find((m) => (m._id === selectedMemberId || m.id === selectedMemberId)) || null,
-    [selectedMemberId, membersData]
+    () => sortedMembers.find((m) => (m._id === selectedMemberId || m.id === selectedMemberId)) || null,
+    [selectedMemberId, sortedMembers]
   );
 
   const handleMemberFieldChange = (field, value) => {
@@ -252,8 +281,8 @@ function Introduction() {
       <Banner />
 
       {/* Giới thiệu chung về đoàn */}
-      <section className="container my-5 lgd-section">
-        <h2 className="text-center mb-4 fw-bold" style={{ color: '#7c3aed' }}>
+      <section className="container py-2 my-2 lgd-section">
+        <h2 className="text-center mb-3 fw-bold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Giới thiệu về đoàn</DecorativeTitle>
         </h2>
         <div
@@ -270,13 +299,13 @@ function Introduction() {
               src="/images/gioi_thieu_doan.jpg"
               alt="Giới thiệu đoàn Lục Gia Đường"
               className="w-100 h-100"
-              style={{ objectFit: 'cover', minHeight: '280px' }}
+              style={{ objectFit: 'cover', minHeight: '260px' }}
               onError={(e) => {
                 e.target.src = '/images/Logo_full.png';
               }}
             />
           </div>
-          <div className="p-4 p-md-5 flex-grow-1" style={{ lineHeight: 1.8, fontSize: '1.05rem' }}>
+          <div className="p-3 p-md-4 flex-grow-1" style={{ lineHeight: 1.8, fontSize: '1rem' }}>
             <p className="mb-3">
               <strong style={{ color: 'var(--lgd-purple)' }}>Tiền thân của Lục Gia Đường</strong> là đội Kì Lân Khu 6, được hình thành từ những người đam mê nghệ thuật Lân – Sư – Rồng tại địa phương.
               Từ một đội biểu diễn mang tính cộng đồng, qua thời gian tập luyện và phát triển, đội đã mở rộng quy mô và chính thức phát triển thành
@@ -299,12 +328,12 @@ function Introduction() {
       </section>
 
       {/* Thành tích nổi bật */}
-      <section className="container my-5 lgd-section">
-        <h2 className="text-center mb-4 fw-bold" style={{ color: '#7c3aed' }}>
+      <section className="container py-2 my-2 lgd-section">
+        <h2 className="text-center mb-3 fw-bold" style={{ color: '#7c3aed' }}>
           <DecorativeTitle showIcons={true}>Thành tích nổi bật</DecorativeTitle>
         </h2>
         <div
-          className="rounded p-4 p-md-5 shadow-sm"
+          className="rounded p-3 p-md-4 shadow-sm"
           style={{
             background: '#ffffff',
             border: '1px solid #e9d5ff',
@@ -312,7 +341,7 @@ function Introduction() {
             color: 'var(--lgd-text)',
           }}
         >
-          <ul className="mb-0 ps-3 ps-md-4" style={{ listStyle: 'none', fontSize: '1.05rem', lineHeight: 2 }}>
+          <ul className="mb-0 ps-3 ps-md-4" style={{ listStyle: 'none', fontSize: '1rem', lineHeight: 1.9 }}>
             <li className="mb-2">• Xuất sắc đạt Giải Nhất nội dung Địa Bửu tại Giải giao lưu Đền Gin (Nam Định) lần thứ nhất</li>
             <li className="mb-2">• Đạt Giải Ba nội dung Song Lân tại Giải giao lưu Đền Gin (Nam Định) lần thứ nhất</li>
             <li className="mb-2">• Vinh dự hợp tác và biểu diễn cùng nghệ sĩ Đen Vâu</li>
@@ -323,13 +352,13 @@ function Introduction() {
       </section>
 
       {/* Thành viên Lục Gia Đường (Lấy từ Database) */}
-      <section className="container my-5 lgd-section">
-        <h2 className="text-center mb-4 fw-bold lgd-title-gold" style={{ color: '#7c3aed' }}>
-          <DecorativeTitle showIcons={true}>Thành viên Lục Gia Đường ({membersData.length})</DecorativeTitle>
+      <section className="container py-2 my-2 lgd-section">
+        <h2 className="text-center mb-3 fw-bold lgd-title-gold" style={{ color: '#7c3aed' }}>
+          <DecorativeTitle showIcons={true}>Thành viên Lục Gia Đường ({sortedMembers.length})</DecorativeTitle>
         </h2>
 
         {isAdmin && (
-          <div className="text-center mb-4 d-flex justify-content-center gap-3 flex-wrap">
+          <div className="text-center mb-3 d-flex justify-content-center gap-3 flex-wrap">
             <Button
               variant={isAdminMode ? 'outline-primary' : 'primary'}
               className="fw-bold"
@@ -351,7 +380,7 @@ function Introduction() {
         )}
 
         <div
-          className="rounded p-4 p-md-5 shadow-sm"
+          className="rounded p-3 p-md-4 shadow-sm"
           style={{
             background: '#ffffff',
             border: '1px solid #e9d5ff',
@@ -365,34 +394,57 @@ function Introduction() {
             </div>
           ) : (
             <div className="row g-2 g-md-3">
-              {membersData.map((member) => (
-                <div key={member._id} className="col-6 col-sm-4 col-md-3 col-lg-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setSelectedMemberId((prev) => (prev === member._id ? null : member._id))
-                    }
-                    aria-pressed={selectedMemberId === member._id}
-                    className="w-100 rounded text-center py-2 px-2 d-flex flex-column align-items-center justify-content-center"
-                    style={{
-                      background: selectedMemberId === member._id ? '#f5f3ff' : '#ffffff',
-                      border: selectedMemberId === member._id ? '2px solid #7c3aed' : '1px solid #e2e8f0',
-                      color: selectedMemberId === member._id ? '#7c3aed' : '#1e1b4b',
-                      fontSize: '0.95rem',
-                      cursor: 'pointer',
-                      outline: 'none',
-                      fontWeight: selectedMemberId === member._id ? '700' : '500',
-                      transition: 'all 0.2s ease',
-                      minHeight: '60px',
-                    }}
-                  >
-                    <span>{member.name}</span>
-                    {member.role === 'admin' && (
-                      <span style={{ fontSize: '0.7rem', color: '#7c3aed' }}>👑 Admin</span>
-                    )}
-                  </button>
-                </div>
-              ))}
+              {sortedMembers.map((member) => {
+                const isTruongDoan = member.username === 'hainam' || member.name?.toLowerCase().includes('hải nam');
+                const isSelected = selectedMemberId === (member._id || member.id);
+
+                return (
+                  <div key={member._id || member.id} className="col-6 col-sm-4 col-md-3 col-lg-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedMemberId((prev) => (prev === (member._id || member.id) ? null : (member._id || member.id)))
+                      }
+                      aria-pressed={isSelected}
+                      className="w-100 rounded text-center py-2 px-2 d-flex flex-column align-items-center justify-content-center"
+                      style={{
+                        background: isSelected ? '#f5f3ff' : '#ffffff',
+                        border: isSelected
+                          ? '2px solid #7c3aed'
+                          : (isTruongDoan ? '1.5px solid #c4b5fd' : '1px solid #e2e8f0'),
+                        color: isSelected ? '#7c3aed' : '#1e1b4b',
+                        fontSize: '0.95rem',
+                        cursor: 'pointer',
+                        outline: 'none',
+                        fontWeight: isSelected ? '700' : (isTruongDoan ? '600' : '500'),
+                        boxShadow: isSelected
+                          ? '0 4px 12px rgba(124, 58, 237, 0.12)'
+                          : '0 1px 3px rgba(0, 0, 0, 0.04)',
+                        transition: 'all 0.2s ease',
+                        minHeight: '60px',
+                      }}
+                    >
+                      <span>{member.name}</span>
+                      {isTruongDoan && (
+                        <span
+                          className="badge"
+                          style={{
+                            fontSize: '0.65rem',
+                            background: '#7c3aed',
+                            color: '#ffffff',
+                            borderRadius: '6px',
+                            marginTop: '3px',
+                            padding: '2px 7px',
+                            fontWeight: '600',
+                          }}
+                        >
+                          👑 Trưởng đoàn
+                        </span>
+                      )}
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
 
@@ -544,11 +596,16 @@ function Introduction() {
                             <span
                               className="badge ms-2"
                               style={{
-                                background: selectedMember.role === 'admin' ? '#7c3aed' : '#e2e8f0',
-                                color: selectedMember.role === 'admin' ? '#ffffff' : '#475569',
+                                background: (selectedMember.username === 'hainam' || selectedMember.name?.toLowerCase().includes('hải nam')) ? '#7c3aed' : '#f1f5f9',
+                                color: (selectedMember.username === 'hainam' || selectedMember.name?.toLowerCase().includes('hải nam')) ? '#ffffff' : '#475569',
+                                border: (selectedMember.username === 'hainam' || selectedMember.name?.toLowerCase().includes('hải nam')) ? 'none' : '1px solid #e2e8f0',
+                                padding: '5px 12px',
+                                borderRadius: '6px',
+                                fontSize: '0.8rem',
+                                fontWeight: '600',
                               }}
                             >
-                              {selectedMember.role === 'admin' ? '👑 Quản trị viên' : '👤 Thành viên'}
+                              {(selectedMember.username === 'hainam' || selectedMember.name?.toLowerCase().includes('hải nam')) ? '👑 Trưởng đoàn / Quản trị viên' : '👤 Thành viên đoàn'}
                             </span>
                           </div>
 

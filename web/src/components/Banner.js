@@ -1,49 +1,39 @@
-import { useState, useEffect, useCallback } from "react";
-import { auth, db } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useState, useEffect, useCallback, useContext } from "react";
 import Carousel from "react-bootstrap/Carousel";
-import { DragonIcon, LionIcon, PeachBlossomIcon, LanternIcon } from "./Decorations";
-import { ADMIN_EMAILS } from "../config";
+import { AuthContext } from "../AuthContext";
+import "./Banner.css";
 
 const SLIDES = [
-  { imageUrl: "/images/banner_1.jpg", title: "Lân Sư Rồng Chuyên Nghiệp", subtitle: "Dịch vụ biểu diễn – phụ kiện – trang phục" },
-  { imageUrl: "/images/banner_2.jpg", title: "Dịch Vụ Biểu Diễn", subtitle: "Giá rẻ – uy tín – book show toàn quốc" },
-  { imageUrl: "/images/banner_3.jpg", title: "Phụ Kiện Lân Sư Rồng", subtitle: "Full sản phẩm – giá tốt – chất lượng cao" },
+  { imageUrl: "/images/banner_1.jpg", title: "Lân Sư Rồng Chuyên Nghiệp", subtitle: "Dịch vụ biểu diễn – Phụ kiện – Trang phục cao cấp" },
+  { imageUrl: "/images/banner_2.jpg", title: "Dịch Vụ Biểu Diễn Sự Kiện", subtitle: "Chuyên nghiệp – Uy tín – Book show toàn quốc" },
+  { imageUrl: "/images/banner_3.jpg", title: "Phụ Kiện Lân Sư Rồng", subtitle: "Đầy đủ mẫu mã – Giá tốt – Chất lượng chuẩn" },
 ];
 
 const BANNER_POSITIONS_KEY = "bannerPositions";
 const defaultPositions = SLIDES.map(() => ({ x: 50, y: 50 }));
 
 function Banner() {
-  const [positions, setPositions] = useState(defaultPositions);
-  const [user, setUser] = useState(null);
+  const { isAdmin } = useContext(AuthContext) || {};
+  const [positions, setPositions] = useState(() => {
+    try {
+      const saved = localStorage.getItem(BANNER_POSITIONS_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === SLIDES.length) {
+          return parsed;
+        }
+      }
+    } catch {}
+    return defaultPositions;
+  });
   const [dragging, setDragging] = useState(null);
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    getDoc(doc(db, "config", BANNER_POSITIONS_KEY))
-      .then((snapshot) => {
-        if (cancelled) return;
-        if (snapshot.exists() && Array.isArray(snapshot.data().positions) && snapshot.data().positions.length === SLIDES.length) {
-          setPositions(snapshot.data().positions);
-        }
-      })
-      .catch(() => setPositions(defaultPositions));
-    return () => { cancelled = true; };
-  }, []);
-
-  const isAdmin = user && ADMIN_EMAILS.includes(user.email);
-
   const savePositions = useCallback((nextPositions) => {
-    setDoc(doc(db, "config", BANNER_POSITIONS_KEY), { positions: nextPositions }).catch((err) =>
-      console.error("Save banner positions error:", err)
-    );
+    try {
+      localStorage.setItem(BANNER_POSITIONS_KEY, JSON.stringify(nextPositions));
+    } catch (err) {
+      console.error("Save banner positions error:", err);
+    }
   }, []);
 
   const handleMouseDown = useCallback((index, e) => {
@@ -85,81 +75,44 @@ function Banner() {
     };
   }, [dragging, savePositions]);
 
-  const captionStyle = { background: 'linear-gradient(transparent, rgba(0,0,0,0.92))', padding: '1.5rem', borderRadius: '0 0 8px 8px', borderTop: '2px solid rgba(139,92,246,0.5)', borderBottom: '1px solid rgba(167,139,250,0.3)' };
-  const titleStyle = { color: 'var(--lgd-accent-light)', textShadow: '0 0 12px rgba(139,92,246,0.6), 0 2px 4px #000', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem 0.75rem', flexWrap: 'wrap' };
-
   return (
-    <div
-      className="banner-wide"
-      style={{
-        width: "100vw",
-        position: "relative",
-        left: "50%",
-        right: "50%",
-        marginLeft: "-50vw",
-        marginRight: "-50vw",
-      }}
-    >
-      <Carousel fade interval={3500} className="shadow-sm rounded-0 overflow-hidden">
+    <div className="lgd-banner-container">
+      <Carousel fade interval={4000} className="shadow-sm rounded-0 overflow-hidden">
         {SLIDES.map((slide, index) => (
           <Carousel.Item key={index}>
             <div
               role="img"
               aria-label={slide.title || `Slide ${index + 1}`}
               onMouseDown={(e) => handleMouseDown(index, e)}
+              className="lgd-banner-slide"
               style={{
-                height: "500px",
-                width: "100%",
                 backgroundImage: `url(${slide.imageUrl})`,
-                backgroundSize: "cover",
                 backgroundPosition: `${positions[index]?.x ?? 50}% ${positions[index]?.y ?? 50}%`,
-                backgroundRepeat: "no-repeat",
                 cursor: dragging?.index === index ? "grabbing" : isAdmin ? "grab" : "default",
                 userSelect: "none",
               }}
             >
+              {/* Dark overlay ensuring crystal clear contrast */}
+              <div className="lgd-banner-overlay" />
+
               {isAdmin && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 8,
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    background: "rgba(0,0,0,0.7)",
-                    color: "var(--lgd-accent-light)",
-                    padding: "4px 10px",
-                    borderRadius: 6,
-                    fontSize: 12,
-                    pointerEvents: "none",
-                  }}
-                >
-                  Kéo để chỉnh vị trí ảnh
+                <div className="lgd-banner-admin-hint">
+                  🖱️ Kéo để chỉnh vị trí ảnh (Admin)
                 </div>
               )}
+
+              {/* Floating Caption Box */}
+              <div className="lgd-banner-caption">
+                <h3 className="lgd-banner-title">
+                  <span className="lgd-banner-title-text">{slide.title || "Lục Gia Đường"}</span>
+                </h3>
+                {slide.subtitle && (
+                  <p className="lgd-banner-subtitle">
+                    {slide.subtitle}
+                  </p>
+                )}
+              </div>
             </div>
-            <Carousel.Caption style={captionStyle}>
-              <h3 className="fw-bold" style={titleStyle}>
-                <PeachBlossomIcon size={26} color="var(--lgd-accent-light)" />
-                <PeachBlossomIcon size={22} color="var(--lgd-accent-light)" />
-                <LanternIcon size={28} color="var(--lgd-accent-light)" />
-                <DragonIcon size={32} color="var(--lgd-accent-light)" />
-                <DragonIcon size={28} color="var(--lgd-accent-light)" />
-                {slide.title || "Lục Gia Đường"}
-                <DragonIcon size={28} color="var(--lgd-accent-light)" />
-                <DragonIcon size={32} color="var(--lgd-accent-light)" />
-                <LanternIcon size={28} color="var(--lgd-accent-light)" />
-                <PeachBlossomIcon size={22} color="var(--lgd-accent-light)" />
-                <PeachBlossomIcon size={26} color="var(--lgd-accent-light)" />
-                <LionIcon size={30} color="var(--lgd-accent-light)" />
-              </h3>
-              {slide.subtitle && (
-                <p style={{ color: 'var(--lgd-text)', textShadow: '0 1px 2px #000', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <PeachBlossomIcon size={18} color="var(--lgd-accent-light)" />
-                  {slide.subtitle}
-                  <LanternIcon size={20} color="var(--lgd-accent-light)" />
-                </p>
-              )}
-            </Carousel.Caption>
           </Carousel.Item>
         ))}
       </Carousel>
@@ -168,3 +121,4 @@ function Banner() {
 }
 
 export default Banner;
+

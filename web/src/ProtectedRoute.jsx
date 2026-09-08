@@ -1,22 +1,11 @@
-import { useEffect, useState } from "react";
-import { auth } from "./firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
 
 export default function ProtectedRoute({ children }) {
-    const [loading, setLoading] = useState(true);
+    const { user, loading } = useContext(AuthContext) || {};
 
-    useEffect(() => {
-        const unsub = onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                alert("Bạn phải đăng nhập trước");
-                window.location.href = "/login";
-            } else {
-                setLoading(false);
-            }
-        });
-        return () => unsub();
-    }, []);
-
-    if (loading) return <p>Đang kiểm tra đăng nhập...</p>;
+    if (loading) return <p style={{ color: "var(--lgd-text)", textAlign: "center", padding: "2rem" }}>Đang kiểm tra đăng nhập...</p>;
+    if (!user) return <Navigate to="/login" replace />;
     return children;
-}
+}

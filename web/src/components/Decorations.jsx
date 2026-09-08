@@ -239,22 +239,22 @@ export function CornerOrnament({ position = "top-left", size = 24 }) {
   return <div style={style} aria-hidden />;
 }
 
-/* Tiêu đề có icon hai bên (nhiều hoa đào hồng + rồng + lân) */
+/* Tiêu đề trang trí gọn gàng, cân xứng, không bị rớt dòng trên mobile */
 export function DecorativeTitle({ children, showIcons = true, iconSize = 22, className = "" }) {
   if (!showIcons) return <span className={className}>{children}</span>;
   return (
-    <span className={className} style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem 0.75rem", flexWrap: "wrap", justifyContent: "center" }}>
-      <PeachBlossomIcon size={iconSize} color={PEACH_BLOSSOM_PINK} />
-      <PeachBlossomIcon size={iconSize - 2} color={PEACH_BLOSSOM_PINK} />
-      <DragonIcon size={iconSize + 4} />
-      <DragonIcon size={iconSize + 2} />
-      <span>{children}</span>
-      <DragonIcon size={iconSize + 2} />
-      <DragonIcon size={iconSize + 4} />
-      <PeachBlossomIcon size={iconSize - 2} color={PEACH_BLOSSOM_PINK} />
-      <PeachBlossomIcon size={iconSize} color={PEACH_BLOSSOM_PINK} />
-      <LionIcon size={iconSize + 4} />
-    </span>
+    <div className={`lgd-title-wrapper ${className}`}>
+      <div className="lgd-title-center-row">
+        <DragonIcon size={iconSize} color="#7c3aed" className="lgd-side-icon" />
+        <span className="lgd-title-core-text">{children}</span>
+        <DragonIcon size={iconSize} color="#7c3aed" className="lgd-side-icon" />
+      </div>
+      <div className="lgd-title-sub-decor">
+        <span className="lgd-title-sub-line" />
+        <PeachBlossomIcon size={12} color="#a78bfa" />
+        <span className="lgd-title-sub-line" />
+      </div>
+    </div>
   );
 }
 

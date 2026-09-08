@@ -1,103 +1,15 @@
-import { useState, useEffect } from "react";
-import { auth, storage, db } from "../firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-
-import { ADMIN_EMAILS } from "../config";
+import { useState, useContext } from "react";
+import { AuthContext } from "../AuthContext";
 
 const DEFAULT_IMAGE = "/lan-su-rong.jpg";
 
 export default function LucGiaDuongIntroSection() {
-  const [user, setUser] = useState(null);
-  const [imageUrl, setImageUrl] = useState(DEFAULT_IMAGE);
-  const [uploading, setUploading] = useState(false);
+  const { isAdmin } = useContext(AuthContext) || {};
+  const [imageUrl] = useState(DEFAULT_IMAGE);
+  const [uploading] = useState(false);
 
-  // 🔹 Theo dõi đăng nhập + tự tạo hồ sơ user
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (u) => {
-      console.log("AUTH USER:", u);
-      setUser(u);
-
-      if (!u) return;
-
-      try {
-        await setDoc(
-          doc(db, "members", u.uid),
-          {
-            uid: u.uid,
-            email: u.email,
-            name: u.displayName || "",
-            photo: u.photoURL || "",
-            role: "member",
-            lastLogin: serverTimestamp(),
-            createdAt: serverTimestamp(),
-          },
-          { merge: true }
-        );
-        console.log("✅ USER SYNC FIRESTORE OK");
-      } catch (err) {
-        console.error("❌ USER SYNC ERROR:", err);
-      }
-    });
-
-    return () => unsub();
-  }, []);
-
-  // 🔹 Đọc ảnh từ Firestore (một lần, tránh lỗi onSnapshot)
-  useEffect(() => {
-    let cancelled = false;
-    getDoc(doc(db, "config", "intro"))
-      .then((snapshot) => {
-        if (cancelled) return;
-        if (snapshot.exists() && snapshot.data().imageUrl) {
-          setImageUrl(snapshot.data().imageUrl);
-        }
-      })
-      .catch((err) => console.warn("Firestore intro config:", err?.message));
-    return () => { cancelled = true; };
-  }, []);
-
-  const isAdmin = user && ADMIN_EMAILS.includes(user.email);
-
-  const handleImageUpload = async (e) => {
-    if (!user) return alert("Chưa đăng nhập");
-    if (!isAdmin) return alert("Bạn không phải admin");
-
-    const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith("image/")) {
-      return alert("Vui lòng chọn file ảnh.");
-    }
-
-    setUploading(true);
-    try {
-      console.log("BẮT ĐẦU UPLOAD STORAGE...");
-
-      const storageRef = ref(storage, `intro/${user.uid}/${Date.now()}-${file.name}`);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-
-      console.log("UPLOAD STORAGE OK:", url);
-
-      await setDoc(
-        doc(db, "config", "intro"),
-        {
-          imageUrl: url,
-          updatedAt: serverTimestamp(),
-          updatedBy: user.uid,
-        },
-        { merge: true }
-      );
-
-      console.log("GHI FIRESTORE THÀNH CÔNG");
-      setImageUrl(url);
-    } catch (err) {
-      console.error("UPLOAD ERROR:", err);
-      alert("Lỗi: " + err.message);
-    } finally {
-      setUploading(false);
-      e.target.value = "";
-    }
+  const handleImageUpload = () => {
+    alert("Tính năng đang được bảo trì.");
   };
 
   return (

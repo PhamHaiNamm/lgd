@@ -231,21 +231,23 @@ export default function SchedulePage() {
 
                 {/* Bảng chú thích ký hiệu lịch biểu diễn */}
                 <div
-                  className="mt-3 p-3 rounded-3 d-flex flex-wrap align-items-center justify-content-center gap-3 gap-md-4"
+                  className="mt-3 p-3 rounded-3 d-flex flex-column gap-2"
                   style={{ backgroundColor: "#faf5ff", border: "1px solid #e9d5ff" }}
                 >
                   {/* Chú thích 1: Dấu chấm */}
                   <div className="d-flex align-items-center gap-2">
-                    <span
-                      style={{
-                        width: "12px",
-                        height: "12px",
-                        borderRadius: "50%",
-                        backgroundColor: "#7c3aed",
-                        display: "inline-block",
-                        boxShadow: "0 0 6px rgba(124, 58, 237, 0.6)",
-                      }}
-                    ></span>
+                    <div style={{ width: "28px", display: "flex", justifyContent: "center", alignItems: "center", flexShrink: 0 }}>
+                      <span
+                        style={{
+                          width: "12px",
+                          height: "12px",
+                          borderRadius: "50%",
+                          backgroundColor: "#7c3aed",
+                          display: "inline-block",
+                          boxShadow: "0 0 6px rgba(124, 58, 237, 0.6)",
+                        }}
+                      />
+                    </div>
                     <span className="small" style={{ color: "#1e1b4b" }}>
                       <strong>Dấu chấm tím:</strong> Có lịch biểu diễn
                     </span>
@@ -253,22 +255,24 @@ export default function SchedulePage() {
 
                   {/* Chú thích 2: Ô màu tím */}
                   <div className="d-flex align-items-center gap-2">
-                    <span
-                      style={{
-                        width: "24px",
-                        height: "24px",
-                        borderRadius: "6px",
-                        backgroundColor: "#7c3aed",
-                        color: "#ffffff",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "0.75rem",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      15
-                    </span>
+                    <div style={{ width: "28px", display: "flex", justifyContent: "center", alignItems: "center", flexShrink: 0 }}>
+                      <span
+                        style={{
+                          width: "24px",
+                          height: "24px",
+                          borderRadius: "6px",
+                          backgroundColor: "#7c3aed",
+                          color: "#ffffff",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "0.75rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        15
+                      </span>
+                    </div>
                     <span className="small" style={{ color: "#1e1b4b" }}>
                       <strong>Ô tím đậm:</strong> Ngày đang chọn xem
                     </span>
@@ -276,31 +280,38 @@ export default function SchedulePage() {
 
                   {/* Chú thích 3: Ô viền tím (Hôm nay) */}
                   <div className="d-flex align-items-center gap-2">
-                    <span
-                      style={{
-                        width: "24px",
-                        height: "24px",
-                        borderRadius: "6px",
-                        backgroundColor: "#ede9fe",
-                        border: "2px solid #7c3aed",
-                        color: "#7c3aed",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "0.75rem",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Nay
-                    </span>
+                    <div style={{ width: "28px", display: "flex", justifyContent: "center", alignItems: "center", flexShrink: 0 }}>
+                      <span
+                        style={{
+                          width: "24px",
+                          height: "24px",
+                          borderRadius: "6px",
+                          backgroundColor: "#ede9fe",
+                          border: "2px solid #7c3aed",
+                          color: "#7c3aed",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "0.68rem",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        Nay
+                      </span>
+                    </div>
                     <span className="small" style={{ color: "#1e1b4b" }}>
                       <strong>Ô viền tím:</strong> Ngày hôm nay
                     </span>
                   </div>
 
                   {/* Chú thích 4: Dương lịch & Âm lịch */}
-                  <div className="d-flex align-items-center gap-1 text-muted small" style={{ fontSize: "0.8rem" }}>
-                    <span>ℹ️ Số lớn: <strong>Dương lịch</strong> • Số nhỏ góc phải: <strong>Âm lịch</strong></span>
+                  <div className="d-flex align-items-center gap-2 pt-1 mt-1 border-top" style={{ borderColor: "#e9d5ff" }}>
+                    <div style={{ width: "28px", display: "flex", justifyContent: "center", alignItems: "center", flexShrink: 0 }}>
+                      <span style={{ fontSize: "1rem" }}>ℹ️</span>
+                    </div>
+                    <span className="small text-muted" style={{ fontSize: "0.82rem" }}>
+                      Số lớn: <strong style={{ color: "#1e1b4b" }}>Dương lịch</strong> • Số nhỏ góc phải: <strong style={{ color: "#7c3aed" }}>Âm lịch</strong>
+                    </span>
                   </div>
                 </div>
               </div>

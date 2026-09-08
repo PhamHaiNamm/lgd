@@ -167,7 +167,34 @@
 }
 
 @media (max-width: 991px) {
+  .performance-section {
+    padding: 1.5rem 0.75rem;
+  }
+
   .performance-details-container {
-    margin-top: 20px;
+    margin-top: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .performance-section {
+    padding: 1rem 0.5rem;
+  }
+
+  .performance-tab {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  .performance-details-img-container {
+    height: 220px;
+  }
+
+  .performance-details-content {
+    padding: 16px;
+  }
+
+  .performance-detail-title {
+    font-size: 1.2rem;
   }
 }
