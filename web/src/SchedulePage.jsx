@@ -490,6 +490,18 @@ export default function SchedulePage() {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
+                  <Form.Label className="small fw-bold text-muted">Mô tả / Tên chương trình *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    required
+                    placeholder="VD: Khai trương cửa hàng ABC, biểu diễn 2 Lân..."
+                    value={scheduleForm.description}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, description: e.target.value })}
+                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
                   <Form.Label className="small fw-bold text-muted">Địa điểm biểu diễn *</Form.Label>
                   <Form.Control
                     type="text"
@@ -497,6 +509,18 @@ export default function SchedulePage() {
                     placeholder="VD: 123 Hoàn Kiếm, Hà Nội / Trung tâm Hội nghị..."
                     value={scheduleForm.location}
                     onChange={(e) => setScheduleForm({ ...scheduleForm, location: e.target.value })}
+                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label className="small fw-bold text-muted">Ghi chú thêm</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={2}
+                    placeholder="VD: Đem theo trang phục Lân đỏ, chuẩn bị trước 30p..."
+                    value={scheduleForm.note}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, note: e.target.value })}
                     style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
                   />
                 </Form.Group>
@@ -515,30 +539,6 @@ export default function SchedulePage() {
                   <Form.Text className="text-muted" style={{ fontSize: "0.78rem" }}>
                     💡 Nhập tọa độ hoặc link bản đồ giúp người xem bấm <strong>"Chỉ đường Google Maps"</strong> để mở app chỉ đường chính xác từng mét.
                   </Form.Text>
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold text-muted">Mô tả / Tên chương trình *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    required
-                    placeholder="VD: Khai trương cửa hàng ABC, biểu diễn 2 Lân..."
-                    value={scheduleForm.description}
-                    onChange={(e) => setScheduleForm({ ...scheduleForm, description: e.target.value })}
-                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold text-muted">Ghi chú thêm</Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    rows={2}
-                    placeholder="VD: Đem theo trang phục Lân đỏ, chuẩn bị trước 30p..."
-                    value={scheduleForm.note}
-                    onChange={(e) => setScheduleForm({ ...scheduleForm, note: e.target.value })}
-                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
-                  />
                 </Form.Group>
               </Modal.Body>
 

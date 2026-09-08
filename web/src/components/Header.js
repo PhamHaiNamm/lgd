@@ -24,17 +24,109 @@ function Header() {
     return location.pathname.startsWith(path) && path !== '/';
   };
 
+  const navLinks = (
+    <ul className="lgd-nav-menu-capsule">
+      <li className="lgd-nav-item">
+        <Link
+          to="/"
+          className={`lgd-nav-link ${isActive('/') ? 'active' : ''}`}
+        >
+          <span>Trang chủ</span>
+        </Link>
+      </li>
+
+      <li className="lgd-nav-item">
+        <Link
+          to="/performance-services"
+          className={`lgd-nav-link ${isActive('/performance-services') ? 'active' : ''}`}
+        >
+          <span>Dịch vụ biểu diễn</span>
+          <span className="lgd-badge-hot ms-1">HOT</span>
+        </Link>
+      </li>
+
+      <li className="lgd-nav-item">
+        <Link
+          to="/schedule"
+          className={`lgd-nav-link ${isActive('/schedule') ? 'active' : ''}`}
+        >
+          <span>Lịch biểu diễn</span>
+        </Link>
+      </li>
+
+      <li className="lgd-nav-item">
+        <Link
+          to="/social"
+          className={`lgd-nav-link ${isActive('/social') ? 'active' : ''}`}
+        >
+          <span>Mạng xã hội</span>
+        </Link>
+      </li>
+
+      {/* CHỈ HIỆN MỤC NHẮN TIN KHI NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP */}
+      {user && (
+        <li className="lgd-nav-item">
+          <Link
+            to="/chat"
+            className={`lgd-nav-link ${isActive('/chat') ? 'active' : ''}`}
+          >
+            <span>Nhắn tin nội bộ</span>
+            <span className="lgd-badge-chat ms-1">CHAT</span>
+          </Link>
+        </li>
+      )}
+
+      <li className="lgd-nav-item">
+        <Link
+          to="/contact"
+          className={`lgd-nav-link ${isActive('/contact') ? 'active' : ''}`}
+        >
+          <span>Liên hệ / Đặt lịch</span>
+        </Link>
+      </li>
+    </ul>
+  );
+
   return (
     <div className="lgd-header-wrapper">
       {/* Main Header Bar */}
       <header className="lgd-header-main">
-        <div className="d-flex align-items-center justify-content-between flex-nowrap w-100 gap-2">
-          {/* Logo bên trái */}
-          <div className="d-flex align-items-center flex-shrink-0">
+        {/* Top Navigation Row */}
+        <div className="lgd-header-top-bar">
+          {/* Nút 3 gạch bên trái ngoài cùng (Chỉ hiện trên Mobile) */}
+          <div className="lgd-header-left">
+            <button
+              className="navbar-toggler lgd-navbar-toggler-custom d-lg-none"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNavDropdown"
+              aria-controls="navbarNavDropdown"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#ffffff"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          {/* Logo (Desktop: bên trái | Mobile: chính giữa) */}
+          <div className="lgd-header-brand">
             <Link to="/" className="lgd-brand-link">
               <PeachBlossomIcon size={20} color="#f59e0b" className="d-none d-md-inline-block" />
               <img
-                src="/images/Logo_full.png"
+                src="/images/Logo_circle.png"
                 alt="Logo Đoàn Lân Sư Rồng Lục Gia Đường"
                 className="lgd-header-logo"
               />
@@ -42,90 +134,13 @@ function Header() {
             </Link>
           </div>
 
-          {/* Menu điều hướng ở giữa (Desktop) & Nút 3 gạch (Mobile) */}
-          <nav className="navbar navbar-expand-lg p-0 flex-grow-1 justify-content-center">
-            <div className="container-fluid p-0 justify-content-end justify-content-lg-center">
-              {/* Nút 3 gạch mobile */}
-              <button
-                className="navbar-toggler lgd-navbar-toggler-custom ms-auto me-2"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarNavDropdown"
-                aria-controls="navbarNavDropdown"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-              >
-                <span className="navbar-toggler-icon" style={{ filter: 'invert(1)' }}></span>
-              </button>
+          {/* Menu điều hướng (Desktop: ở giữa) */}
+          <div className="lgd-header-nav-desktop d-none d-lg-flex">
+            {navLinks}
+          </div>
 
-              {/* Danh sách các mục menu trong capsule */}
-              <div className="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
-                <ul className="lgd-nav-menu-capsule">
-                  <li className="lgd-nav-item">
-                    <Link
-                      to="/"
-                      className={`lgd-nav-link ${isActive('/') ? 'active' : ''}`}
-                    >
-                      <span>Trang chủ</span>
-                    </Link>
-                  </li>
-
-                  <li className="lgd-nav-item">
-                    <Link
-                      to="/performance-services"
-                      className={`lgd-nav-link ${isActive('/performance-services') ? 'active' : ''}`}
-                    >
-                      <span>Dịch vụ biểu diễn</span>
-                      <span className="lgd-badge-hot ms-1">HOT</span>
-                    </Link>
-                  </li>
-
-                  <li className="lgd-nav-item">
-                    <Link
-                      to="/schedule"
-                      className={`lgd-nav-link ${isActive('/schedule') ? 'active' : ''}`}
-                    >
-                      <span>Lịch biểu diễn</span>
-                    </Link>
-                  </li>
-
-                  <li className="lgd-nav-item">
-                    <Link
-                      to="/social"
-                      className={`lgd-nav-link ${isActive('/social') ? 'active' : ''}`}
-                    >
-                      <span>Mạng xã hội</span>
-                    </Link>
-                  </li>
-
-                  {/* CHỈ HIỆN MỤC NHẮN TIN KHI NGƯỜI DÙNG ĐÃ ĐĂNG NHẬP */}
-                  {user && (
-                    <li className="lgd-nav-item">
-                      <Link
-                        to="/chat"
-                        className={`lgd-nav-link ${isActive('/chat') ? 'active' : ''}`}
-                      >
-                        <span>Nhắn tin nội bộ</span>
-                        <span className="lgd-badge-chat ms-1">CHAT</span>
-                      </Link>
-                    </li>
-                  )}
-
-                  <li className="lgd-nav-item">
-                    <Link
-                      to="/contact"
-                      className={`lgd-nav-link ${isActive('/contact') ? 'active' : ''}`}
-                    >
-                      <span>Liên hệ / Đặt lịch</span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </nav>
-
-          {/* User Account / Nút Đăng nhập bên phải */}
-          <div className="d-flex align-items-center flex-shrink-0">
+          {/* User Account / Nút Đăng nhập bên phải ngoài cùng */}
+          <div className="lgd-header-right">
             {user ? (
               <div className="dropdown">
                 <button
@@ -183,6 +198,11 @@ function Header() {
               </Link>
             )}
           </div>
+        </div>
+
+        {/* Mobile Menu Dropdown (Chỉ hiện trên Mobile khi bấm nút 3 gạch) */}
+        <div className="collapse navbar-collapse lgd-mobile-collapse d-lg-none" id="navbarNavDropdown">
+          {navLinks}
         </div>
       </header>
     </div>

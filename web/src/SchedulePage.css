@@ -15,19 +15,19 @@
   border-left-color: #6d28d9;
 }
 
-/* Nút chỉ đường Google Maps cao cấp */
+/* Nút chỉ đường Google Maps cao cấp màu tím */
 .btn-google-maps {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
+  background: linear-gradient(135deg, #5b21b6 0%, #7c3aed 50%, #9333ea 100%);
   color: #ffffff !important;
   font-size: 0.82rem;
   font-weight: 600;
   padding: 6px 14px;
   border-radius: 50px;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 3px 10px rgba(124, 58, 237, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   text-decoration: none !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
@@ -35,15 +35,15 @@
 }
 
 .btn-google-maps:hover {
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #60a5fa 100%);
+  background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 55%, #a855f7 100%);
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   color: #ffffff !important;
 }
 
 .btn-google-maps:active {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.25);
 }
 
 .btn-google-maps .map-icon-box {
