@@ -28,6 +28,7 @@ export default function SchedulePage() {
     location: '',
     description: '',
     note: '',
+    coordinates: '',
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -54,6 +55,22 @@ export default function SchedulePage() {
     fetchSchedules();
   }, [fetchSchedules]);
 
+  // Tạo URL chỉ đường Google Maps
+  const getDirectionsUrl = (item) => {
+    if (!item) return null;
+    const coords = (item.coordinates || item.mapUrl || '').trim();
+    if (coords) {
+      if (coords.startsWith('http://') || coords.startsWith('https://')) {
+        return coords;
+      }
+      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(coords)}`;
+    }
+    if (item.location && item.location.trim()) {
+      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.location.trim())}`;
+    }
+    return null;
+  };
+
   // Mở modal thêm lịch mới cho ngày đang chọn
   const handleOpenAddModal = (dateStr) => {
     const targetDate = dateStr || selectedDate;
@@ -64,6 +81,7 @@ export default function SchedulePage() {
       location: "",
       description: "",
       note: "",
+      coordinates: "",
     });
     setShowEditModal(true);
   };
@@ -77,6 +95,7 @@ export default function SchedulePage() {
       location: item.location || "",
       description: item.description || item.content || "",
       note: item.note || "",
+      coordinates: item.coordinates || item.mapUrl || "",
     });
     setShowEditModal(true);
   };
@@ -384,13 +403,36 @@ export default function SchedulePage() {
                         )}
                       </div>
 
-                      <div className="mb-1" style={{ color: "#334155" }}>
+                      <div className="mb-2" style={{ color: "#334155" }}>
                         <i className="bi bi-clock me-2 text-primary"></i>
                         <strong>Giờ:</strong> {item.time || "Chưa xác định"}
                       </div>
-                      <div className="mb-1" style={{ color: "#334155" }}>
-                        <i className="bi bi-geo-alt me-2 text-success"></i>
-                        <strong>Địa điểm:</strong> {item.location || "Đang cập nhật"}
+                      <div className="mb-2 d-flex align-items-center justify-content-between flex-wrap gap-2" style={{ color: "#334155" }}>
+                        <div>
+                          <i className="bi bi-geo-alt me-2 text-danger"></i>
+                          <strong>Địa điểm:</strong> {item.location || "Đang cập nhật"}
+                        </div>
+                        {getDirectionsUrl(item) && (
+                          <a
+                            href={getDirectionsUrl(item)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-sm d-inline-flex align-items-center gap-1 shadow-sm text-decoration-none"
+                            style={{
+                              backgroundColor: "#2563eb",
+                              color: "#ffffff",
+                              borderRadius: "6px",
+                              fontSize: "0.8rem",
+                              padding: "4px 10px",
+                              fontWeight: "600",
+                              border: "none",
+                              transition: "all 0.2s ease",
+                            }}
+                            title="Mở Google Maps để chỉ đường đến địa điểm này"
+                          >
+                            <span>🧭 Chỉ đường Google Maps</span>
+                          </a>
+                        )}
                       </div>
                       {item.note && (
                         <div
@@ -457,6 +499,22 @@ export default function SchedulePage() {
                     onChange={(e) => setScheduleForm({ ...scheduleForm, location: e.target.value })}
                     style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
                   />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label className="small fw-bold text-muted">
+                    Tọa độ GPS / Link Google Maps <span className="text-secondary fw-normal">(Tùy chọn)</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="VD: 21.028511, 105.854444 hoặc link Google Maps"
+                    value={scheduleForm.coordinates}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, coordinates: e.target.value })}
+                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
+                  />
+                  <Form.Text className="text-muted" style={{ fontSize: "0.78rem" }}>
+                    💡 Nhập tọa độ hoặc link bản đồ giúp người xem bấm <strong>"Chỉ đường Google Maps"</strong> để mở app chỉ đường chính xác từng mét.
+                  </Form.Text>
                 </Form.Group>
 
                 <Form.Group className="mb-3">

@@ -36,6 +36,16 @@ const scheduleSchema = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    coordinates: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    mapUrl: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
