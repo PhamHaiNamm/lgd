@@ -27,6 +27,21 @@ function Introduction() {
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingIntroImage, setUploadingIntroImage] = useState(false);
 
+  // Tải ảnh giới thiệu mới nhất từ cơ sở dữ liệu
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/settings/intro_image`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          setIntroImage(data.data);
+          try {
+            localStorage.setItem('lgd_intro_image', data.data);
+          } catch {}
+        }
+      })
+      .catch((err) => console.warn('Lỗi tải ảnh giới thiệu từ backend:', err));
+  }, []);
+
   const handleIntroImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -49,9 +64,29 @@ function Introduction() {
       const data = await res.json();
 
       if (data.success && data.data?.url) {
-        setIntroImage(data.data.url);
-        localStorage.setItem('lgd_intro_image', data.data.url);
-        alert('🎉 Đã cập nhật ảnh giới thiệu thành công!');
+        const newUrl = data.data.url;
+        setIntroImage(newUrl);
+        try {
+          localStorage.setItem('lgd_intro_image', newUrl);
+        } catch {}
+
+        // Lưu vào Database để mọi thiết bị đều thấy ảnh mới
+        if (token && isAdmin) {
+          try {
+            await fetch(`${API_BASE_URL}/settings/intro_image`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({ value: newUrl }),
+            });
+          } catch (dbErr) {
+            console.warn('Lưu DB lỗi:', dbErr);
+          }
+        }
+
+        alert('🎉 Đã cập nhật ảnh giới thiệu thành công cho tất cả thiết bị!');
       } else {
         alert(data.message || 'Lỗi tải ảnh lên máy chủ.');
       }

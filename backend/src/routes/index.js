@@ -9,6 +9,7 @@ const bookingRoutes = require('./booking.routes');
 const healthRoutes = require('./health.routes');
 const itemRoutes = require('./item.routes');
 const exampleRoutes = require('./example.routes');
+const settingRoutes = require('./setting.routes');
 
 const router = express.Router();
 
@@ -20,6 +21,7 @@ router.use('/messages', messageRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/schedules', scheduleRoutes);
 router.use('/bookings', bookingRoutes);
+router.use('/settings', settingRoutes);
 router.use('/health', healthRoutes);
 router.use('/items', itemRoutes);
 router.use('/example', exampleRoutes);

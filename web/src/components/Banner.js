@@ -163,19 +163,72 @@ function Banner() {
     setEditingSlides((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSaveBannerChanges = () => {
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/settings/banner_slides`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          setSlides(data.data);
+          try {
+            localStorage.setItem(BANNER_SLIDES_KEY, JSON.stringify(data.data));
+          } catch {}
+        }
+      })
+      .catch((err) => console.warn("Lỗi tải banner slides từ backend:", err));
+  }, []);
+
+  const handleSaveBannerChanges = async () => {
     setSlides(editingSlides);
-    localStorage.setItem(BANNER_SLIDES_KEY, JSON.stringify(editingSlides));
+    try {
+      localStorage.setItem(BANNER_SLIDES_KEY, JSON.stringify(editingSlides));
+    } catch {}
     setShowManageModal(false);
-    alert("🎉 Đã lưu thay đổi ảnh banner thành công!");
+
+    if (isAdmin && token) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/settings/banner_slides`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ value: editingSlides }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("🎉 Đã lưu thay đổi banner vào Cơ sở dữ liệu cho tất cả các thiết bị!");
+        } else {
+          alert("Đã lưu cục bộ. " + (data.message || "Lỗi lưu vào DB"));
+        }
+      } catch (err) {
+        alert("Đã lưu cục bộ. Lỗi kết nối DB: " + err.message);
+      }
+    } else {
+      alert("🎉 Đã lưu thay đổi ảnh banner thành công!");
+    }
   };
 
-  const handleResetDefault = () => {
+  const handleResetDefault = async () => {
     if (window.confirm("Bạn có chắc muốn khôi phục về danh sách banner mặc định?")) {
       setEditingSlides(DEFAULT_SLIDES);
       setSlides(DEFAULT_SLIDES);
-      localStorage.removeItem(BANNER_SLIDES_KEY);
+      try {
+        localStorage.removeItem(BANNER_SLIDES_KEY);
+      } catch {}
       setShowManageModal(false);
+
+      if (isAdmin && token) {
+        try {
+          await fetch(`${API_BASE_URL}/settings/banner_slides`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ value: DEFAULT_SLIDES }),
+          });
+        } catch {}
+      }
     }
   };
 

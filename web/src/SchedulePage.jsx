@@ -56,20 +56,16 @@ export default function SchedulePage() {
     fetchSchedules();
   }, [fetchSchedules]);
 
-  // Tạo URL chỉ đường Google Maps
+  // Tạo URL chỉ đường Google Maps (Chỉ hiển thị khi Admin có nhập tọa độ / link bản đồ)
   const getDirectionsUrl = (item) => {
     if (!item) return null;
     const coords = (item.coordinates || item.mapUrl || '').trim();
-    if (coords) {
-      if (coords.startsWith('http://') || coords.startsWith('https://')) {
-        return coords;
-      }
-      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(coords)}`;
+    if (!coords) return null;
+
+    if (coords.startsWith('http://') || coords.startsWith('https://')) {
+      return coords;
     }
-    if (item.location && item.location.trim()) {
-      return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(item.location.trim())}`;
-    }
-    return null;
+    return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(coords)}`;
   };
 
   // Mở modal thêm lịch mới cho ngày đang chọn
