@@ -106,6 +106,10 @@ function Banner() {
   // Upload ảnh cho slide trong modal
   const handleUploadSlideImage = async (index, file) => {
     if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      alert(`File ảnh quá lớn (${(file.size / (1024 * 1024)).toFixed(1)}MB). Giới hạn tối đa là 50MB!`);
+      return;
+    }
     try {
       setUploadingIndex(index);
       const formData = new FormData();

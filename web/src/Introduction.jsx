@@ -29,6 +29,10 @@ function Introduction() {
   const handleIntroImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      alert(`File ảnh quá lớn (${(file.size / (1024 * 1024)).toFixed(1)}MB). Giới hạn tối đa là 50MB!`);
+      return;
+    }
 
     try {
       setUploadingIntroImage(true);
@@ -138,6 +142,10 @@ function Introduction() {
   const handleAvatarUpload = async (memberId, e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      alert(`File ảnh quá lớn (${(file.size / (1024 * 1024)).toFixed(1)}MB). Giới hạn tối đa là 50MB!`);
+      return;
+    }
 
     try {
       setUploadingAvatar(true);

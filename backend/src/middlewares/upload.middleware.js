@@ -30,7 +30,7 @@ const upload = multer
       storage,
       fileFilter: imageFileFilter,
       limits: {
-        fileSize: 15 * 1024 * 1024, // 15MB
+        fileSize: 50 * 1024 * 1024, // 50MB
       },
     })
   : {

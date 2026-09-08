@@ -76,8 +76,8 @@ if (cors) {
 }
 
 // Phân tích dữ liệu JSON và urlencoded
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Phục vụ file ảnh tải lên cục bộ
 const UPLOADS_DIR = path.join(__dirname, '../uploads');

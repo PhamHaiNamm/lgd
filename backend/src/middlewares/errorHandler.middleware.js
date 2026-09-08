@@ -14,6 +14,10 @@ function notFoundHandler(req, res, next) {
  * Middleware xử lý tập trung mọi lỗi trong ứng dụng
  */
 function globalErrorHandler(err, req, res, next) {
+  if (err && err.code === 'LIMIT_FILE_SIZE') {
+    return sendError(res, 'File tải lên quá lớn! Vui lòng chọn ảnh có dung lượng dưới 50MB.', 400);
+  }
+
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   const message = err.message || 'Lỗi máy chủ nội bộ.';
 
