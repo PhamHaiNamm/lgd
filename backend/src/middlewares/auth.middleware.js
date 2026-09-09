@@ -20,7 +20,15 @@ async function verifyToken(req, res, next) {
     }
 
     const decoded = verifyTokenString(token, config.jwtSecret);
-    const user = await User.findById(decoded.id);
+    let user = null;
+    if (decoded && decoded.id) {
+      try {
+        user = await User.findById(decoded.id);
+      } catch (e) {}
+      if (!user) {
+        user = await User.findOne({ _id: decoded.id });
+      }
+    }
 
     if (!user) {
       return sendError(res, 'Tài khoản người dùng không tồn tại hoặc đã bị xóa.', 401);

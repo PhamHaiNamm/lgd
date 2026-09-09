@@ -1,3 +1,14 @@
+let mongoose;
+try {
+  mongoose = require('mongoose');
+} catch (e) {
+  try {
+    mongoose = require('../../../web/node_modules/mongoose');
+  } catch (err) {
+    mongoose = require('mongoose');
+  }
+}
+
 const Schedule = require('../models/schedule.model');
 const { sendSuccess, sendError } = require('../utils/responseHandler');
 
@@ -19,7 +30,18 @@ async function getAllSchedules(req, res, next) {
 async function getScheduleById(req, res, next) {
   try {
     const { id } = req.params;
-    const schedule = await Schedule.findById(id);
+    if (!id || id === '[object Object]' || String(id).trim() === '') {
+      return sendError(res, 'Mã định danh lịch không hợp lệ.', 400);
+    }
+
+    const cleanId = String(id).trim();
+    let schedule = null;
+    if (mongoose.Types.ObjectId.isValid(cleanId) && cleanId.length === 24) {
+      schedule = await Schedule.findById(cleanId);
+    } else {
+      schedule = await Schedule.findOne({ _id: cleanId });
+    }
+
     if (!schedule) {
       return sendError(res, 'Không tìm thấy lịch biểu diễn.', 404);
     }
@@ -66,23 +88,37 @@ async function updateSchedule(req, res, next) {
     const { id } = req.params;
     const { date, time, location, description, note, phone, coordinates, mapUrl } = req.body;
 
-    const schedule = await Schedule.findById(id);
+    if (!id || id === '[object Object]' || String(id).trim() === '') {
+      return sendError(res, 'Mã định danh lịch không hợp lệ.', 400);
+    }
+
+    const cleanId = String(id).trim();
+    let schedule = null;
+    if (mongoose.Types.ObjectId.isValid(cleanId) && cleanId.length === 24) {
+      schedule = await Schedule.findById(cleanId);
+    } else {
+      schedule = await Schedule.findOne({ _id: cleanId });
+    }
+
     if (!schedule) {
       return sendError(res, 'Không tìm thấy lịch biểu diễn cần cập nhật.', 404);
     }
 
-    if (date) schedule.date = date.trim();
-    if (time !== undefined) schedule.time = time.trim();
-    if (location) schedule.location = location.trim();
-    if (description) schedule.description = description.trim();
-    if (note !== undefined) schedule.note = note.trim();
-    if (phone !== undefined) schedule.phone = phone.trim();
-    if (coordinates !== undefined) schedule.coordinates = coordinates.trim();
-    if (mapUrl !== undefined) schedule.mapUrl = mapUrl.trim();
+    const updateFields = {};
+    if (date) updateFields.date = date.trim();
+    if (time !== undefined) updateFields.time = time.trim();
+    if (location) updateFields.location = location.trim();
+    if (description) updateFields.description = description.trim();
+    if (note !== undefined) updateFields.note = note.trim();
+    if (phone !== undefined) updateFields.phone = phone.trim();
+    if (coordinates !== undefined) updateFields.coordinates = coordinates.trim();
+    if (mapUrl !== undefined) updateFields.mapUrl = mapUrl.trim();
 
-    await schedule.save();
+    await Schedule.updateOne({ _id: schedule._id }, { $set: updateFields });
 
-    return sendSuccess(res, schedule, 'Cập nhật lịch biểu diễn thành công!');
+    const updatedSchedule = await Schedule.findById(schedule._id);
+
+    return sendSuccess(res, updatedSchedule || schedule, 'Cập nhật lịch biểu diễn thành công!');
   } catch (error) {
     next(error);
   }
@@ -94,13 +130,25 @@ async function updateSchedule(req, res, next) {
 async function deleteSchedule(req, res, next) {
   try {
     const { id } = req.params;
+    if (!id || id === '[object Object]' || String(id).trim() === '') {
+      return sendError(res, 'Mã định danh lịch không hợp lệ.', 400);
+    }
 
-    const schedule = await Schedule.findByIdAndDelete(id);
+    const cleanId = String(id).trim();
+    let schedule = null;
+    if (mongoose.Types.ObjectId.isValid(cleanId) && cleanId.length === 24) {
+      schedule = await Schedule.findById(cleanId);
+    } else {
+      schedule = await Schedule.findOne({ _id: cleanId });
+    }
+
     if (!schedule) {
       return sendError(res, 'Không tìm thấy lịch biểu diễn cần xóa.', 404);
     }
 
-    return sendSuccess(res, { deletedId: id }, 'Đã xóa lịch biểu diễn thành công.');
+    await Schedule.deleteOne({ _id: schedule._id });
+
+    return sendSuccess(res, { deletedId: schedule._id }, 'Đã xóa lịch biểu diễn thành công.');
   } catch (error) {
     next(error);
   }

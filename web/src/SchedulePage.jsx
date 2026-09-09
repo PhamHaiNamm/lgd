@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import { AuthContext } from "./AuthContext";
 import { API_BASE_URL } from "./config";
 import LunarCalendar from "./components/LunarCalendar";
+import { extractMongoId } from "./Introduction";
 import "./SchedulePage.css";
 
 export default function SchedulePage() {
@@ -40,7 +41,15 @@ export default function SchedulePage() {
       const res = await fetch(`${API_BASE_URL}/schedules`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
-        setItems(data.data);
+        const normalized = data.data.map((item, idx) => {
+          const validId = extractMongoId(item._id || item.id, `sched_${idx}`);
+          return {
+            ...item,
+            _id: validId,
+            id: validId,
+          };
+        });
+        setItems(normalized);
       } else {
         setItems([]);
       }
@@ -112,12 +121,14 @@ export default function SchedulePage() {
       return;
     }
 
+    const editId = editingItem ? extractMongoId(editingItem._id || editingItem.id) : null;
+
     try {
       setIsSaving(true);
-      const url = editingItem
-        ? `${API_BASE_URL}/schedules/${editingItem._id}`
+      const url = editId
+        ? `${API_BASE_URL}/schedules/${editId}`
         : `${API_BASE_URL}/schedules`;
-      const method = editingItem ? "PUT" : "POST";
+      const method = editId ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
@@ -132,7 +143,7 @@ export default function SchedulePage() {
       if (data.success) {
         setShowEditModal(false);
         fetchSchedules();
-        alert(editingItem ? "🎉 Đã cập nhật lịch biểu diễn!" : "🎉 Đã thêm lịch biểu diễn thành công!");
+        alert(editId ? "🎉 Đã cập nhật lịch biểu diễn!" : "🎉 Đã thêm lịch biểu diễn thành công!");
       } else {
         alert(data.message || "Lỗi khi lưu lịch.");
       }
@@ -146,10 +157,15 @@ export default function SchedulePage() {
   // Xóa lịch khỏi MongoDB Atlas
   const handleDeleteSchedule = async (id) => {
     if (!isAdmin || !token) return;
+    const cleanScheduleId = extractMongoId(id);
+    if (!cleanScheduleId) {
+      alert("Không tìm thấy mã định danh lịch hợp lệ.");
+      return;
+    }
     if (!window.confirm("Bạn có chắc chắn muốn xóa lịch biểu diễn này?")) return;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/schedules/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/schedules/${cleanScheduleId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
