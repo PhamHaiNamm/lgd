@@ -26,6 +26,37 @@ export const NAME_FRAMES = [
   { id: 'frame_spider', name: 'Khung Nhện Tím (Chỉ Trưởng đoàn)', file: '/images/frames/frame_spider.png', leaderOnly: true },
 ];
 
+// Trích xuất mã ID ObjectId chuẩn xác từ cấu trúc JSON/Buffer của MongoDB Atlas
+export function extractMongoId(rawId, fallback = '') {
+  if (!rawId) return fallback;
+  if (typeof rawId === 'string') {
+    if (rawId === '[object Object]') return fallback;
+    return rawId;
+  }
+  if (typeof rawId === 'object') {
+    if (rawId.$oid && typeof rawId.$oid === 'string') return rawId.$oid;
+    if (rawId._id) return extractMongoId(rawId._id, fallback);
+    if (rawId.buffer) {
+      try {
+        const buf = rawId.buffer.data || Object.values(rawId.buffer);
+        const hex = Array.from(buf).map((b) => Number(b).toString(16).padStart(2, '0')).join('');
+        if (hex.length === 24) return hex;
+      } catch (e) {}
+    }
+    if (rawId.data && Array.isArray(rawId.data)) {
+      try {
+        const hex = rawId.data.map((b) => Number(b).toString(16).padStart(2, '0')).join('');
+        if (hex.length === 24) return hex;
+      } catch (e) {}
+    }
+    if (typeof rawId.toString === 'function') {
+      const str = rawId.toString();
+      if (str && str !== '[object Object]') return str;
+    }
+  }
+  return fallback;
+}
+
 export function getMemberFrameBg(member) {
   if (!member) return null;
   const isLeader = member.username === 'hainam' || (member.name && member.name.toLowerCase().includes('hải nam'));
@@ -152,16 +183,7 @@ function Introduction() {
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         const normalized = data.data.map((m, idx) => {
-          let strId = '';
-          if (m && m._id) {
-            strId = typeof m._id === 'object' ? (m._id.$oid || (m._id.toString ? m._id.toString() : '')) : String(m._id);
-          }
-          if (!strId && m && m.id) {
-            strId = typeof m.id === 'object' ? (m.id.$oid || (m.id.toString ? m.id.toString() : '')) : String(m.id);
-          }
-          if (!strId || strId === '[object Object]') {
-            strId = m?.username ? `u_${m.username}` : `mem_${idx}`;
-          }
+          const strId = extractMongoId(m._id || m.id, m.username || `mem_${idx}`);
           return {
             ...m,
             _id: strId,
