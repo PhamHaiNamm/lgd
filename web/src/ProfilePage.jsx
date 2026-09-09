@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import { AuthContext } from './AuthContext';
 import { API_BASE_URL, formatImageUrl } from './config';
 import { compressImage } from './utils/imageCompressor';
+import { NAME_FRAMES } from './Introduction';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -20,6 +21,7 @@ export default function ProfilePage() {
     location: '',
     bio: '',
     avatar: '',
+    nameFrame: '',
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -47,6 +49,7 @@ export default function ProfilePage() {
         location: user.location || '',
         bio: user.bio || '',
         avatar: user.avatar || '',
+        nameFrame: user.nameFrame || '',
       });
       setAvatarPreview(
         formatImageUrl(user.avatar) ||
@@ -183,6 +186,7 @@ export default function ProfilePage() {
         location: formData.location.trim(),
         bio: formData.bio.trim(),
         avatar: finalAvatarUrl,
+        nameFrame: formData.nameFrame || '',
       };
 
       if (passwordData.newPassword) {
@@ -372,6 +376,79 @@ export default function ProfilePage() {
                           placeholder="Giới thiệu đôi nét về bản thân hoặc vị trí trong đoàn..."
                           className="profile-form-control"
                         />
+                      </Form.Group>
+                    </Col>
+
+                    {/* Chọn Khung Tên Thành Viên */}
+                    <Col xs={12}>
+                      <Form.Group>
+                        <Form.Label className="small fw-bold text-secondary d-flex justify-content-between align-items-center">
+                          <span style={{ color: '#a78bfa' }}>🎨 Khung hiển thị tên thành viên</span>
+                          <span className="text-muted" style={{ fontSize: '0.75rem', fontWeight: 'normal' }}>
+                            (Hiển thị tại danh sách Giới thiệu thành viên)
+                          </span>
+                        </Form.Label>
+                        <Row className="g-2">
+                          {NAME_FRAMES.map((f) => {
+                            const isLeader = user?.role === 'admin' || user?.username === 'hainam' || (user?.name && user.name.toLowerCase().includes('hải nam'));
+                            const isDisabled = f.leaderOnly && !isLeader;
+                            const isChosen = (formData.nameFrame || (isLeader && !formData.nameFrame ? 'frame_spider' : '')) === f.id;
+
+                            return (
+                              <Col xs={12} sm={6} key={f.id}>
+                                <div
+                                  onClick={() => {
+                                    if (!isDisabled) {
+                                      setFormData((prev) => ({ ...prev, nameFrame: f.id }));
+                                    }
+                                  }}
+                                  className={`p-2 rounded border d-flex align-items-center justify-content-between h-100 ${isDisabled ? 'opacity-50' : ''}`}
+                                  style={{
+                                    cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                    backgroundColor: isChosen ? '#2e1065' : '#1e1b4b',
+                                    borderColor: isChosen ? '#a855f7' : '#475569',
+                                    borderWidth: isChosen ? '2px' : '1px',
+                                    transition: 'all 0.15s ease',
+                                  }}
+                                >
+                                  <div className="d-flex align-items-center gap-2">
+                                    <input
+                                      type="radio"
+                                      name="profile_nameFrame"
+                                      checked={isChosen}
+                                      disabled={isDisabled}
+                                      onChange={() => setFormData((prev) => ({ ...prev, nameFrame: f.id }))}
+                                      style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+                                    />
+                                    <span className="small fw-semibold text-white">
+                                      {f.name}
+                                    </span>
+                                    {isDisabled && (
+                                      <span className="badge bg-secondary" style={{ fontSize: '0.62rem' }}>
+                                        🔒 Chỉ Trưởng đoàn
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  {f.file ? (
+                                    <div
+                                      style={{
+                                        width: '100px',
+                                        height: '28px',
+                                        background: `url('${f.file}') center / 100% 100% no-repeat #ffffff`,
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        borderRadius: '4px',
+                                        flexShrink: 0,
+                                      }}
+                                    />
+                                  ) : (
+                                    <span className="small text-muted fst-italic me-1" style={{ fontSize: '0.75rem' }}>Mặc định</span>
+                                  )}
+                                </div>
+                              </Col>
+                            );
+                          })}
+                        </Row>
                       </Form.Group>
                     </Col>
                   </Row>

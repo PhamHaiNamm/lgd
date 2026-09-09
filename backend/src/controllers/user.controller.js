@@ -8,7 +8,7 @@ const { sendSuccess, sendError } = require('../utils/responseHandler');
 async function updateMyProfile(req, res, next) {
   try {
     const user = req.user;
-    const { name, birthYear, avatar, location, bio, password } = req.body;
+    const { name, birthYear, avatar, location, bio, password, nameFrame } = req.body;
 
     if (name) user.name = name.trim();
     if (birthYear !== undefined) user.birthYear = birthYear ? Number(birthYear) : null;
@@ -16,6 +16,14 @@ async function updateMyProfile(req, res, next) {
     if (location !== undefined) user.location = location.trim();
     if (bio !== undefined) user.bio = bio.trim();
     if (password) user.password = password; // Sẽ tự động băm qua pre('save')
+
+    if (nameFrame !== undefined) {
+      const isLeader = user.role === 'admin' || user.username === 'hainam' || (user.name && user.name.toLowerCase().includes('hải nam'));
+      if (nameFrame === 'frame_spider' && !isLeader) {
+        return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
+      }
+      user.nameFrame = nameFrame ? nameFrame.trim() : '';
+    }
 
     await user.save();
 
@@ -38,7 +46,7 @@ async function updateMyProfile(req, res, next) {
  */
 async function getPublicMembers(req, res, next) {
   try {
-    const members = await User.find({}, 'name username role birthYear avatar location bio createdAt')
+    const members = await User.find({}, 'name username role birthYear avatar location bio nameFrame createdAt')
       .sort({ role: 1, createdAt: 1 });
     return sendSuccess(res, members, 'Lấy danh sách thành viên thành công.');
   } catch (error) {
@@ -51,7 +59,7 @@ async function getPublicMembers(req, res, next) {
  */
 async function createUserByAdmin(req, res, next) {
   try {
-    const { name, username, password, role, birthYear, location, bio, avatar } = req.body;
+    const { name, username, password, role, birthYear, location, bio, avatar, nameFrame } = req.body;
 
     if (!name || !username || !password) {
       return sendError(res, 'Vui lòng cung cấp Họ tên, Tên đăng nhập và Mật khẩu.', 400);
@@ -72,6 +80,7 @@ async function createUserByAdmin(req, res, next) {
       location: location ? location.trim() : '',
       bio: bio ? bio.trim() : '',
       avatar: avatar || undefined,
+      nameFrame: nameFrame ? nameFrame.trim() : '',
     });
 
     return sendSuccess(res, newUser, `Tạo tài khoản thành viên "${newUser.name}" thành công!`, 201);
@@ -98,7 +107,7 @@ async function getAllUsers(req, res, next) {
 async function updateUserByAdmin(req, res, next) {
   try {
     const { id } = req.params;
-    const { name, username, role, birthYear, avatar, location, bio, password } = req.body;
+    const { name, username, role, birthYear, avatar, location, bio, password, nameFrame } = req.body;
 
     const targetUser = await User.findById(id);
     if (!targetUser) {
@@ -120,6 +129,14 @@ async function updateUserByAdmin(req, res, next) {
     if (location !== undefined) targetUser.location = location.trim();
     if (bio !== undefined) targetUser.bio = bio.trim();
     if (password) targetUser.password = password; // Sẽ tự băm lại khi save
+
+    if (nameFrame !== undefined) {
+      const isLeader = targetUser.role === 'admin' || targetUser.username === 'hainam' || (targetUser.name && targetUser.name.toLowerCase().includes('hải nam'));
+      if (nameFrame === 'frame_spider' && !isLeader && req.user.role !== 'admin') {
+        return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
+      }
+      targetUser.nameFrame = nameFrame ? nameFrame.trim() : '';
+    }
 
     await targetUser.save();
 

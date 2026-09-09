@@ -10,6 +10,31 @@ import { compressImage } from './utils/imageCompressor';
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?name=LGD&background=7c3aed&color=fff';
 
+export const NAME_FRAMES = [
+  { id: '', name: 'Mặc định (Viền tím cơ bản)', file: '' },
+  { id: 'frame_lan_rong', name: 'Lân & Rồng', file: '/images/frames/frame_lan_rong.png', leaderOnly: false },
+  { id: 'frame_dragon', name: 'Rồng Uy Dũng', file: '/images/frames/frame_dragon.png', leaderOnly: false },
+  { id: 'frame_trung_thu', name: 'Trung Thu Trăng Rằm', file: '/images/frames/frame_trung_thu.png', leaderOnly: false },
+  { id: 'frame_lan', name: 'Lân Sư Oai Vệ', file: '/images/frames/frame_lan.png', leaderOnly: false },
+  { id: 'frame_spider', name: 'Khung Nhện Tím (Chỉ Trưởng đoàn)', file: '/images/frames/frame_spider.png', leaderOnly: true },
+];
+
+export function getMemberFrameBg(member) {
+  if (!member) return null;
+  const isLeader = member.username === 'hainam' || (member.name && member.name.toLowerCase().includes('hải nam'));
+
+  if (member.nameFrame === 'frame_spider') {
+    return '/images/frames/frame_spider.png';
+  }
+  if (member.nameFrame && ['frame_lan_rong', 'frame_dragon', 'frame_trung_thu', 'frame_lan'].includes(member.nameFrame)) {
+    return `/images/frames/${member.nameFrame}.png`;
+  }
+  if (isLeader) {
+    return '/images/frames/frame_spider.png';
+  }
+  return null;
+}
+
 function Introduction() {
   const { token, isAdmin } = useContext(AuthContext);
 
@@ -109,6 +134,7 @@ function Introduction() {
     location: 'Quảng Ninh',
     bio: '',
     avatar: '',
+    nameFrame: '',
   });
 
   // Tải danh sách thành viên từ MongoDB Atlas
@@ -244,6 +270,7 @@ function Introduction() {
         location: member.location,
         bio: member.bio,
         avatar: member.avatar,
+        nameFrame: member.nameFrame || '',
       };
       if (member.newPassword && member.newPassword.trim()) {
         payload.password = member.newPassword.trim();
@@ -331,6 +358,7 @@ function Introduction() {
           location: 'Quảng Ninh',
           bio: '',
           avatar: '',
+          nameFrame: '',
         });
         fetchMembers();
       } else {
@@ -513,6 +541,8 @@ function Introduction() {
               {sortedMembers.map((member) => {
                 const isTruongDoan = member.username === 'hainam' || member.name?.toLowerCase().includes('hải nam');
                 const isSelected = selectedMemberId === (member._id || member.id);
+                const frameBg = getMemberFrameBg(member);
+                const hasFrame = Boolean(frameBg);
 
                 return (
                   <div key={member._id || member.id} className="col-6 col-sm-4 col-md-3 col-lg-2">
@@ -524,34 +554,52 @@ function Introduction() {
                       aria-pressed={isSelected}
                       className="w-100 rounded text-center py-2 px-2 d-flex flex-column align-items-center justify-content-center"
                       style={{
-                        background: isSelected ? '#f5f3ff' : '#ffffff',
-                        border: isSelected
-                          ? '2px solid #7c3aed'
-                          : (isTruongDoan ? '1.5px solid #c4b5fd' : '1px solid #e2e8f0'),
-                        color: isSelected ? '#7c3aed' : '#1e1b4b',
-                        fontSize: '0.95rem',
+                        background: hasFrame
+                          ? `url('${frameBg}') center / 100% 100% no-repeat #ffffff`
+                          : (isSelected ? '#f5f3ff' : '#ffffff'),
+                        border: hasFrame
+                          ? 'none'
+                          : (isSelected ? '2px solid #7c3aed' : (isTruongDoan ? '1.5px solid #c4b5fd' : '1px solid #e2e8f0')),
+                        color: hasFrame ? '#0f172a' : (isSelected ? '#7c3aed' : '#1e1b4b'),
+                        fontSize: '1rem',
                         cursor: 'pointer',
                         outline: 'none',
-                        fontWeight: isSelected ? '700' : (isTruongDoan ? '600' : '500'),
-                        boxShadow: isSelected
-                          ? '0 4px 12px rgba(124, 58, 237, 0.12)'
-                          : '0 1px 3px rgba(0, 0, 0, 0.04)',
+                        boxShadow: hasFrame
+                          ? (isSelected ? '0 6px 20px rgba(124, 58, 237, 0.35)' : '0 4px 14px rgba(124, 58, 237, 0.18)')
+                          : (isSelected ? '0 4px 12px rgba(124, 58, 237, 0.12)' : '0 1px 3px rgba(0, 0, 0, 0.04)'),
                         transition: 'all 0.2s ease',
-                        minHeight: '60px',
+                        minHeight: hasFrame ? '64px' : '60px',
+                        padding: hasFrame ? '4px 10px' : '8px',
+                        transform: isSelected ? 'scale(1.02)' : 'none',
                       }}
                     >
-                      <span>{member.name}</span>
+                      <span
+                        style={{
+                          position: 'relative',
+                          zIndex: 1,
+                          fontFamily: "'Charm', 'Charmonman', cursive, serif",
+                          fontSize: '1.22rem',
+                          fontWeight: '500',
+                          letterSpacing: '0.4px',
+                          color: '#0f172a',
+                          textShadow: hasFrame ? '0 0 4px #ffffff, 0 0 2px #ffffff' : 'none',
+                        }}
+                      >
+                        {member.name}
+                      </span>
                       {isTruongDoan && (
                         <span
                           className="badge"
                           style={{
-                            fontSize: '0.65rem',
+                            fontSize: '0.62rem',
                             background: '#7c3aed',
                             color: '#ffffff',
                             borderRadius: '6px',
-                            marginTop: '3px',
-                            padding: '2px 7px',
-                            fontWeight: '600',
+                            marginTop: '2px',
+                            padding: '1px 6px',
+                            fontWeight: '700',
+                            position: 'relative',
+                            zIndex: 1,
                           }}
                         >
                           👑 Trưởng đoàn
@@ -643,6 +691,75 @@ function Introduction() {
                             </Form.Select>
                           </Form.Group>
 
+                          {/* Chọn Khung Tên Hiển Thị */}
+                          <Form.Group className="mb-2">
+                            <Form.Label className="small fw-bold d-flex justify-content-between align-items-center" style={{ color: '#7c3aed' }}>
+                              <span>🎨 Khung hiển thị tên thành viên</span>
+                              <span className="text-muted" style={{ fontSize: '0.72rem', fontWeight: 'normal' }}>
+                                (Hiện ở danh sách thành viên)
+                              </span>
+                            </Form.Label>
+                            <div className="d-flex flex-column gap-1">
+                              {NAME_FRAMES.map((f) => {
+                                const isLeaderMember = selectedMember.username === 'hainam' || selectedMember.name?.toLowerCase().includes('hải nam') || selectedMember.role === 'admin';
+                                const isDisabled = f.leaderOnly && !isLeaderMember;
+                                const isChosen = (selectedMember.nameFrame || (isLeaderMember && !selectedMember.nameFrame ? 'frame_spider' : '')) === f.id;
+
+                                return (
+                                  <div
+                                    key={f.id}
+                                    onClick={() => {
+                                      if (!isDisabled) {
+                                        handleMemberFieldChange('nameFrame', f.id);
+                                      }
+                                    }}
+                                    className={`p-2 rounded border d-flex align-items-center justify-content-between ${isDisabled ? 'opacity-50' : ''}`}
+                                    style={{
+                                      cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                      backgroundColor: isChosen ? '#f5f3ff' : '#ffffff',
+                                      borderColor: isChosen ? '#7c3aed' : '#e2e8f0',
+                                      borderWidth: isChosen ? '2px' : '1px',
+                                      transition: 'all 0.15s ease',
+                                    }}
+                                  >
+                                    <div className="d-flex align-items-center gap-2">
+                                      <input
+                                        type="radio"
+                                        name="selectedMember_nameFrame"
+                                        checked={isChosen}
+                                        disabled={isDisabled}
+                                        onChange={() => handleMemberFieldChange('nameFrame', f.id)}
+                                        style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+                                      />
+                                      <span className="small fw-semibold" style={{ color: '#1e1b4b' }}>
+                                        {f.name}
+                                      </span>
+                                      {isDisabled && (
+                                        <span className="badge bg-secondary" style={{ fontSize: '0.62rem' }}>
+                                          🔒 Chỉ Trưởng đoàn
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {f.file ? (
+                                      <div
+                                        style={{
+                                          width: '120px',
+                                          height: '32px',
+                                          background: `url('${f.file}') center / 100% 100% no-repeat`,
+                                          border: '1px solid #e2e8f0',
+                                          borderRadius: '4px',
+                                        }}
+                                      />
+                                    ) : (
+                                      <span className="small text-muted fst-italic me-2" style={{ fontSize: '0.75rem' }}>Mặc định</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </Form.Group>
+
                           <Form.Group className="mb-2">
                             <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Năm sinh</Form.Label>
                             <Form.Control
@@ -704,9 +821,41 @@ function Introduction() {
                         </>
                       ) : (
                         <>
-                          <div className="fw-bold mb-1" style={{ fontSize: '1.6rem', color: '#1e1b4b' }}>
-                            {selectedMember.name}
-                          </div>
+                          {getMemberFrameBg(selectedMember) ? (
+                            <div
+                              className="d-inline-flex align-items-center justify-content-center px-4 py-2 mb-2 shadow-sm rounded"
+                              style={{
+                                background: `url('${getMemberFrameBg(selectedMember)}') center / 100% 100% no-repeat #ffffff`,
+                                minWidth: '240px',
+                                minHeight: '64px',
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: '1.9rem',
+                                  color: '#0f172a',
+                                  fontFamily: "'Charm', 'Charmonman', cursive, serif",
+                                  fontWeight: '500',
+                                  letterSpacing: '0.5px',
+                                  textShadow: '0 0 4px #ffffff',
+                                }}
+                              >
+                                {selectedMember.name}
+                              </span>
+                            </div>
+                          ) : (
+                            <div
+                              className="mb-1"
+                              style={{
+                                fontSize: '1.9rem',
+                                color: '#0f172a',
+                                fontFamily: "'Charm', 'Charmonman', cursive, serif",
+                                fontWeight: '500',
+                              }}
+                            >
+                              {selectedMember.name}
+                            </div>
+                          )}
                           <div className="mb-2">
                             <span className="text-muted small">@{selectedMember.username}</span>
                             <span
@@ -882,6 +1031,72 @@ function Introduction() {
                 onChange={(e) => setNewMemberForm({ ...newMemberForm, bio: e.target.value })}
                 style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
               />
+            </Form.Group>
+
+            {/* Chọn Khung Tên Khi Tạo Thành Viên */}
+            <Form.Group className="mb-3">
+              <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>
+                🎨 Khung hiển thị tên thành viên
+              </Form.Label>
+              <div className="d-flex flex-column gap-1">
+                {NAME_FRAMES.map((f) => {
+                  const isLeader = newMemberForm.role === 'admin' || newMemberForm.username === 'hainam';
+                  const isDisabled = f.leaderOnly && !isLeader;
+                  const isChosen = (newMemberForm.nameFrame || '') === f.id;
+
+                  return (
+                    <div
+                      key={f.id}
+                      onClick={() => {
+                        if (!isDisabled) {
+                          setNewMemberForm({ ...newMemberForm, nameFrame: f.id });
+                        }
+                      }}
+                      className={`p-2 rounded border d-flex align-items-center justify-content-between ${isDisabled ? 'opacity-50' : ''}`}
+                      style={{
+                        cursor: isDisabled ? 'not-allowed' : 'pointer',
+                        backgroundColor: isChosen ? '#f5f3ff' : '#ffffff',
+                        borderColor: isChosen ? '#7c3aed' : '#e2e8f0',
+                        borderWidth: isChosen ? '2px' : '1px',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <div className="d-flex align-items-center gap-2">
+                        <input
+                          type="radio"
+                          name="newMember_nameFrame"
+                          checked={isChosen}
+                          disabled={isDisabled}
+                          onChange={() => setNewMemberForm({ ...newMemberForm, nameFrame: f.id })}
+                          style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+                        />
+                        <span className="small fw-semibold" style={{ color: '#1e1b4b' }}>
+                          {f.name}
+                        </span>
+                        {isDisabled && (
+                          <span className="badge bg-secondary" style={{ fontSize: '0.62rem' }}>
+                            🔒 Chỉ Trưởng đoàn
+                          </span>
+                        )}
+                      </div>
+
+                      {f.file ? (
+                        <div
+                          style={{
+                            width: '120px',
+                            height: '32px',
+                            background: `url('${f.file}') center / 100% 100% no-repeat`,
+                            border: '1px solid #e2e8f0',
+                            borderRadius: '4px',
+                          }}
+                        />
+                      ) : (
+                        <span className="small text-muted fst-italic me-2" style={{ fontSize: '0.75rem' }}>Mặc định</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </Form.Group>
           </Modal.Body>
 
