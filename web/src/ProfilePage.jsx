@@ -416,7 +416,8 @@ export default function ProfilePage() {
                           {NAME_FRAMES.map((f) => {
                             const isLeader = user?.role === 'admin' || user?.username === 'hainam' || (user?.name && user.name.toLowerCase().includes('hải nam'));
                             const isDisabled = f.leaderOnly && !isLeader;
-                            const isChosen = (formData.nameFrame || (isLeader && !formData.nameFrame ? 'frame_spider' : '')) === f.id;
+                            const currentFrame = formData.nameFrame || '';
+                            const isChosen = currentFrame === f.id;
 
                             return (
                               <Col xs={12} sm={6} key={f.id || 'profile_frame_default'}>

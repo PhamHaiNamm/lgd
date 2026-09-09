@@ -59,16 +59,13 @@ export function extractMongoId(rawId, fallback = '') {
 
 export function getMemberFrameBg(member) {
   if (!member) return null;
-  const isLeader = member.username === 'hainam' || (member.name && member.name.toLowerCase().includes('hải nam'));
+  const frame = member.nameFrame;
+  if (!frame || frame === 'default' || frame === '') {
+    return null;
+  }
 
-  if (member.nameFrame === 'frame_spider') {
-    return '/images/frames/frame_spider.png';
-  }
-  if (member.nameFrame && ['frame_lan_rong', 'frame_dragon', 'frame_trung_thu', 'frame_lan'].includes(member.nameFrame)) {
-    return `/images/frames/${member.nameFrame}.png`;
-  }
-  if (isLeader) {
-    return '/images/frames/frame_spider.png';
+  if (['frame_spider', 'frame_lan_rong', 'frame_dragon', 'frame_trung_thu', 'frame_lan'].includes(frame)) {
+    return `/images/frames/${frame}.png`;
   }
   return null;
 }
@@ -779,7 +776,8 @@ function Introduction() {
                                 {NAME_FRAMES.map((f) => {
                                   const isLeaderMember = selectedMember.username === 'hainam' || selectedMember.name?.toLowerCase().includes('hải nam') || selectedMember.role === 'admin';
                                   const isDisabled = f.leaderOnly && !isLeaderMember;
-                                  const isChosen = (selectedMember.nameFrame || (isLeaderMember && !selectedMember.nameFrame ? 'frame_spider' : '')) === f.id;
+                                  const currentFrame = selectedMember.nameFrame || '';
+                                  const isChosen = currentFrame === f.id;
 
                                   return (
                                     <div
