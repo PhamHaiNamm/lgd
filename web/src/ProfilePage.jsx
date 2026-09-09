@@ -45,6 +45,7 @@ export default function ProfilePage() {
       setFormData({
         name: user.name || '',
         username: user.username || '',
+        phone: user.phone || '',
         birthYear: user.birthYear || '',
         location: user.location || '',
         bio: user.bio || '',
@@ -359,6 +360,25 @@ export default function ProfilePage() {
                           value={formData.location}
                           onChange={handleInputChange}
                           placeholder="VD: Hà Nội, TP.HCM..."
+                          className="profile-form-control"
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    <Col xs={12}>
+                      <Form.Group>
+                        <Form.Label className="small fw-bold text-secondary d-flex justify-content-between align-items-center">
+                          <span>📞 Số điện thoại</span>
+                          <span className="text-warning" style={{ fontSize: '0.75rem', fontWeight: 'normal' }}>
+                            🔒 Chỉ Ban quản trị / Admin mới nhìn thấy (Không bắt buộc)
+                          </span>
+                        </Form.Label>
+                        <Form.Control
+                          type="tel"
+                          name="phone"
+                          value={formData.phone || ''}
+                          onChange={handleInputChange}
+                          placeholder="VD: 0912345678 (để trống nếu không muốn cung cấp)"
                           className="profile-form-control"
                         />
                       </Form.Group>

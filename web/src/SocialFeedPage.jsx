@@ -45,6 +45,7 @@ export default function SocialFeedPage() {
     birthYear: '',
     location: '',
     bio: '',
+    phone: '',
     password: '',
   });
   const [isSavingAdminUser, setIsSavingAdminUser] = useState(false);
@@ -57,6 +58,7 @@ export default function SocialFeedPage() {
     birthYear: '',
     location: '',
     bio: '',
+    phone: '',
   });
 
   const fileInputRef = useRef(null);
@@ -295,6 +297,7 @@ export default function SocialFeedPage() {
       birthYear: targetUser.birthYear || '',
       location: targetUser.location || '',
       bio: targetUser.bio || '',
+      phone: targetUser.phone || '',
       password: '',
     });
   };
@@ -877,6 +880,19 @@ export default function SocialFeedPage() {
                   </div>
 
                   <div className="form-group-custom">
+                    <label>📞 Số điện thoại (Chỉ Admin nhìn thấy, không bắt buộc)</label>
+                    <input
+                      type="tel"
+                      className="form-control-custom"
+                      placeholder="VD: 0912345678"
+                      value={adminUserForm.phone || ''}
+                      onChange={(e) =>
+                        setAdminUserForm({ ...adminUserForm, phone: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="form-group-custom">
                     <label>Đặt lại mật khẩu mới (Để trống nếu không đổi)</label>
                     <input
                       type="password"
@@ -984,6 +1000,17 @@ export default function SocialFeedPage() {
                   </div>
 
                   <div className="form-group-custom">
+                    <label>📞 Số điện thoại (Chỉ Admin nhìn thấy, không bắt buộc)</label>
+                    <input
+                      type="tel"
+                      className="form-control-custom"
+                      placeholder="VD: 0912345678"
+                      value={newUserForm.phone || ''}
+                      onChange={(e) => setNewUserForm({ ...newUserForm, phone: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group-custom">
                     <label>Vị trí trong đoàn</label>
                     <select
                       className="form-control-custom"
@@ -1038,6 +1065,7 @@ export default function SocialFeedPage() {
                           <th>Tên hiển thị</th>
                           <th>Username</th>
                           <th>Vai trò</th>
+                          <th>SĐT</th>
                           <th>Năm sinh</th>
                           <th>Vị trí</th>
                           <th>Hành động</th>
@@ -1064,6 +1092,7 @@ export default function SocialFeedPage() {
                                 {u.role}
                               </span>
                             </td>
+                            <td>{u.phone || '-'}</td>
                             <td>{u.birthYear || '-'}</td>
                             <td>{u.location || '-'}</td>
                             <td>

@@ -171,6 +171,7 @@ function Introduction() {
     birthYear: '',
     location: 'Quảng Ninh',
     bio: '',
+    phone: '',
     avatar: '',
     nameFrame: '',
   });
@@ -333,6 +334,7 @@ function Introduction() {
         birthYear: member.birthYear ? Number(member.birthYear) : null,
         location: member.location,
         bio: member.bio,
+        phone: member.phone || '',
         avatar: member.avatar,
         nameFrame: member.nameFrame || '',
       };
@@ -857,6 +859,20 @@ function Introduction() {
                           </Form.Group>
 
                           <Form.Group className="mb-2">
+                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>
+                              📞 Số điện thoại <span className="text-muted fw-normal" style={{ fontSize: '0.72rem' }}>(Chỉ Admin nhìn thấy, không bắt buộc)</span>
+                            </Form.Label>
+                            <Form.Control
+                              type="tel"
+                              size="sm"
+                              placeholder="VD: 0912345678"
+                              value={selectedMember.phone || ''}
+                              onChange={(e) => handleMemberFieldChange('phone', e.target.value)}
+                              style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
+                            />
+                          </Form.Group>
+
+                          <Form.Group className="mb-2">
                             <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Vị trí trong đoàn</Form.Label>
                             <Form.Select
                               size="sm"
@@ -961,6 +977,15 @@ function Introduction() {
                             <strong style={{ color: '#7c3aed' }}>Khu vực:</strong> {selectedMember.location || 'Quảng Ninh'}
                           </div>
 
+                          {isAdmin && selectedMember.phone && (
+                            <div style={{ color: 'var(--lgd-text)', marginTop: 6, fontSize: '1rem' }}>
+                              <strong style={{ color: '#7c3aed' }}>📞 Số điện thoại:</strong> {selectedMember.phone}{' '}
+                              <span className="badge" style={{ backgroundColor: '#fef3c7', color: '#92400e', fontSize: '0.72rem', border: '1px solid #fde68a' }}>
+                                🔒 Chỉ Admin thấy
+                              </span>
+                            </div>
+                          )}
+
                           {selectedMember.bio && (
                             <div style={{ color: 'var(--lgd-text)', marginTop: 6, fontSize: '1rem' }}>
                               <strong style={{ color: '#7c3aed' }}>Vị trí:</strong> {selectedMember.bio}
@@ -1056,6 +1081,20 @@ function Introduction() {
                 placeholder="Mặc định: 123"
                 value={newMemberForm.password}
                 onChange={(e) => setNewMemberForm({ ...newMemberForm, password: e.target.value })}
+                style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label className="small fw-bold text-muted d-flex justify-content-between">
+                <span>Số điện thoại</span>
+                <span className="text-warning" style={{ fontSize: '0.72rem' }}>🔒 Chỉ Admin thấy (Không bắt buộc)</span>
+              </Form.Label>
+              <Form.Control
+                type="tel"
+                placeholder="VD: 0912345678 (không bắt buộc)"
+                value={newMemberForm.phone}
+                onChange={(e) => setNewMemberForm({ ...newMemberForm, phone: e.target.value })}
                 style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
               />
             </Form.Group>

@@ -19,13 +19,14 @@ const { sendSuccess, sendError } = require('../utils/responseHandler');
 async function updateMyProfile(req, res, next) {
   try {
     const user = req.user;
-    const { name, birthYear, avatar, location, bio, password, nameFrame } = req.body;
+    const { name, birthYear, avatar, location, bio, password, nameFrame, phone } = req.body;
 
     if (name) user.name = name.trim();
     if (birthYear !== undefined) user.birthYear = birthYear ? Number(birthYear) : null;
     if (avatar) user.avatar = avatar;
     if (location !== undefined) user.location = location.trim();
     if (bio !== undefined) user.bio = bio.trim();
+    if (phone !== undefined) user.phone = phone ? phone.trim() : '';
     if (password) user.password = password; // Sẽ tự động băm qua pre('save')
 
     if (nameFrame !== undefined) {
@@ -57,7 +58,7 @@ async function updateMyProfile(req, res, next) {
  */
 async function getPublicMembers(req, res, next) {
   try {
-    const members = await User.find({}, '_id name username role birthYear avatar location bio nameFrame createdAt')
+    const members = await User.find({}, '_id name username role birthYear avatar location bio nameFrame phone createdAt')
       .sort({ role: 1, createdAt: 1 });
     return sendSuccess(res, members, 'Lấy danh sách thành viên thành công.');
   } catch (error) {
@@ -70,7 +71,7 @@ async function getPublicMembers(req, res, next) {
  */
 async function createUserByAdmin(req, res, next) {
   try {
-    const { name, username, password, role, birthYear, location, bio, avatar, nameFrame } = req.body;
+    const { name, username, password, role, birthYear, location, bio, avatar, nameFrame, phone } = req.body;
 
     if (!name || !username || !password) {
       return sendError(res, 'Vui lòng cung cấp Họ tên, Tên đăng nhập và Mật khẩu.', 400);
@@ -92,6 +93,7 @@ async function createUserByAdmin(req, res, next) {
       bio: bio ? bio.trim() : '',
       avatar: avatar || undefined,
       nameFrame: nameFrame ? nameFrame.trim() : '',
+      phone: phone ? phone.trim() : '',
     });
 
     return sendSuccess(res, newUser, `Tạo tài khoản thành viên "${newUser.name}" thành công!`, 201);
@@ -118,7 +120,7 @@ async function getAllUsers(req, res, next) {
 async function updateUserByAdmin(req, res, next) {
   try {
     const { id } = req.params;
-    const { name, username, role, birthYear, avatar, location, bio, password, nameFrame } = req.body;
+    const { name, username, role, birthYear, avatar, location, bio, password, nameFrame, phone } = req.body;
 
     if (!id || id === '[object Object]' || String(id).trim() === '') {
       return sendError(res, 'Mã định danh người dùng (ID) không hợp lệ.', 400);
@@ -161,6 +163,7 @@ async function updateUserByAdmin(req, res, next) {
     if (avatar) targetUser.avatar = avatar;
     if (location !== undefined) targetUser.location = location.trim();
     if (bio !== undefined) targetUser.bio = bio.trim();
+    if (phone !== undefined) targetUser.phone = phone ? phone.trim() : '';
     if (password) targetUser.password = password; // Sẽ tự băm lại khi save
 
     if (nameFrame !== undefined) {
