@@ -1,3 +1,14 @@
+let mongoose;
+try {
+  mongoose = require('mongoose');
+} catch (e) {
+  try {
+    mongoose = require('../../../web/node_modules/mongoose');
+  } catch (err) {
+    mongoose = require('mongoose');
+  }
+}
+
 const User = require('../models/user.model');
 const Post = require('../models/post.model');
 const { sendSuccess, sendError } = require('../utils/responseHandler');
@@ -109,6 +120,10 @@ async function updateUserByAdmin(req, res, next) {
     const { id } = req.params;
     const { name, username, role, birthYear, avatar, location, bio, password, nameFrame } = req.body;
 
+    if (!id || id === '[object Object]' || !mongoose.Types.ObjectId.isValid(id)) {
+      return sendError(res, 'Mã định danh người dùng (ID) không hợp lệ.', 400);
+    }
+
     const targetUser = await User.findById(id);
     if (!targetUser) {
       return sendError(res, 'Không tìm thấy người dùng cần sửa.', 404);
@@ -160,6 +175,10 @@ async function updateUserByAdmin(req, res, next) {
 async function deleteUserByAdmin(req, res, next) {
   try {
     const { id } = req.params;
+
+    if (!id || id === '[object Object]' || !mongoose.Types.ObjectId.isValid(id)) {
+      return sendError(res, 'Mã định danh người dùng (ID) không hợp lệ.', 400);
+    }
 
     if (id === req.user._id.toString()) {
       return sendError(res, 'Admin không thể tự xóa chính tài khoản của mình.', 400);

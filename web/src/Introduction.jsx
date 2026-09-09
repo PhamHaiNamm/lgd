@@ -262,6 +262,12 @@ function Introduction() {
   // Admin lưu cập nhật thông tin thành viên vào DB
   const handleSaveMember = async (member) => {
     if (!isAdmin || !token) return;
+    const targetId = typeof member === 'object' && member ? (member._id || member.id) : member;
+    if (!targetId || typeof targetId === 'object') {
+      alert('Không tìm thấy mã định danh thành viên hợp lệ.');
+      return;
+    }
+
     try {
       const payload = {
         name: member.name,
@@ -276,7 +282,7 @@ function Introduction() {
         payload.password = member.newPassword.trim();
       }
 
-      const res = await fetch(`${API_BASE_URL}/users/${member._id}`, {
+      const res = await fetch(`${API_BASE_URL}/users/${targetId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -299,12 +305,18 @@ function Introduction() {
   // Admin xóa tài khoản thành viên khỏi DB
   const handleDeleteMember = async (member) => {
     if (!isAdmin || !token) return;
+    const targetId = typeof member === 'object' && member ? (member._id || member.id) : member;
+    if (!targetId || typeof targetId === 'object') {
+      alert('Không tìm thấy mã định danh thành viên hợp lệ.');
+      return;
+    }
+
     if (!window.confirm(`Bạn có chắc chắn muốn xóa tài khoản thành viên "${member.name}" (@${member.username}) khỏi cơ sở dữ liệu?`)) {
       return;
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/users/${member._id}`, {
+      const res = await fetch(`${API_BASE_URL}/users/${targetId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
