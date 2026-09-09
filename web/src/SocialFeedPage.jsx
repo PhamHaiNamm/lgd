@@ -5,6 +5,7 @@ import { API_BASE_URL, formatImageUrl } from './config';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { compressImage } from './utils/imageCompressor';
+import { MEMBER_POSITIONS } from './Introduction';
 import './SocialFeedPage.css';
 
 export default function SocialFeedPage() {
@@ -681,14 +682,19 @@ export default function SocialFeedPage() {
                 </div>
 
                 <div className="form-group-custom">
-                  <label>Tiểu sử / Giới thiệu</label>
-                  <textarea
-                    rows="3"
+                  <label>Vị trí trong đoàn</label>
+                  <select
                     className="form-control-custom"
-                    placeholder="Đôi lời giới thiệu về bạn..."
                     value={profileForm.bio}
                     onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-                  />
+                  >
+                    <option value="">-- Chọn vị trí trong đoàn --</option>
+                    {MEMBER_POSITIONS.map((pos) => (
+                      <option key={pos} value={pos}>
+                        {pos}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -855,13 +861,19 @@ export default function SocialFeedPage() {
                   </div>
 
                   <div className="form-group-custom">
-                    <label>Tiểu sử / Miêu tả</label>
-                    <textarea
-                      rows="2"
+                    <label>Vị trí trong đoàn</label>
+                    <select
                       className="form-control-custom"
                       value={adminUserForm.bio}
                       onChange={(e) => setAdminUserForm({ ...adminUserForm, bio: e.target.value })}
-                    />
+                    >
+                      <option value="">-- Chọn vị trí trong đoàn --</option>
+                      {MEMBER_POSITIONS.map((pos) => (
+                        <option key={pos} value={pos}>
+                          {pos}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="form-group-custom">
@@ -972,14 +984,19 @@ export default function SocialFeedPage() {
                   </div>
 
                   <div className="form-group-custom">
-                    <label>Tiểu sử / Miêu tả</label>
-                    <textarea
-                      rows="2"
+                    <label>Vị trí trong đoàn</label>
+                    <select
                       className="form-control-custom"
-                      placeholder="Giới thiệu về thành viên..."
                       value={newUserForm.bio}
                       onChange={(e) => setNewUserForm({ ...newUserForm, bio: e.target.value })}
-                    />
+                    >
+                      <option value="">-- Chọn vị trí trong đoàn --</option>
+                      {MEMBER_POSITIONS.map((pos) => (
+                        <option key={pos} value={pos}>
+                          {pos}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>

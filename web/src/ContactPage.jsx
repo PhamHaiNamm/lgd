@@ -29,15 +29,15 @@ function ContactPage() {
   const { token, isAdmin } = useContext(AuthContext);
 
   // Dynamic Leader Avatar
-  const [leaderAvatar, setLeaderAvatar] = useState('/images/trưởng_đoàn.jpg');
+  const [leaderAvatar, setLeaderAvatar] = useState('/images/Logo_full.png');
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users`)
+    fetch(`${API_BASE_URL}/users/members`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.data)) {
           const leader = data.data.find(
-            (u) => u.role === 'admin' || (u.name && u.name.toLowerCase().includes('hải nam'))
+            (u) => u.username === 'hainam' || (u.name && u.name.toLowerCase().includes('hải nam'))
           );
           if (leader && leader.avatar) {
             setLeaderAvatar(formatImageUrl(leader.avatar));
@@ -389,7 +389,7 @@ function ContactPage() {
                   <div className="text-center mb-3">
                     <div className="d-inline-block position-relative">
                       <img
-                        src={leaderAvatar || '/images/trưởng_đoàn.jpg'}
+                        src={leaderAvatar || '/images/Logo_full.png'}
                         alt={CONTACT_INFO.fullName}
                         className="rounded-circle shadow"
                         style={{

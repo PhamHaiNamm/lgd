@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import { AuthContext } from './AuthContext';
 import { API_BASE_URL, formatImageUrl } from './config';
 import { compressImage } from './utils/imageCompressor';
-import { NAME_FRAMES } from './Introduction';
+import { NAME_FRAMES, MEMBER_POSITIONS } from './Introduction';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -366,16 +366,20 @@ export default function ProfilePage() {
 
                     <Col xs={12}>
                       <Form.Group>
-                        <Form.Label className="small fw-bold text-secondary">Tiểu sử / Giới thiệu</Form.Label>
-                        <Form.Control
-                          as="textarea"
-                          rows={3}
+                        <Form.Label className="small fw-bold text-secondary">Vị trí trong đoàn</Form.Label>
+                        <Form.Select
                           name="bio"
                           value={formData.bio}
                           onChange={handleInputChange}
-                          placeholder="Giới thiệu đôi nét về bản thân hoặc vị trí trong đoàn..."
                           className="profile-form-control"
-                        />
+                        >
+                          <option value="">-- Chọn vị trí trong đoàn --</option>
+                          {MEMBER_POSITIONS.map((pos) => (
+                            <option key={pos} value={pos}>
+                              {pos}
+                            </option>
+                          ))}
+                        </Form.Select>
                       </Form.Group>
                     </Col>
 
@@ -395,7 +399,7 @@ export default function ProfilePage() {
                             const isChosen = (formData.nameFrame || (isLeader && !formData.nameFrame ? 'frame_spider' : '')) === f.id;
 
                             return (
-                              <Col xs={12} sm={6} key={f.id}>
+                              <Col xs={12} sm={6} key={f.id || 'profile_frame_default'}>
                                 <div
                                   onClick={() => {
                                     if (!isDisabled) {

@@ -10,6 +10,13 @@ import { compressImage } from './utils/imageCompressor';
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?name=LGD&background=7c3aed&color=fff';
 
+export const MEMBER_POSITIONS = [
+  'Lân',
+  'Sư Tử Truyền Thống',
+  'Âm Thanh',
+  'Truyền Thông',
+];
+
 export const NAME_FRAMES = [
   { id: '', name: 'Mặc định (Viền tím cơ bản)', file: '' },
   { id: 'frame_lan_rong', name: 'Lân & Rồng', file: '/images/frames/frame_lan_rong.png', leaderOnly: false },
@@ -144,7 +151,24 @@ function Introduction() {
       const res = await fetch(`${API_BASE_URL}/users/members`);
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
-        setMembersData(data.data);
+        const normalized = data.data.map((m, idx) => {
+          let strId = '';
+          if (m && m._id) {
+            strId = typeof m._id === 'object' ? (m._id.$oid || (m._id.toString ? m._id.toString() : '')) : String(m._id);
+          }
+          if (!strId && m && m.id) {
+            strId = typeof m.id === 'object' ? (m.id.$oid || (m.id.toString ? m.id.toString() : '')) : String(m.id);
+          }
+          if (!strId || strId === '[object Object]') {
+            strId = m?.username ? `u_${m.username}` : `mem_${idx}`;
+          }
+          return {
+            ...m,
+            _id: strId,
+            id: strId,
+          };
+        });
+        setMembersData(normalized);
       } else {
         setMembersData([]);
       }
@@ -164,17 +188,19 @@ function Introduction() {
   const sortedMembers = useMemo(() => {
     const rawList = Array.isArray(membersData) ? membersData : [];
 
-    // Loại bỏ các bản ghi trùng lặp theo tên
+    // Loại bỏ các bản ghi trùng lặp theo tên hoặc username
     const uniqueMap = new Map();
-    for (const m of rawList) {
+    for (let i = 0; i < rawList.length; i++) {
+      const m = rawList[i];
       if (!m || !m.name) continue;
       const lowerName = m.name.trim().toLowerCase();
       // Bỏ qua tài khoản placeholder "admin" hoặc "quản trị viên trưởng"
       if (m.username === 'admin' || lowerName === 'quản trị viên trưởng') {
         continue;
       }
-      if (!uniqueMap.has(lowerName)) {
-        uniqueMap.set(lowerName, m);
+      const uniqueKey = m.username ? `user_${m.username.trim().toLowerCase()}` : `name_${lowerName}`;
+      if (!uniqueMap.has(uniqueKey)) {
+        uniqueMap.set(uniqueKey, m);
       }
     }
 
@@ -189,15 +215,21 @@ function Introduction() {
     });
   }, [membersData]);
 
-  const selectedMember = useMemo(
-    () => sortedMembers.find((m) => (m._id === selectedMemberId || m.id === selectedMemberId)) || null,
-    [selectedMemberId, sortedMembers]
-  );
+  const selectedMember = useMemo(() => {
+    if (!selectedMemberId) return null;
+    const target = String(selectedMemberId);
+    return (
+      sortedMembers.find(
+        (m) => String(m._id) === target || String(m.id) === target || (m.username && `u_${m.username}` === target)
+      ) || null
+    );
+  }, [selectedMemberId, sortedMembers]);
 
   const handleMemberFieldChange = (field, value) => {
     if (!selectedMember) return;
+    const targetId = String(selectedMember._id || selectedMember.id);
     setMembersData((prev) =>
-      prev.map((m) => (m._id === selectedMember._id ? { ...m, [field]: value } : m))
+      prev.map((m) => (String(m._id || m.id) === targetId ? { ...m, [field]: value } : m))
     );
   };
 
@@ -261,8 +293,8 @@ function Introduction() {
 
   // Admin lưu cập nhật thông tin thành viên vào DB
   const handleSaveMember = async (member) => {
-    if (!isAdmin || !token) return;
-    const targetId = typeof member === 'object' && member ? (member._id || member.id) : member;
+    if (!isAdmin || !token || !member) return;
+    const targetId = member._id || member.id || member.username;
     if (!targetId || typeof targetId === 'object') {
       alert('Không tìm thấy mã định danh thành viên hợp lệ.');
       return;
@@ -271,6 +303,7 @@ function Introduction() {
     try {
       const payload = {
         name: member.name,
+        username: member.username,
         role: member.role,
         birthYear: member.birthYear ? Number(member.birthYear) : null,
         location: member.location,
@@ -304,8 +337,8 @@ function Introduction() {
 
   // Admin xóa tài khoản thành viên khỏi DB
   const handleDeleteMember = async (member) => {
-    if (!isAdmin || !token) return;
-    const targetId = typeof member === 'object' && member ? (member._id || member.id) : member;
+    if (!isAdmin || !token || !member) return;
+    const targetId = member._id || member.id || member.username;
     if (!targetId || typeof targetId === 'object') {
       alert('Không tìm thấy mã định danh thành viên hợp lệ.');
       return;
@@ -550,18 +583,19 @@ function Introduction() {
             </div>
           ) : (
             <div className="row g-2 g-md-3">
-              {sortedMembers.map((member) => {
+              {sortedMembers.map((member, idx) => {
                 const isTruongDoan = member.username === 'hainam' || member.name?.toLowerCase().includes('hải nam');
-                const isSelected = selectedMemberId === (member._id || member.id);
+                const memberIdStr = String(member._id || member.id || (member.username ? `u_${member.username}` : `mem_${idx}`));
+                const isSelected = selectedMemberId !== null && String(selectedMemberId) === memberIdStr;
                 const frameBg = getMemberFrameBg(member);
                 const hasFrame = Boolean(frameBg);
 
                 return (
-                  <div key={member._id || member.id} className="col-6 col-sm-4 col-md-3 col-lg-2">
+                  <div key={memberIdStr} className="col-6 col-sm-4 col-md-3 col-lg-2">
                     <button
                       type="button"
                       onClick={() =>
-                        setSelectedMemberId((prev) => (prev === (member._id || member.id) ? null : (member._id || member.id)))
+                        setSelectedMemberId((prev) => (prev && String(prev) === memberIdStr ? null : memberIdStr))
                       }
                       aria-pressed={isSelected}
                       className="w-100 rounded text-center py-2 px-2 d-flex flex-column align-items-center justify-content-center"
@@ -712,19 +746,19 @@ function Introduction() {
                               </span>
                             </Form.Label>
                             <div className="d-flex flex-column gap-1">
-                              {NAME_FRAMES.map((f) => {
-                                const isLeaderMember = selectedMember.username === 'hainam' || selectedMember.name?.toLowerCase().includes('hải nam') || selectedMember.role === 'admin';
-                                const isDisabled = f.leaderOnly && !isLeaderMember;
-                                const isChosen = (selectedMember.nameFrame || (isLeaderMember && !selectedMember.nameFrame ? 'frame_spider' : '')) === f.id;
+                                {NAME_FRAMES.map((f) => {
+                                  const isLeaderMember = selectedMember.username === 'hainam' || selectedMember.name?.toLowerCase().includes('hải nam') || selectedMember.role === 'admin';
+                                  const isDisabled = f.leaderOnly && !isLeaderMember;
+                                  const isChosen = (selectedMember.nameFrame || (isLeaderMember && !selectedMember.nameFrame ? 'frame_spider' : '')) === f.id;
 
-                                return (
-                                  <div
-                                    key={f.id}
-                                    onClick={() => {
-                                      if (!isDisabled) {
-                                        handleMemberFieldChange('nameFrame', f.id);
-                                      }
-                                    }}
+                                  return (
+                                    <div
+                                      key={f.id || 'frame_default'}
+                                      onClick={() => {
+                                        if (!isDisabled) {
+                                          handleMemberFieldChange('nameFrame', f.id);
+                                        }
+                                      }}
                                     className={`p-2 rounded border d-flex align-items-center justify-content-between ${isDisabled ? 'opacity-50' : ''}`}
                                     style={{
                                       cursor: isDisabled ? 'not-allowed' : 'pointer',
@@ -795,15 +829,20 @@ function Introduction() {
                           </Form.Group>
 
                           <Form.Group className="mb-2">
-                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Tiểu sử / Giới thiệu</Form.Label>
-                            <Form.Control
-                              as="textarea"
-                              rows={2}
+                            <Form.Label className="small fw-bold" style={{ color: '#7c3aed' }}>Vị trí trong đoàn</Form.Label>
+                            <Form.Select
                               size="sm"
                               value={selectedMember.bio || ''}
                               onChange={(e) => handleMemberFieldChange('bio', e.target.value)}
                               style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
-                            />
+                            >
+                              <option value="">-- Chọn vị trí --</option>
+                              {MEMBER_POSITIONS.map((pos) => (
+                                <option key={pos} value={pos}>
+                                  {pos}
+                                </option>
+                              ))}
+                            </Form.Select>
                           </Form.Group>
 
                           <Form.Group className="mb-2">
@@ -896,7 +935,7 @@ function Introduction() {
 
                           {selectedMember.bio && (
                             <div style={{ color: 'var(--lgd-text)', marginTop: 6, fontSize: '1rem' }}>
-                              <strong style={{ color: '#7c3aed' }}>Tiểu sử:</strong> {selectedMember.bio}
+                              <strong style={{ color: '#7c3aed' }}>Vị trí:</strong> {selectedMember.bio}
                             </div>
                           )}
 
@@ -1034,15 +1073,19 @@ function Introduction() {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label className="small fw-bold text-muted">Tiểu sử / Giới thiệu</Form.Label>
-              <Form.Control
-                as="textarea"
-                rows={2}
-                placeholder="VD: Thành viên đội múa Lân..."
+              <Form.Label className="small fw-bold text-muted">Vị trí trong đoàn</Form.Label>
+              <Form.Select
                 value={newMemberForm.bio}
                 onChange={(e) => setNewMemberForm({ ...newMemberForm, bio: e.target.value })}
                 style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
-              />
+              >
+                <option value="">-- Chọn vị trí --</option>
+                {MEMBER_POSITIONS.map((pos) => (
+                  <option key={pos} value={pos}>
+                    {pos}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
 
             {/* Chọn Khung Tên Khi Tạo Thành Viên */}
@@ -1058,7 +1101,7 @@ function Introduction() {
 
                   return (
                     <div
-                      key={f.id}
+                      key={f.id || 'new_frame_default'}
                       onClick={() => {
                         if (!isDisabled) {
                           setNewMemberForm({ ...newMemberForm, nameFrame: f.id });

@@ -57,7 +57,7 @@ async function updateMyProfile(req, res, next) {
  */
 async function getPublicMembers(req, res, next) {
   try {
-    const members = await User.find({}, 'name username role birthYear avatar location bio nameFrame createdAt')
+    const members = await User.find({}, '_id name username role birthYear avatar location bio nameFrame createdAt')
       .sort({ role: 1, createdAt: 1 });
     return sendSuccess(res, members, 'Lấy danh sách thành viên thành công.');
   } catch (error) {
@@ -120,18 +120,36 @@ async function updateUserByAdmin(req, res, next) {
     const { id } = req.params;
     const { name, username, role, birthYear, avatar, location, bio, password, nameFrame } = req.body;
 
-    if (!id || id === '[object Object]' || !mongoose.Types.ObjectId.isValid(id)) {
+    if (!id || id === '[object Object]' || String(id).trim() === '') {
       return sendError(res, 'Mã định danh người dùng (ID) không hợp lệ.', 400);
     }
 
-    const targetUser = await User.findById(id);
+    let targetUser = null;
+    const cleanId = String(id).trim();
+
+    // 1. Tìm theo ObjectId nếu hợp lệ
+    if (mongoose.Types.ObjectId.isValid(cleanId) && cleanId.length === 24) {
+      targetUser = await User.findById(cleanId);
+    }
+
+    // 2. Tìm theo username nếu không tìm thấy theo ObjectId
+    if (!targetUser) {
+      const cleanUsername = cleanId.replace(/^u_/, '').toLowerCase().trim();
+      targetUser = await User.findOne({ username: cleanUsername });
+    }
+
+    // 3. Tìm theo username hoặc name nếu vẫn chưa thấy
+    if (!targetUser && name) {
+      targetUser = await User.findOne({ name: name.trim() });
+    }
+
     if (!targetUser) {
       return sendError(res, 'Không tìm thấy người dùng cần sửa.', 404);
     }
 
     if (username && username.toLowerCase().trim() !== targetUser.username) {
       const exists = await User.findOne({ username: username.toLowerCase().trim() });
-      if (exists) {
+      if (exists && exists._id.toString() !== targetUser._id.toString()) {
         return sendError(res, 'Tên đăng nhập này đã được sử dụng bởi người khác.', 400);
       }
       targetUser.username = username.toLowerCase().trim();
@@ -176,23 +194,39 @@ async function deleteUserByAdmin(req, res, next) {
   try {
     const { id } = req.params;
 
-    if (!id || id === '[object Object]' || !mongoose.Types.ObjectId.isValid(id)) {
+    if (!id || id === '[object Object]' || String(id).trim() === '') {
       return sendError(res, 'Mã định danh người dùng (ID) không hợp lệ.', 400);
     }
 
-    if (id === req.user._id.toString()) {
-      return sendError(res, 'Admin không thể tự xóa chính tài khoản của mình.', 400);
+    let targetUser = null;
+    const cleanId = String(id).trim();
+
+    // 1. Tìm theo ObjectId
+    if (mongoose.Types.ObjectId.isValid(cleanId) && cleanId.length === 24) {
+      targetUser = await User.findById(cleanId);
     }
 
-    const deleted = await User.findByIdAndDelete(id);
-    if (!deleted) {
+    // 2. Tìm theo username
+    if (!targetUser) {
+      const cleanUsername = cleanId.replace(/^u_/, '').toLowerCase().trim();
+      targetUser = await User.findOne({ username: cleanUsername });
+    }
+
+    if (!targetUser) {
       return sendError(res, 'Không tìm thấy người dùng cần xóa.', 404);
     }
 
-    // Xóa tất cả các bài post của user này
-    await Post.deleteMany({ author: id });
+    if (targetUser._id.toString() === req.user._id.toString()) {
+      return sendError(res, 'Admin không thể tự xóa chính tài khoản của mình.', 400);
+    }
 
-    return sendSuccess(res, deleted, 'Đã xóa tài khoản và dữ liệu liên quan thành công.');
+    const targetUserId = targetUser._id;
+    await User.findByIdAndDelete(targetUserId);
+
+    // Xóa tất cả các bài post của user này
+    await Post.deleteMany({ author: targetUserId });
+
+    return sendSuccess(res, null, `Đã xóa tài khoản "${targetUser.name}" và dữ liệu liên quan thành công.`);
   } catch (error) {
     next(error);
   }
