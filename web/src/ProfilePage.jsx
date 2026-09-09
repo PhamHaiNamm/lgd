@@ -427,7 +427,8 @@ export default function ProfilePage() {
                         <Row className="g-2">
                           {NAME_FRAMES.map((f) => {
                             const isLeader = user?.role === 'admin' || user?.username === 'hainam' || (user?.name && user.name.toLowerCase().includes('hải nam'));
-                            const isDisabled = f.leaderOnly && !isLeader;
+                            const isTargetMember = f.targetOnly ? user?.username === f.targetOnly : true;
+                            const isDisabled = (f.leaderOnly && !isLeader) || !isTargetMember;
                             const currentFrame = formData.nameFrame || '';
                             const isChosen = currentFrame === f.id;
 
@@ -460,11 +461,11 @@ export default function ProfilePage() {
                                     <span className="small fw-semibold text-white">
                                       {f.name}
                                     </span>
-                                    {isDisabled && (
-                                      <span className="badge bg-secondary" style={{ fontSize: '0.62rem' }}>
-                                        🔒 Chỉ Trưởng đoàn
-                                      </span>
-                                    )}
+                                      {isDisabled && (
+                                        <span className="badge bg-secondary" style={{ fontSize: '0.62rem' }}>
+                                          {f.targetOnly ? `🔒 Chỉ định` : `🔒 Chỉ Trưởng đoàn`}
+                                        </span>
+                                      )}
                                   </div>
 
                                   {f.file ? (

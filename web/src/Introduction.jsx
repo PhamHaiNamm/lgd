@@ -24,6 +24,7 @@ export const NAME_FRAMES = [
   { id: 'frame_trung_thu', name: 'Trung Thu Trăng Rằm', file: '/images/frames/frame_trung_thu.png', leaderOnly: false },
   { id: 'frame_lan', name: 'Lân Sư Oai Vệ', file: '/images/frames/frame_lan.png', leaderOnly: false },
   { id: 'frame_spider', name: 'Khung Nhện Tím (Chỉ Trưởng đoàn)', file: '/images/frames/frame_spider.png', leaderOnly: true },
+  { id: 'frame_hoan_luon', name: 'Hoàn Lươn (Độc quyền)', file: '/images/frames/frame_hoan_luon.png', leaderOnly: false, targetOnly: 'tranthanhhai' },
 ];
 
 export const DEFAULT_MEMBER_FRAMES = {
@@ -39,6 +40,7 @@ export const DEFAULT_MEMBER_FRAMES = {
   duymanh: 'frame_dragon',
   xuanbach: 'frame_dragon',
   doanhuy: 'frame_lan_rong',
+  tranthanhhai: 'frame_hoan_luon',
 };
 
 // Trích xuất mã ID ObjectId chuẩn xác từ cấu trúc JSON/Buffer của MongoDB Atlas
@@ -85,7 +87,7 @@ export function getMemberFrameBg(member) {
     return null;
   }
 
-  if (['frame_spider', 'frame_lan_rong', 'frame_dragon', 'frame_trung_thu', 'frame_lan'].includes(frame)) {
+  if (['frame_spider', 'frame_lan_rong', 'frame_dragon', 'frame_trung_thu', 'frame_lan', 'frame_hoan_luon'].includes(frame)) {
     return `/images/frames/${frame}.png`;
   }
   return null;
@@ -803,7 +805,8 @@ function Introduction() {
                             <div className="d-flex flex-column gap-1">
                                 {NAME_FRAMES.map((f) => {
                                   const isLeaderMember = selectedMember.username === 'hainam' || selectedMember.name?.toLowerCase().includes('hải nam') || selectedMember.role === 'admin';
-                                  const isDisabled = f.leaderOnly && !isLeaderMember;
+                                  const isTargetMember = f.targetOnly ? selectedMember.username === f.targetOnly : true;
+                                  const isDisabled = (f.leaderOnly && !isLeaderMember) || !isTargetMember;
                                   const currentFrame = selectedMember.nameFrame || '';
                                   const isChosen = currentFrame === f.id;
 
@@ -838,7 +841,7 @@ function Introduction() {
                                       </span>
                                       {isDisabled && (
                                         <span className="badge bg-secondary" style={{ fontSize: '0.62rem' }}>
-                                          🔒 Chỉ Trưởng đoàn
+                                          {f.targetOnly ? `🔒 Chỉ định` : `🔒 Chỉ Trưởng đoàn`}
                                         </span>
                                       )}
                                     </div>

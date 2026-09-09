@@ -36,6 +36,9 @@ async function updateMyProfile(req, res, next) {
       if (nameFrame === 'frame_spider' && !isLeader) {
         return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
       }
+      if (nameFrame === 'frame_hoan_luon' && user.username !== 'tranthanhhai') {
+        return sendError(res, 'Khung Hoàn Lươn là khung độc quyền chỉ dành riêng cho Trần Thanh Hải!', 403);
+      }
       // Ngăn lưu giá trị "undefined" dạng string
       const safeFrame = (nameFrame && nameFrame !== 'undefined') ? nameFrame.trim() : '';
       updateFields.nameFrame = safeFrame;
@@ -191,6 +194,9 @@ async function updateUserByAdmin(req, res, next) {
       const isLeader = targetUser.role === 'admin' || targetUser.username === 'hainam' || (targetUser.name && targetUser.name.toLowerCase().includes('hải nam'));
       if (nameFrame === 'frame_spider' && !isLeader && req.user.role !== 'admin') {
         return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
+      }
+      if (nameFrame === 'frame_hoan_luon' && targetUser.username !== 'tranthanhhai') {
+        return sendError(res, 'Khung Hoàn Lươn là khung độc quyền chỉ dành riêng cho Trần Thanh Hải!', 403);
       }
       // Ngăn lưu giá trị "undefined" dạng string
       const safeFrame = (nameFrame && nameFrame !== 'undefined') ? nameFrame.trim() : '';
