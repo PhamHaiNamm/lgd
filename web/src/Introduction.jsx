@@ -294,7 +294,10 @@ function Introduction() {
   // Admin lưu cập nhật thông tin thành viên vào DB
   const handleSaveMember = async (member) => {
     if (!isAdmin || !token || !member) return;
-    const targetId = member._id || member.id || member.username;
+    let targetId = member._rawId || member._id || member.id || member.username;
+    if (typeof targetId === 'string' && targetId.startsWith('u_') && targetId.length !== 24) {
+      targetId = targetId.replace(/^u_/, '');
+    }
     if (!targetId || typeof targetId === 'object') {
       alert('Không tìm thấy mã định danh thành viên hợp lệ.');
       return;
@@ -338,7 +341,10 @@ function Introduction() {
   // Admin xóa tài khoản thành viên khỏi DB
   const handleDeleteMember = async (member) => {
     if (!isAdmin || !token || !member) return;
-    const targetId = member._id || member.id || member.username;
+    let targetId = member._rawId || member._id || member.id || member.username;
+    if (typeof targetId === 'string' && targetId.startsWith('u_') && targetId.length !== 24) {
+      targetId = targetId.replace(/^u_/, '');
+    }
     if (!targetId || typeof targetId === 'object') {
       alert('Không tìm thấy mã định danh thành viên hợp lệ.');
       return;
