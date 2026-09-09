@@ -385,7 +385,7 @@ function Introduction() {
               className="w-100 h-100"
               style={{ objectFit: 'cover', minHeight: '260px', display: 'block' }}
               onError={(e) => {
-                e.target.src = '/images/Logo_full.png';
+                e.target.src = '/images/gioi_thieu_doan.jpg';
               }}
             />
             {isAdmin && (
