@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import { AuthContext } from './AuthContext';
 import { API_BASE_URL, formatImageUrl } from './config';
 import { compressImage } from './utils/imageCompressor';
-import { NAME_FRAMES, MEMBER_POSITIONS } from './Introduction';
+import { NAME_FRAMES, MEMBER_POSITIONS, DEFAULT_MEMBER_FRAMES } from './Introduction';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -42,6 +42,11 @@ export default function ProfilePage() {
     }
 
     if (user) {
+      const un = (user.username || '').toLowerCase().trim();
+      let currentFrame = user.nameFrame;
+      if (currentFrame === undefined || currentFrame === null || currentFrame === 'undefined') {
+        currentFrame = DEFAULT_MEMBER_FRAMES[un] || '';
+      }
       setFormData({
         name: user.name || '',
         username: user.username || '',
@@ -50,7 +55,7 @@ export default function ProfilePage() {
         location: user.location || '',
         bio: user.bio || '',
         avatar: user.avatar || '',
-        nameFrame: user.nameFrame || '',
+        nameFrame: currentFrame,
       });
       setAvatarPreview(
         formatImageUrl(user.avatar) ||
@@ -186,6 +191,7 @@ export default function ProfilePage() {
         birthYear: formData.birthYear ? Number(formData.birthYear) : null,
         location: formData.location.trim(),
         bio: formData.bio.trim(),
+        phone: formData.phone ? formData.phone.trim() : '',
         avatar: finalAvatarUrl,
         nameFrame: formData.nameFrame || '',
       };
@@ -205,7 +211,12 @@ export default function ProfilePage() {
 
       const resData = await res.json();
       if (resData.success) {
-        updateUserData(resData.data);
+        const mergedUser = {
+          ...(resData.data || user),
+          ...payload,
+          nameFrame: formData.nameFrame || '',
+        };
+        updateUserData(mergedUser);
         setPasswordData({ newPassword: '', confirmPassword: '' });
         setAvatarFile(null);
         setAlertInfo({

@@ -298,6 +298,7 @@ export default function SocialFeedPage() {
       location: targetUser.location || '',
       bio: targetUser.bio || '',
       phone: targetUser.phone || '',
+      nameFrame: targetUser.nameFrame || '',
       password: '',
     });
   };

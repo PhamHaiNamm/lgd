@@ -26,6 +26,21 @@ export const NAME_FRAMES = [
   { id: 'frame_spider', name: 'Khung Nhện Tím (Chỉ Trưởng đoàn)', file: '/images/frames/frame_spider.png', leaderOnly: true },
 ];
 
+export const DEFAULT_MEMBER_FRAMES = {
+  hainam: 'frame_spider',
+  baonguyen: 'frame_lan_rong',
+  tuansua: 'frame_trung_thu',
+  giahung: 'frame_dragon',
+  luuthinh: 'frame_trung_thu',
+  giahuy: 'frame_dragon',
+  danhduc: 'frame_lan_rong',
+  giaminh: 'frame_dragon',
+  duyhung: 'frame_dragon',
+  duymanh: 'frame_dragon',
+  xuanbach: 'frame_dragon',
+  doanhuy: 'frame_lan_rong',
+};
+
 // Trích xuất mã ID ObjectId chuẩn xác từ cấu trúc JSON/Buffer của MongoDB Atlas
 export function extractMongoId(rawId, fallback = '') {
   if (!rawId) return fallback;
@@ -59,8 +74,14 @@ export function extractMongoId(rawId, fallback = '') {
 
 export function getMemberFrameBg(member) {
   if (!member) return null;
-  const frame = member.nameFrame;
-  if (!frame || frame === 'default' || frame === '') {
+  let frame = member.nameFrame;
+  if (frame === undefined || frame === null || frame === 'undefined') {
+    const un = (member.username || '').toLowerCase().trim();
+    if (DEFAULT_MEMBER_FRAMES[un]) {
+      frame = DEFAULT_MEMBER_FRAMES[un];
+    }
+  }
+  if (!frame || frame === 'default' || frame === '' || frame === 'undefined') {
     return null;
   }
 
@@ -182,10 +203,16 @@ function Introduction() {
       if (data.success && Array.isArray(data.data)) {
         const normalized = data.data.map((m, idx) => {
           const strId = extractMongoId(m._id || m.id, m.username || `mem_${idx}`);
+          const un = (m.username || '').toLowerCase().trim();
+          let frame = m.nameFrame;
+          if (frame === undefined || frame === null || frame === 'undefined') {
+            frame = DEFAULT_MEMBER_FRAMES[un] || '';
+          }
           return {
             ...m,
             _id: strId,
             id: strId,
+            nameFrame: frame,
           };
         });
         setMembersData(normalized);
