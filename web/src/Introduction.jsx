@@ -351,6 +351,7 @@ function Introduction() {
     }
 
     try {
+      const safeNameFrame = (member.nameFrame && member.nameFrame !== 'undefined') ? member.nameFrame : '';
       const payload = {
         name: member.name,
         username: member.username,
@@ -360,7 +361,7 @@ function Introduction() {
         bio: member.bio,
         phone: member.phone || '',
         avatar: member.avatar,
-        nameFrame: member.nameFrame || '',
+        nameFrame: safeNameFrame,
       };
       if (member.newPassword && member.newPassword.trim()) {
         payload.password = member.newPassword.trim();

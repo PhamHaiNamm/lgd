@@ -186,6 +186,7 @@ export default function ProfilePage() {
       }
 
       // Gửi yêu cầu cập nhật Profile
+      const safeNameFrame = (formData.nameFrame && formData.nameFrame !== 'undefined') ? formData.nameFrame : '';
       const payload = {
         name: formData.name.trim(),
         birthYear: formData.birthYear ? Number(formData.birthYear) : null,
@@ -193,7 +194,7 @@ export default function ProfilePage() {
         bio: formData.bio.trim(),
         phone: formData.phone ? formData.phone.trim() : '',
         avatar: finalAvatarUrl,
-        nameFrame: formData.nameFrame || '',
+        nameFrame: safeNameFrame,
       };
 
       if (passwordData.newPassword) {
@@ -214,7 +215,7 @@ export default function ProfilePage() {
         const mergedUser = {
           ...(resData.data || user),
           ...payload,
-          nameFrame: formData.nameFrame || '',
+          nameFrame: safeNameFrame,
         };
         updateUserData(mergedUser);
         setPasswordData({ newPassword: '', confirmPassword: '' });

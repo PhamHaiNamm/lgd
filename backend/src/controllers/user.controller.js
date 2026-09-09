@@ -12,6 +12,7 @@ try {
 const User = require('../models/user.model');
 const Post = require('../models/post.model');
 const { sendSuccess, sendError } = require('../utils/responseHandler');
+const { hashPassword } = require('../utils/security');
 
 /**
  * Người dùng tự cập nhật thông tin cá nhân của mình
@@ -35,7 +36,9 @@ async function updateMyProfile(req, res, next) {
       if (nameFrame === 'frame_spider' && !isLeader) {
         return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
       }
-      updateFields.nameFrame = nameFrame ? nameFrame.trim() : '';
+      // Ngăn lưu giá trị "undefined" dạng string
+      const safeFrame = (nameFrame && nameFrame !== 'undefined') ? nameFrame.trim() : '';
+      updateFields.nameFrame = safeFrame;
     }
 
     await User.updateOne({ _id: user._id }, { $set: updateFields });
@@ -189,7 +192,9 @@ async function updateUserByAdmin(req, res, next) {
       if (nameFrame === 'frame_spider' && !isLeader && req.user.role !== 'admin') {
         return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
       }
-      updateFields.nameFrame = nameFrame ? nameFrame.trim() : '';
+      // Ngăn lưu giá trị "undefined" dạng string
+      const safeFrame = (nameFrame && nameFrame !== 'undefined') ? nameFrame.trim() : '';
+      updateFields.nameFrame = safeFrame;
     }
 
     await User.updateOne({ _id: targetUser._id }, { $set: updateFields });
