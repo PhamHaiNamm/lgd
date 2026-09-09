@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
-import { Form, Button, Spinner, Table, Badge, Alert } from 'react-bootstrap';
+import { Form, Button, Spinner, Table, Badge, Alert, InputGroup } from 'react-bootstrap';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { AuthContext } from './AuthContext';
@@ -150,14 +150,39 @@ function ContactPage() {
     });
   };
 
+  // Xử lý thay đổi số điện thoại: Tự động bỏ số 0 ở đầu, giới hạn đúng 9 số sau +84
+  const handlePhoneChange = (e) => {
+    let val = e.target.value || '';
+    // Chỉ giữ chữ số
+    val = val.replace(/\D/g, '');
+    // Tự động bỏ số 0 ở đầu nếu khách gõ hoặc paste
+    val = val.replace(/^0+/, '');
+    // Giới hạn tối đa đúng 9 chữ số
+    if (val.length > 9) {
+      val = val.slice(0, 9);
+    }
+    setFormData((prev) => ({ ...prev, phone: val }));
+  };
+
   // Gửi Form Đặt lịch
   const handleSubmitBooking = async (e) => {
     e.preventDefault();
     setSubmitError('');
     setSubmitSuccess(false);
 
-    if (!formData.fullName.trim() || !formData.phone.trim()) {
-      setSubmitError('Vui lòng nhập đầy đủ Họ tên và Số điện thoại liên hệ.');
+    if (!formData.fullName.trim()) {
+      setSubmitError('Vui lòng nhập đầy đủ Họ tên quý khách.');
+      return;
+    }
+
+    const cleanPhone = (formData.phone || '').trim();
+    if (!cleanPhone) {
+      setSubmitError('Vui lòng nhập Số điện thoại liên hệ.');
+      return;
+    }
+
+    if (cleanPhone.length !== 9) {
+      setSubmitError('Số điện thoại không hợp lệ! Vui lòng nhập đủ 9 chữ số (sau mã +84, không bao gồm số 0 ở đầu).');
       return;
     }
 
@@ -185,6 +210,7 @@ function ContactPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          phone: `+84${cleanPhone}`,
           serviceType: formData.serviceTypes.join(' + '),
         }),
       });
@@ -543,15 +569,56 @@ function ContactPage() {
 
                     <div className="col-md-6">
                       <Form.Group className="mb-3">
-                        <Form.Label className="small fw-bold text-muted">Số điện thoại liên hệ *</Form.Label>
-                        <Form.Control
-                          type="tel"
-                          required
-                          placeholder="VD: 0987654321"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                          style={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#1e1b4b' }}
-                        />
+                        <Form.Label className="small fw-bold text-muted d-flex justify-content-between align-items-center">
+                          <span>Số điện thoại liên hệ *</span>
+                          <span style={{ color: '#7c3aed', fontSize: '0.75rem', fontWeight: 'normal' }}>
+                            (9 số sau +84)
+                          </span>
+                        </Form.Label>
+                        <InputGroup>
+                          <InputGroup.Text
+                            style={{
+                              backgroundColor: '#f5f3ff',
+                              borderColor: '#e2e8f0',
+                              color: '#7c3aed',
+                              fontWeight: '700',
+                              fontSize: '0.92rem',
+                              userSelect: 'none',
+                            }}
+                          >
+                            +84
+                          </InputGroup.Text>
+                          <Form.Control
+                            type="tel"
+                            required
+                            placeholder="345422378"
+                            value={formData.phone}
+                            onChange={handlePhoneChange}
+                            maxLength={9}
+                            style={{
+                              backgroundColor: '#ffffff',
+                              borderColor: '#e2e8f0',
+                              color: '#1e1b4b',
+                              fontWeight: '600',
+                              letterSpacing: '0.5px',
+                            }}
+                          />
+                        </InputGroup>
+                        {formData.phone ? (
+                          <div className="mt-1" style={{ fontSize: '0.75rem' }}>
+                            {formData.phone.length === 9 ? (
+                              <span className="text-success fw-bold">✓ Số hợp lệ: +84 {formData.phone} (0{formData.phone})</span>
+                            ) : (
+                              <span className="text-danger fw-semibold">
+                                Đã nhập {formData.phone.length}/9 số (còn thiếu {9 - formData.phone.length} số)
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-muted mt-1" style={{ fontSize: '0.73rem' }}>
+                            💡 Tự động bỏ số 0 ở đầu. Chỉ nhập 9 số tiếp theo.
+                          </div>
+                        )}
                       </Form.Group>
                     </div>
                   </div>
@@ -838,7 +905,7 @@ function ContactPage() {
                           <div className="d-flex align-items-center gap-2">
                             <span style={{ color: '#0284c7', fontWeight: 'bold' }}>{b.phone}</span>
                             <a
-                              href={`https://zalo.me/${b.phone.replace(/\D/g, '')}`}
+                              href={`https://zalo.me/${b.phone.startsWith('+84') ? '0' + b.phone.replace(/\D/g, '').slice(2) : b.phone.replace(/\D/g, '')}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="btn btn-sm py-0 px-2 text-white"

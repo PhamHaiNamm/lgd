@@ -97,6 +97,19 @@ async function createBooking(req, res, next) {
       return sendError(res, 'Vui lòng cung cấp đầy đủ Họ tên và Số điện thoại liên hệ.', 400);
     }
 
+    // Chuẩn hóa và validate số điện thoại (chỉ 9 chữ số sau +84 / bỏ số 0 ở đầu)
+    let digitsOnly = phone.toString().replace(/\D/g, '');
+    if (digitsOnly.startsWith('84')) {
+      digitsOnly = digitsOnly.slice(2);
+    }
+    digitsOnly = digitsOnly.replace(/^0+/, '');
+
+    if (digitsOnly.length !== 9) {
+      return sendError(res, 'Số điện thoại không hợp lệ! Vui lòng cung cấp đúng 9 chữ số sau mã +84 (không bao gồm số 0 ở đầu).', 400);
+    }
+
+    const formattedPhone = `+84${digitsOnly}`;
+
     // Xử lý danh sách dịch vụ (chuỗi hoặc mảng chọn nhiều)
     let selectedServices = 'Múa Lân Khai Trương';
     if (Array.isArray(serviceTypes) && serviceTypes.length > 0) {
@@ -121,7 +134,7 @@ async function createBooking(req, res, next) {
 
     const newBooking = await Booking.create({
       fullName: fullName.trim(),
-      phone: phone.trim(),
+      phone: formattedPhone,
       serviceType: selectedServices,
       eventDate: eventDate ? eventDate.trim() : '',
       eventTime: eventTime ? eventTime.trim() : '',

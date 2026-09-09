@@ -70,6 +70,13 @@ async function uploadToCloudinary(fileBuffer, options = {}) {
   if (cloudName && apiKey && apiSecret) {
     try {
       if (cloudinarySDK) {
+        cloudinarySDK.config({
+          cloud_name: cloudName,
+          api_key: apiKey,
+          api_secret: apiSecret,
+          secure: true,
+        });
+
         return await new Promise((resolve, reject) => {
           const uploadStream = cloudinarySDK.uploader.upload_stream(
             { folder, resource_type: 'auto', ...options },
@@ -89,7 +96,7 @@ async function uploadToCloudinary(fileBuffer, options = {}) {
         });
       }
     } catch (cloudErr) {
-      console.warn('⚠️ Cloudinary SDK upload lỗi, chuyển sang lưu trữ cục bộ:', cloudErr.message || cloudErr);
+      console.error('❌ Cloudinary SDK upload lỗi:', cloudErr.message || cloudErr);
     }
   }
 
