@@ -36,6 +36,11 @@ const scheduleSchema = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    phone: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     coordinates: {
       type: String,
       default: '',

@@ -77,6 +77,7 @@ export default function SchedulePage() {
       time: "",
       location: "",
       description: "",
+      phone: "",
       note: "",
       coordinates: "",
     });
@@ -91,6 +92,7 @@ export default function SchedulePage() {
       time: item.time || "",
       location: item.location || "",
       description: item.description || item.content || "",
+      phone: item.phone || "",
       note: item.note || "",
       coordinates: item.coordinates || item.mapUrl || "",
     });
@@ -404,6 +406,16 @@ export default function SchedulePage() {
                         <strong>Giờ:</strong> {item.time || "Chưa xác định"}
                       </div>
 
+                      {item.phone && (
+                        <div className="mb-2" style={{ color: "#334155" }}>
+                          <i className="bi bi-telephone-fill me-2 text-success"></i>
+                          <strong>Liên hệ:</strong>{" "}
+                          <a href={`tel:${item.phone}`} style={{ color: "#7c3aed", fontWeight: "600", textDecoration: "none" }}>
+                            {item.phone}
+                          </a>
+                        </div>
+                      )}
+
                       <div className="mb-2 d-flex align-items-center justify-content-between flex-wrap gap-3" style={{ color: "#334155" }}>
                         <div className="d-flex align-items-center">
                           <i className="bi bi-geo-alt-fill me-2 text-danger fs-5"></i>
@@ -455,6 +467,7 @@ export default function SchedulePage() {
             show={showEditModal}
             onHide={() => setShowEditModal(false)}
             centered
+            backdrop="static"
           >
             <Modal.Header closeButton style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e9d5ff" }}>
               <Modal.Title className="fw-bold" style={{ color: "#7c3aed" }}>
@@ -505,6 +518,19 @@ export default function SchedulePage() {
                     placeholder="VD: 123 Hoàn Kiếm, Hà Nội / Trung tâm Hội nghị..."
                     value={scheduleForm.location}
                     onChange={(e) => setScheduleForm({ ...scheduleForm, location: e.target.value })}
+                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label className="small fw-bold text-muted">
+                    📞 Số điện thoại liên hệ <span className="text-secondary fw-normal">(Không bắt buộc)</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="tel"
+                    placeholder="VD: 0912345678 (SĐT khách hàng hoặc người phụ trách)"
+                    value={scheduleForm.phone || ""}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, phone: e.target.value })}
                     style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
                   />
                 </Form.Group>

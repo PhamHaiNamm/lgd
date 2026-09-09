@@ -34,7 +34,7 @@ async function getScheduleById(req, res, next) {
  */
 async function createSchedule(req, res, next) {
   try {
-    const { date, time, location, description, note, coordinates, mapUrl } = req.body;
+    const { date, time, location, description, note, phone, coordinates, mapUrl } = req.body;
 
     if (!date || !location || !description) {
       return sendError(res, 'Vui lòng cung cấp đầy đủ Ngày, Địa điểm và Mô tả chương trình.', 400);
@@ -46,6 +46,7 @@ async function createSchedule(req, res, next) {
       location: location.trim(),
       description: description.trim(),
       note: note ? note.trim() : '',
+      phone: phone ? phone.trim() : '',
       coordinates: coordinates ? coordinates.trim() : '',
       mapUrl: mapUrl ? mapUrl.trim() : '',
       createdBy: req.user?._id,
@@ -63,7 +64,7 @@ async function createSchedule(req, res, next) {
 async function updateSchedule(req, res, next) {
   try {
     const { id } = req.params;
-    const { date, time, location, description, note, coordinates, mapUrl } = req.body;
+    const { date, time, location, description, note, phone, coordinates, mapUrl } = req.body;
 
     const schedule = await Schedule.findById(id);
     if (!schedule) {
@@ -75,6 +76,7 @@ async function updateSchedule(req, res, next) {
     if (location) schedule.location = location.trim();
     if (description) schedule.description = description.trim();
     if (note !== undefined) schedule.note = note.trim();
+    if (phone !== undefined) schedule.phone = phone.trim();
     if (coordinates !== undefined) schedule.coordinates = coordinates.trim();
     if (mapUrl !== undefined) schedule.mapUrl = mapUrl.trim();
 

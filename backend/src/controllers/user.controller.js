@@ -21,33 +21,36 @@ async function updateMyProfile(req, res, next) {
     const user = req.user;
     const { name, birthYear, avatar, location, bio, password, nameFrame, phone } = req.body;
 
-    if (name) user.name = name.trim();
-    if (birthYear !== undefined) user.birthYear = birthYear ? Number(birthYear) : null;
-    if (avatar) user.avatar = avatar;
-    if (location !== undefined) user.location = location.trim();
-    if (bio !== undefined) user.bio = bio.trim();
-    if (phone !== undefined) user.phone = phone ? phone.trim() : '';
-    if (password) user.password = password; // Sẽ tự động băm qua pre('save')
+    const updateFields = {};
+    if (name) updateFields.name = name.trim();
+    if (birthYear !== undefined) updateFields.birthYear = birthYear ? Number(birthYear) : null;
+    if (avatar) updateFields.avatar = avatar;
+    if (location !== undefined) updateFields.location = location.trim();
+    if (bio !== undefined) updateFields.bio = bio.trim();
+    if (phone !== undefined) updateFields.phone = phone ? phone.trim() : '';
+    if (password && password.trim()) updateFields.password = hashPassword(password.trim());
 
     if (nameFrame !== undefined) {
       const isLeader = user.role === 'admin' || user.username === 'hainam' || (user.name && user.name.toLowerCase().includes('hải nam'));
       if (nameFrame === 'frame_spider' && !isLeader) {
         return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
       }
-      user.nameFrame = nameFrame ? nameFrame.trim() : '';
+      updateFields.nameFrame = nameFrame ? nameFrame.trim() : '';
     }
 
-    await user.save();
+    await User.updateOne({ _id: user._id }, { $set: updateFields });
+
+    const updatedUser = await User.findById(user._id);
 
     // Đồng bộ tên và avatar mới sang tất cả bài đăng cũ của user này
     if (name || avatar) {
       const updateData = {};
-      if (name) updateData.authorName = user.name;
-      if (avatar) updateData.authorAvatar = user.avatar;
+      if (name) updateData.authorName = (name || user.name).trim();
+      if (avatar) updateData.authorAvatar = avatar || user.avatar;
       await Post.updateMany({ author: user._id }, { $set: updateData });
     }
 
-    return sendSuccess(res, user, 'Cập nhật thông tin cá nhân thành công.');
+    return sendSuccess(res, updatedUser || user, 'Cập nhật thông tin cá nhân thành công.');
   } catch (error) {
     next(error);
   }
@@ -131,18 +134,31 @@ async function updateUserByAdmin(req, res, next) {
 
     // 1. Tìm theo ObjectId nếu hợp lệ
     if (mongoose.Types.ObjectId.isValid(cleanId) && cleanId.length === 24) {
-      targetUser = await User.findById(cleanId);
+      try {
+        targetUser = await User.findById(cleanId);
+      } catch (e) {}
     }
 
-    // 2. Tìm theo username nếu không tìm thấy theo ObjectId
+    // 2. Tìm theo username hoặc _id
     if (!targetUser) {
       const cleanUsername = cleanId.replace(/^u_/, '').toLowerCase().trim();
-      targetUser = await User.findOne({ username: cleanUsername });
+      targetUser = await User.findOne({
+        $or: [
+          { username: cleanUsername },
+          { _id: cleanId }
+        ]
+      });
     }
 
     // 3. Tìm theo username hoặc name nếu vẫn chưa thấy
-    if (!targetUser && name) {
-      targetUser = await User.findOne({ name: name.trim() });
+    if (!targetUser) {
+      const cleanUsername = cleanId.replace(/^u_/, '').toLowerCase().trim();
+      targetUser = await User.findOne({
+        $or: [
+          { username: cleanUsername },
+          { name: name ? name.trim() : cleanId }
+        ]
+      });
     }
 
     if (!targetUser) {
@@ -157,34 +173,38 @@ async function updateUserByAdmin(req, res, next) {
       targetUser.username = username.toLowerCase().trim();
     }
 
-    if (name) targetUser.name = name.trim();
-    if (role && ['user', 'admin'].includes(role)) targetUser.role = role;
-    if (birthYear !== undefined) targetUser.birthYear = birthYear ? Number(birthYear) : null;
-    if (avatar) targetUser.avatar = avatar;
-    if (location !== undefined) targetUser.location = location.trim();
-    if (bio !== undefined) targetUser.bio = bio.trim();
-    if (phone !== undefined) targetUser.phone = phone ? phone.trim() : '';
-    if (password) targetUser.password = password; // Sẽ tự băm lại khi save
+    const updateFields = {};
+    if (name) updateFields.name = name.trim();
+    if (username) updateFields.username = username.toLowerCase().trim();
+    if (role && ['user', 'admin'].includes(role)) updateFields.role = role;
+    if (birthYear !== undefined) updateFields.birthYear = birthYear ? Number(birthYear) : null;
+    if (avatar) updateFields.avatar = avatar;
+    if (location !== undefined) updateFields.location = location.trim();
+    if (bio !== undefined) updateFields.bio = bio.trim();
+    if (phone !== undefined) updateFields.phone = phone ? phone.trim() : '';
+    if (password && password.trim()) updateFields.password = hashPassword(password.trim());
 
     if (nameFrame !== undefined) {
       const isLeader = targetUser.role === 'admin' || targetUser.username === 'hainam' || (targetUser.name && targetUser.name.toLowerCase().includes('hải nam'));
       if (nameFrame === 'frame_spider' && !isLeader && req.user.role !== 'admin') {
         return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
       }
-      targetUser.nameFrame = nameFrame ? nameFrame.trim() : '';
+      updateFields.nameFrame = nameFrame ? nameFrame.trim() : '';
     }
 
-    await targetUser.save();
+    await User.updateOne({ _id: targetUser._id }, { $set: updateFields });
+
+    const resultUser = await User.findById(targetUser._id);
 
     // Đồng bộ lại tên/avatar trên các bài post
     if (name || avatar) {
       const updateData = {};
-      if (name) updateData.authorName = targetUser.name;
-      if (avatar) updateData.authorAvatar = targetUser.avatar;
+      if (name) updateData.authorName = (name || targetUser.name).trim();
+      if (avatar) updateData.authorAvatar = avatar || targetUser.avatar;
       await Post.updateMany({ author: targetUser._id }, { $set: updateData });
     }
 
-    return sendSuccess(res, targetUser, `Đã cập nhật thông tin người dùng ${targetUser.username} thành công.`);
+    return sendSuccess(res, resultUser || targetUser, `Đã cập nhật thông tin người dùng ${targetUser.username} thành công.`);
   } catch (error) {
     next(error);
   }
