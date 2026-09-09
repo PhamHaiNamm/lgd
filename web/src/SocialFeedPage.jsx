@@ -5,7 +5,7 @@ import { API_BASE_URL, formatImageUrl } from './config';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { compressImage } from './utils/imageCompressor';
-import { MEMBER_POSITIONS } from './Introduction';
+import { extractMongoId, MEMBER_POSITIONS } from './Introduction';
 import './SocialFeedPage.css';
 
 export default function SocialFeedPage() {
@@ -70,7 +70,12 @@ export default function SocialFeedPage() {
       const res = await fetch(`${API_BASE_URL}/posts`);
       const data = await res.json();
       if (data.success) {
-        setPosts(data.data || []);
+        const processedPosts = (data.data || []).map(p => ({
+          ...p,
+          _id: extractMongoId(p._id, `post_${Date.now()}`),
+          author: extractMongoId(p.author, p.author),
+        }));
+        setPosts(processedPosts);
       }
     } catch (err) {
       console.error('Lỗi tải bài viết:', err);
