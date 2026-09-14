@@ -206,6 +206,15 @@ export default function SchedulePage() {
     };
   }, [revenueItems]);
 
+  // Mở modal tổng hợp doanh thu (Thành viên & Admin đều xem được)
+  const handleOpenRevenueModal = () => {
+    if (!user && !token) {
+      alert("🔒 Vui lòng đăng nhập tài khoản thành viên để xem bảng tổng hợp doanh thu!");
+      return;
+    }
+    setShowRevenueModal(true);
+  };
+
   // Mở modal xem chi tiết lịch (Chỉ người có tài khoản mới bấm được)
   const handleOpenDetailModal = (item) => {
     if (!user && !token) {
@@ -375,35 +384,37 @@ export default function SchedulePage() {
               Xem các lịch biểu diễn dự kiến của Đoàn Lân Sư Rồng Lục Gia Đường. Chọn một ngày trên lịch để xem chi tiết.
             </p>
 
-            {isAdmin && (
-              <div className="d-flex align-items-center justify-content-center gap-3 mt-3 flex-wrap">
-                <Button
-                  variant={isAdminMode ? "outline-primary" : "primary"}
-                  className="fw-bold"
-                  onClick={() => setIsAdminMode((v) => !v)}
-                >
-                  {isAdminMode ? "🔒 Tắt chế độ Admin" : "⚙️ Quản trị lịch"}
-                </Button>
+            <div className="d-flex align-items-center justify-content-center gap-3 mt-3 flex-wrap">
+              <Button
+                variant={user ? "warning" : "outline-warning"}
+                className={`fw-bold ${user ? "text-dark" : ""}`}
+                onClick={handleOpenRevenueModal}
+              >
+                📊 Bảng tổng hợp doanh thu {user ? "" : "🔒 (Cần đăng nhập)"}
+              </Button>
 
-                <Button
-                  variant="warning"
-                  className="fw-bold text-dark"
-                  onClick={() => setShowRevenueModal(true)}
-                >
-                  📊 Tổng hợp doanh thu
-                </Button>
-
-                {isAdminMode && (
+              {isAdmin && (
+                <>
                   <Button
-                    variant="success"
+                    variant={isAdminMode ? "outline-primary" : "primary"}
                     className="fw-bold"
-                    onClick={() => handleOpenAddModal(selectedDate)}
+                    onClick={() => setIsAdminMode((v) => !v)}
                   >
-                    ➕ Thêm lịch cho ngày {new Date(selectedDate).toLocaleDateString("vi-VN")}
+                    {isAdminMode ? "🔒 Tắt chế độ Admin" : "⚙️ Quản trị lịch"}
                   </Button>
-                )}
-              </div>
-            )}
+
+                  {isAdminMode && (
+                    <Button
+                      variant="success"
+                      className="fw-bold"
+                      onClick={() => handleOpenAddModal(selectedDate)}
+                    >
+                      ➕ Thêm lịch cho ngày {new Date(selectedDate).toLocaleDateString("vi-VN")}
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
           <Row className="g-4">
@@ -1106,7 +1117,7 @@ export default function SchedulePage() {
                           <th className="text-end">Tiền Show</th>
                           <th className="text-end">Đã Cọc</th>
                           <th className="text-center">Trạng Thái</th>
-                          <th className="text-center">Hành Động</th>
+                          {isAdmin && <th className="text-center">Hành Động Admin</th>}
                         </tr>
                       </thead>
                       <tbody>
@@ -1133,17 +1144,19 @@ export default function SchedulePage() {
                                 <span className="badge bg-warning text-dark">⏳ Mới cọc (Chỉ cộng cọc)</span>
                               )}
                             </td>
-                            <td className="text-center">
-                              <Button
-                                size="sm"
-                                variant={it.isPaid ? "outline-secondary" : "success"}
-                                className="py-1 px-2 fw-bold"
-                                style={{ fontSize: "0.75rem" }}
-                                onClick={() => handleTogglePaidStatus(it)}
-                              >
-                                {it.isPaid ? "Hủy Đã Thanh Toán" : "✔ Đã Thanh Toán Hết"}
-                              </Button>
-                            </td>
+                            {isAdmin && (
+                              <td className="text-center">
+                                <Button
+                                  size="sm"
+                                  variant={it.isPaid ? "outline-secondary" : "success"}
+                                  className="py-1 px-2 fw-bold"
+                                  style={{ fontSize: "0.75rem" }}
+                                  onClick={() => handleTogglePaidStatus(it)}
+                                >
+                                  {it.isPaid ? "Hủy Đã Thanh Toán" : "✔ Đã Thanh Toán Hết"}
+                                </Button>
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>
