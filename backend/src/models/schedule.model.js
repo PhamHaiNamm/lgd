@@ -51,6 +51,18 @@ const scheduleSchema = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    totalPrice: {
+      type: Number,
+      default: 0,
+    },
+    deposit: {
+      type: Number,
+      default: 0,
+    },
+    isPaid: {
+      type: Boolean,
+      default: false,
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',

@@ -56,7 +56,7 @@ async function getScheduleById(req, res, next) {
  */
 async function createSchedule(req, res, next) {
   try {
-    const { date, time, location, description, note, phone, coordinates, mapUrl } = req.body;
+    const { date, time, location, description, note, phone, coordinates, mapUrl, totalPrice, deposit, isPaid } = req.body;
 
     if (!date || !location || !description) {
       return sendError(res, 'Vui lòng cung cấp đầy đủ Ngày, Địa điểm và Mô tả chương trình.', 400);
@@ -71,6 +71,9 @@ async function createSchedule(req, res, next) {
       phone: phone ? phone.trim() : '',
       coordinates: coordinates ? coordinates.trim() : '',
       mapUrl: mapUrl ? mapUrl.trim() : '',
+      totalPrice: totalPrice !== undefined ? Number(totalPrice) || 0 : 0,
+      deposit: deposit !== undefined ? Number(deposit) || 0 : 0,
+      isPaid: Boolean(isPaid),
       createdBy: req.user?._id,
     });
 
@@ -86,7 +89,7 @@ async function createSchedule(req, res, next) {
 async function updateSchedule(req, res, next) {
   try {
     const { id } = req.params;
-    const { date, time, location, description, note, phone, coordinates, mapUrl } = req.body;
+    const { date, time, location, description, note, phone, coordinates, mapUrl, totalPrice, deposit, isPaid } = req.body;
 
     if (!id || id === '[object Object]' || String(id).trim() === '') {
       return sendError(res, 'Mã định danh lịch không hợp lệ.', 400);
@@ -113,6 +116,9 @@ async function updateSchedule(req, res, next) {
     if (phone !== undefined) updateFields.phone = phone.trim();
     if (coordinates !== undefined) updateFields.coordinates = coordinates.trim();
     if (mapUrl !== undefined) updateFields.mapUrl = mapUrl.trim();
+    if (totalPrice !== undefined) updateFields.totalPrice = Number(totalPrice) || 0;
+    if (deposit !== undefined) updateFields.deposit = Number(deposit) || 0;
+    if (isPaid !== undefined) updateFields.isPaid = Boolean(isPaid);
 
     await Schedule.updateOne({ _id: schedule._id }, { $set: updateFields });
 

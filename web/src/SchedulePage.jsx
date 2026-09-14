@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext, useCallback } from "react";
-import { Container, Row, Col, Button, Form, Modal, Spinner } from "react-bootstrap";
+import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import { Container, Row, Col, Button, Form, Modal, Spinner, Table } from "react-bootstrap";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { AuthContext } from "./AuthContext";
@@ -9,7 +9,7 @@ import { extractMongoId } from "./Introduction";
 import "./SchedulePage.css";
 
 export default function SchedulePage() {
-  const { token, isAdmin } = useContext(AuthContext);
+  const { user, token, isAdmin } = useContext(AuthContext);
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isAdminMode, setIsAdminMode] = useState(false);
@@ -21,6 +21,22 @@ export default function SchedulePage() {
 
   const [showModal, setShowModal] = useState(false);
 
+  // State Modal Xem chi tiết show (Dành cho thành viên đăng nhập)
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [detailItem, setDetailItem] = useState(null);
+
+  // State Modal Tổng hợp doanh thu dành cho Admin
+  const [showRevenueModal, setShowRevenueModal] = useState(false);
+  const [revenueStartDate, setRevenueStartDate] = useState(() => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+  });
+  const [revenueEndDate, setRevenueEndDate] = useState(() => {
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+  });
+
   // State form thêm/sửa lịch
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -30,9 +46,55 @@ export default function SchedulePage() {
     location: '',
     description: '',
     note: '',
+    phone: '',
     coordinates: '',
+    totalPrice: '',
+    deposit: '',
+    isPaid: false,
   });
   const [isSaving, setIsSaving] = useState(false);
+
+  // Chuyển chuỗi định dạng hiển thị (VD: "5.000.000,5") sang số thực
+  const parseInputValue = (val) => {
+    if (val === null || val === undefined || val === '') return 0;
+    if (typeof val === 'number') return val;
+    const cleaned = String(val).replace(/\./g, '').replace(',', '.');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+  };
+
+  // Định dạng số/chuỗi thành dạng có dấu chấm hàng nghìn & phẩy lẻ (VD: "5.000.000,5")
+  const formatInputValue = (val) => {
+    if (val === null || val === undefined || val === '') return '';
+    const str = String(val).trim();
+    if (typeof val === 'number') {
+      const parts = String(val).split('.');
+      const intFormatted = new Intl.NumberFormat('vi-VN').format(Number(parts[0]));
+      return parts.length > 1 ? `${intFormatted},${parts[1]}` : intFormatted;
+    }
+    const hasTrailingComma = /[,.]$/.test(str);
+    const parts = str.replace(/\./g, '').split(/[,.]/);
+    const intDigits = parts[0].replace(/\D/g, '');
+    const decDigits = parts.length > 1 ? parts[1].replace(/\D/g, '') : null;
+
+    if (!intDigits && decDigits === null) return '';
+    const formattedInt = intDigits ? new Intl.NumberFormat('vi-VN').format(Number(intDigits)) : '0';
+
+    if (decDigits !== null) {
+      return `${formattedInt},${decDigits}`;
+    }
+    if (hasTrailingComma) {
+      return `${formattedInt},`;
+    }
+    return formattedInt;
+  };
+
+  // Hàm định dạng tiền tệ VNĐ hiển thị
+  const formatCurrency = (val) => {
+    const num = typeof val === 'number' ? val : parseInputValue(val);
+    if (isNaN(num) || num === 0) return "0 VNĐ";
+    return new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 2 }).format(num) + " VNĐ";
+  };
 
   // Tải danh sách lịch từ Backend (MongoDB Atlas)
   const fetchSchedules = useCallback(async () => {
@@ -77,6 +139,83 @@ export default function SchedulePage() {
     return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(coords)}`;
   };
 
+  // Đánh dấu nhanh hoặc Hủy trạng thái "Đã thanh toán hết" cho 1 show
+  const handleTogglePaidStatus = async (item) => {
+    if (!token || !isAdmin) return;
+    const cleanId = extractMongoId(item._id || item.id);
+    if (!cleanId) return;
+
+    const newStatus = !item.isPaid;
+    try {
+      const res = await fetch(`${API_BASE_URL}/schedules/${cleanId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isPaid: newStatus }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        fetchSchedules();
+      } else {
+        alert(data.message || "Lỗi khi cập nhật trạng thái thanh toán.");
+      }
+    } catch (err) {
+      alert("Lỗi kết nối: " + err.message);
+    }
+  };
+
+  // Lọc danh sách lịch theo khoảng thời gian tổng hợp doanh thu
+  const revenueItems = useMemo(() => {
+    if (!revenueStartDate || !revenueEndDate) return items;
+    return items.filter((it) => {
+      if (!it.date) return false;
+      return it.date >= revenueStartDate && it.date <= revenueEndDate;
+    });
+  }, [items, revenueStartDate, revenueEndDate]);
+
+  // Tính toán số liệu doanh thu cho Admin
+  // Quy tắc: Nếu show đã thanh toán hết (isPaid) -> tính 100% tiền show. Nếu chưa -> chỉ cộng tiền cọc đã nhận.
+  const revenueStats = useMemo(() => {
+    let totalShowPrice = 0;
+    let totalDeposit = 0;
+    let actualRevenue = 0;
+    let remainingDebt = 0;
+
+    revenueItems.forEach((it) => {
+      const price = Number(it.totalPrice) || 0;
+      const dep = Number(it.deposit) || 0;
+      totalShowPrice += price;
+      totalDeposit += dep;
+
+      if (it.isPaid) {
+        actualRevenue += price;
+      } else {
+        actualRevenue += dep; // Chưa thanh toán hết -> chỉ cộng tiền cọc vào tổng hợp doanh thu
+        remainingDebt += Math.max(0, price - dep);
+      }
+    });
+
+    return {
+      count: revenueItems.length,
+      totalShowPrice,
+      totalDeposit,
+      actualRevenue,
+      remainingDebt,
+    };
+  }, [revenueItems]);
+
+  // Mở modal xem chi tiết lịch (Chỉ người có tài khoản mới bấm được)
+  const handleOpenDetailModal = (item) => {
+    if (!user && !token) {
+      alert("🔒 Vui lòng đăng nhập tài khoản thành viên để xem thông tin chi tiết và giá tiền show!");
+      return;
+    }
+    setDetailItem(item);
+    setShowDetailModal(true);
+  };
+
   // Mở modal thêm lịch mới cho ngày đang chọn
   const handleOpenAddModal = (dateStr) => {
     const targetDate = dateStr || selectedDate;
@@ -89,6 +228,9 @@ export default function SchedulePage() {
       phone: "",
       note: "",
       coordinates: "",
+      totalPrice: "",
+      deposit: "",
+      isPaid: false,
     });
     setShowEditModal(true);
   };
@@ -104,6 +246,9 @@ export default function SchedulePage() {
       phone: item.phone || "",
       note: item.note || "",
       coordinates: item.coordinates || item.mapUrl || "",
+      totalPrice: item.totalPrice !== undefined && item.totalPrice !== null ? formatInputValue(item.totalPrice) : "",
+      deposit: item.deposit !== undefined && item.deposit !== null ? formatInputValue(item.deposit) : "",
+      isPaid: Boolean(item.isPaid),
     });
     setShowEditModal(true);
   };
@@ -130,13 +275,19 @@ export default function SchedulePage() {
         : `${API_BASE_URL}/schedules`;
       const method = editId ? "PUT" : "POST";
 
+      const payload = {
+        ...scheduleForm,
+        totalPrice: parseInputValue(scheduleForm.totalPrice),
+        deposit: parseInputValue(scheduleForm.deposit),
+      };
+
       const res = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(scheduleForm),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -232,6 +383,14 @@ export default function SchedulePage() {
                   onClick={() => setIsAdminMode((v) => !v)}
                 >
                   {isAdminMode ? "🔒 Tắt chế độ Admin" : "⚙️ Quản trị lịch"}
+                </Button>
+
+                <Button
+                  variant="warning"
+                  className="fw-bold text-dark"
+                  onClick={() => setShowRevenueModal(true)}
+                >
+                  📊 Tổng hợp doanh thu
                 </Button>
 
                 {isAdminMode && (
@@ -395,7 +554,17 @@ export default function SchedulePage() {
                           {item.description || item.content || "Chương trình biểu diễn"}
                         </h5>
                         {isAdmin && isAdminMode && (
-                          <div className="d-flex gap-2">
+                          <div className="d-flex gap-2 align-items-center flex-wrap">
+                            <Button
+                              size="sm"
+                              variant={item.isPaid ? "success" : "outline-warning"}
+                              className="fw-bold"
+                              style={{ fontSize: "0.78rem" }}
+                              onClick={() => handleTogglePaidStatus(item)}
+                              title={item.isPaid ? "Show đã thanh toán hết (Bấm để đổi)" : "Bấm để đánh dấu Đã thanh toán hết"}
+                            >
+                              {item.isPaid ? "✅ Đã thanh toán hết" : "💵 Đánh dấu ĐÃ THANH TOÁN"}
+                            </Button>
                             <Button
                               size="sm"
                               variant="outline-primary"
@@ -466,6 +635,32 @@ export default function SchedulePage() {
                           <strong>Ghi chú:</strong> {item.note}
                         </div>
                       )}
+
+                      {/* Nút Xem chi tiết & Giá tiền show (Chỉ người có tài khoản mới ấn xem được) */}
+                      <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3 pt-2 border-top" style={{ borderColor: "#f1f5f9" }}>
+                        <Button
+                          size="sm"
+                          style={{ backgroundColor: "#7c3aed", borderColor: "#7c3aed", fontWeight: "600" }}
+                          onClick={() => handleOpenDetailModal(item)}
+                        >
+                          👁️ Xem chi tiết show {user ? "" : "🔒 (Cần đăng nhập)"}
+                        </Button>
+
+                        {user ? (
+                          <div className="d-flex align-items-center gap-2 flex-wrap">
+                            <span className="badge" style={{ backgroundColor: "#f3e8ff", color: "#6b21a8", fontSize: "0.78rem", padding: "6px 10px" }}>
+                              💵 Giá: {formatCurrency(item.totalPrice)}
+                            </span>
+                            <span className="badge bg-success" style={{ fontSize: "0.78rem", padding: "6px 10px" }}>
+                              💳 Còn lại: {formatCurrency((item.totalPrice || 0) - (item.deposit || 0))}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="small text-muted" style={{ fontSize: "0.78rem" }}>
+                            🔒 Đăng nhập để xem giá show & cọc
+                          </span>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -478,12 +673,130 @@ export default function SchedulePage() {
             </Modal.Footer>
           </Modal>
 
+          {/* Modal Xem chi tiết Show (Dành riêng cho người dùng đã đăng nhập) */}
+          <Modal
+            show={showDetailModal}
+            onHide={() => setShowDetailModal(false)}
+            size="lg"
+            centered
+          >
+            <Modal.Header closeButton style={{ backgroundColor: "#7c3aed", color: "#ffffff" }}>
+              <Modal.Title className="fw-bold fs-5">
+                👁️ CHI TIẾT LỊCH BIỂU DIỄN
+              </Modal.Title>
+            </Modal.Header>
+            {detailItem && (
+              <Modal.Body className="p-4" style={{ backgroundColor: "#ffffff" }}>
+                <div className="mb-4">
+                  <span className="badge bg-primary mb-2" style={{ fontSize: "0.85rem" }}>
+                    📅 Ngày diễn: {detailItem.date ? new Date(detailItem.date).toLocaleDateString("vi-VN", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) : "Chưa rõ"}
+                  </span>
+                  <h3 className="fw-bold" style={{ color: "#6b21a8" }}>
+                    {detailItem.description || detailItem.content || "Chương trình biểu diễn"}
+                  </h3>
+                </div>
+
+                <div className="p-3 mb-4 rounded-3" style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0" }}>
+                  <Row className="g-3">
+                    <Col md={6}>
+                      <div className="small text-muted fw-bold mb-1">⏰ GIỜ BIỂU DIỄN</div>
+                      <div className="fw-semibold text-dark">{detailItem.time || "Chưa xác định"}</div>
+                    </Col>
+                    <Col md={6}>
+                      <div className="small text-muted fw-bold mb-1">📞 ĐIỆN THOẠI LIÊN HỆ</div>
+                      <div className="fw-semibold">
+                        {detailItem.phone ? (
+                          <a href={`tel:${detailItem.phone}`} style={{ color: "#7c3aed", textDecoration: "none" }}>
+                            {detailItem.phone}
+                          </a>
+                        ) : (
+                          <span className="text-muted">Chưa cập nhật</span>
+                        )}
+                      </div>
+                    </Col>
+                    <Col md={12}>
+                      <div className="small text-muted fw-bold mb-1">📍 ĐỊA ĐIỂM BIỂU DIỄN</div>
+                      <div className="fw-semibold text-dark d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <span>{detailItem.location || "Đang cập nhật"}</span>
+                        {getDirectionsUrl(detailItem) && (
+                          <a
+                            href={getDirectionsUrl(detailItem)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-sm btn-outline-danger fw-bold"
+                          >
+                            🗺️ Mở chỉ đường Google Maps
+                          </a>
+                        )}
+                      </div>
+                    </Col>
+                    {detailItem.note && (
+                      <Col md={12}>
+                        <div className="small text-muted fw-bold mb-1">📝 GHI CHÚ Bổ SUNG</div>
+                        <div className="p-2 rounded bg-white text-dark border small">
+                          {detailItem.note}
+                        </div>
+                      </Col>
+                    )}
+                  </Row>
+                </div>
+
+                {/* Khối Bảng Giá Tiền & Đặt Cọc */}
+                <div
+                  className="p-3 rounded-3 shadow-sm"
+                  style={{ backgroundColor: "#faf5ff", border: "2px dashed #a855f7" }}
+                >
+                  <h5 className="fw-bold mb-3 d-flex align-items-center gap-2" style={{ color: "#6b21a8" }}>
+                    💰 BẢNG TÍNH GIÁ SHOW & TIỀN CỌC
+                  </h5>
+                  <Row className="g-3">
+                    <Col xs={12} sm={4}>
+                      <div className="p-3 rounded text-center bg-white border h-100">
+                        <div className="small text-muted fw-bold mb-1">💵 TIỀN SHOW</div>
+                        <div className="fs-5 fw-bold text-primary">
+                          {formatCurrency(detailItem.totalPrice)}
+                        </div>
+                      </div>
+                    </Col>
+
+                    <Col xs={12} sm={4}>
+                      <div className="p-3 rounded text-center bg-white border h-100">
+                        <div className="small text-muted fw-bold mb-1">🏦 ĐÃ ĐẶT CỌC</div>
+                        <div className="fs-5 fw-bold text-warning">
+                          {formatCurrency(detailItem.deposit)}
+                        </div>
+                      </div>
+                    </Col>
+
+                    <Col xs={12} sm={4}>
+                      <div className="p-3 rounded text-center bg-white border h-100" style={{ borderColor: "#86efac", backgroundColor: "#f0fdf4" }}>
+                        <div className="small text-success fw-bold mb-1">💳 SỐ TIỀN CÒN LẠI</div>
+                        <div className="fs-5 fw-bold text-success">
+                          {formatCurrency((detailItem.totalPrice || 0) - (detailItem.deposit || 0))}
+                        </div>
+                        <div className="text-muted" style={{ fontSize: "0.68rem" }}>
+                          (Tiền show - Đã cọc)
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+              </Modal.Body>
+            )}
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowDetailModal(false)}>
+                Đóng
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
           {/* Modal Thêm / Sửa lịch biểu diễn (Dành cho Admin) */}
           <Modal
             show={showEditModal}
             onHide={() => setShowEditModal(false)}
             centered
             backdrop="static"
+            size="lg"
           >
             <Modal.Header closeButton style={{ backgroundColor: "#ffffff", borderBottom: "1px solid #e9d5ff" }}>
               <Modal.Title className="fw-bold" style={{ color: "#7c3aed" }}>
@@ -492,27 +805,33 @@ export default function SchedulePage() {
             </Modal.Header>
             <Form onSubmit={handleSaveSchedule}>
               <Modal.Body className="p-4" style={{ backgroundColor: "#ffffff" }}>
-                <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold text-muted">Ngày biểu diễn (YYYY-MM-DD) *</Form.Label>
-                  <Form.Control
-                    type="date"
-                    required
-                    value={scheduleForm.date}
-                    onChange={(e) => setScheduleForm({ ...scheduleForm, date: e.target.value })}
-                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
-                  />
-                </Form.Group>
+                <Row>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label className="small fw-bold text-muted">Ngày biểu diễn (YYYY-MM-DD) *</Form.Label>
+                      <Form.Control
+                        type="date"
+                        required
+                        value={scheduleForm.date}
+                        onChange={(e) => setScheduleForm({ ...scheduleForm, date: e.target.value })}
+                        style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
+                      />
+                    </Form.Group>
+                  </Col>
 
-                <Form.Group className="mb-3">
-                  <Form.Label className="small fw-bold text-muted">Giờ biểu diễn (HH:mm)</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="VD: 18:00, 08:30..."
-                    value={scheduleForm.time}
-                    onChange={(e) => setScheduleForm({ ...scheduleForm, time: e.target.value })}
-                    style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
-                  />
-                </Form.Group>
+                  <Col md={6}>
+                    <Form.Group className="mb-3">
+                      <Form.Label className="small fw-bold text-muted">Giờ biểu diễn (HH:mm)</Form.Label>
+                      <Form.Control
+                        type="text"
+                        placeholder="VD: 18:00, 08:30..."
+                        value={scheduleForm.time}
+                        onChange={(e) => setScheduleForm({ ...scheduleForm, time: e.target.value })}
+                        style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
 
                 <Form.Group className="mb-3">
                   <Form.Label className="small fw-bold text-muted">Mô tả / Tên chương trình *</Form.Label>
@@ -536,6 +855,62 @@ export default function SchedulePage() {
                     onChange={(e) => setScheduleForm({ ...scheduleForm, location: e.target.value })}
                     style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
                   />
+                </Form.Group>
+
+                {/* Trường Giá tiền show và Đặt cọc cho Admin */}
+                <Row className="p-3 mb-3 mx-0 rounded border" style={{ backgroundColor: "#faf5ff", borderColor: "#e9d5ff" }}>
+                  <Col md={6}>
+                    <Form.Group className="mb-2">
+                      <Form.Label className="small fw-bold text-primary">
+                        💵 Giá tiền show / Tổng tiền (VNĐ)
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="VD: 5.000.000 hoặc 1.500.000,5"
+                        value={scheduleForm.totalPrice}
+                        onChange={(e) => setScheduleForm({ ...scheduleForm, totalPrice: formatInputValue(e.target.value) })}
+                        style={{ backgroundColor: "#ffffff", borderColor: "#c084fc", color: "#1e1b4b" }}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group className="mb-2">
+                      <Form.Label className="small fw-bold text-warning">
+                        🏦 Số tiền đã cọc (VNĐ)
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        inputMode="decimal"
+                        placeholder="VD: 1.000.000 hoặc 500.000,5"
+                        value={scheduleForm.deposit}
+                        onChange={(e) => setScheduleForm({ ...scheduleForm, deposit: formatInputValue(e.target.value) })}
+                        style={{ backgroundColor: "#ffffff", borderColor: "#fde047", color: "#1e1b4b" }}
+                      />
+                    </Form.Group>
+                  </Col>
+
+                  {/* Tính toán hiển thị số tiền còn lại */}
+                  <Col md={12} className="mt-2 pt-2 border-top d-flex justify-content-between align-items-center">
+                    <span className="small fw-bold text-muted">💳 Số tiền còn lại (Tiền show - Tiền cọc):</span>
+                    <span className="fw-bold fs-6 text-success">
+                      {formatCurrency(parseInputValue(scheduleForm.totalPrice) - parseInputValue(scheduleForm.deposit))}
+                    </span>
+                  </Col>
+                </Row>
+
+                {/* Công tắc đánh dấu Đã thanh toán hết */}
+                <Form.Group className="mb-3 p-3 rounded border" style={{ backgroundColor: scheduleForm.isPaid ? "#f0fdf4" : "#fff8f1", borderColor: scheduleForm.isPaid ? "#86efac" : "#fed7aa" }}>
+                  <Form.Check
+                    type="switch"
+                    id="isPaidSwitch"
+                    label={<span className="fw-bold text-dark">✅ Đã thanh toán hết (Toàn bộ tiền show đã thu xong)</span>}
+                    checked={scheduleForm.isPaid}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, isPaid: e.target.checked })}
+                  />
+                  <Form.Text className="text-muted" style={{ fontSize: "0.78rem" }}>
+                    💡 Khi bật tính năng này, hệ thống sẽ tính 100% tiền show vào bảng <strong>"Tổng hợp doanh thu"</strong>. Nếu chưa bật (chưa thanh toán hết), hệ thống chỉ cộng tiền cọc đã nhận.
+                  </Form.Text>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -596,6 +971,192 @@ export default function SchedulePage() {
                 </Button>
               </Modal.Footer>
             </Form>
+          </Modal>
+
+          {/* Modal Bảng Tổng Hợp Doanh Thu (Admin Only) */}
+          <Modal
+            show={showRevenueModal}
+            onHide={() => setShowRevenueModal(false)}
+            size="xl"
+            centered
+          >
+            <Modal.Header closeButton style={{ backgroundColor: "#1e1b4b", color: "#ffffff" }}>
+              <Modal.Title className="fw-bold fs-5">
+                📊 BẢNG TỔNG HỢP DOANH THU LỊCH BIỂU DIỄN
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="p-4" style={{ backgroundColor: "#f8fafc" }}>
+              {/* Bộ lọc ngày tháng */}
+              <div className="bg-white p-3 rounded-3 shadow-sm mb-4 border">
+                <Row className="g-3 align-items-end">
+                  <Col md={4}>
+                    <Form.Group>
+                      <Form.Label className="small fw-bold text-muted">Từ ngày (YYYY-MM-DD)</Form.Label>
+                      <Form.Control
+                        type="date"
+                        value={revenueStartDate}
+                        onChange={(e) => setRevenueStartDate(e.target.value)}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                    <Form.Group>
+                      <Form.Label className="small fw-bold text-muted">Đến ngày (YYYY-MM-DD)</Form.Label>
+                      <Form.Control
+                        type="date"
+                        value={revenueEndDate}
+                        onChange={(e) => setRevenueEndDate(e.target.value)}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={4}>
+                    <div className="d-flex gap-2">
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
+                        className="w-100 fw-bold"
+                        onClick={() => {
+                          const now = new Date();
+                          setRevenueStartDate(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`);
+                          const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                          setRevenueEndDate(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`);
+                        }}
+                      >
+                        📅 Tháng này
+                      </Button>
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        className="w-100 fw-bold"
+                        onClick={() => {
+                          setRevenueStartDate("2020-01-01");
+                          setRevenueEndDate("2030-12-31");
+                        }}
+                      >
+                        🌐 Tất cả lịch
+                      </Button>
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+
+              {/* Các thẻ Thống Kê Tổng Quan */}
+              <Row className="g-3 mb-4">
+                <Col xs={12} sm={6} lg={3}>
+                  <div className="p-3 rounded-3 bg-white border shadow-sm h-100" style={{ borderLeft: "4px solid #7c3aed" }}>
+                    <div className="small text-muted fw-bold mb-1">💰 DOANH THU THỰC TẾ ĐÃ THU</div>
+                    <div className="fs-5 fw-bold" style={{ color: "#7c3aed" }}>
+                      {formatCurrency(revenueStats.actualRevenue)}
+                    </div>
+                    <div className="text-muted mt-1" style={{ fontSize: "0.72rem" }}>
+                      (Show thanh toán hết + Tiền cọc các show khác)
+                    </div>
+                  </div>
+                </Col>
+
+                <Col xs={12} sm={6} lg={3}>
+                  <div className="p-3 rounded-3 bg-white border shadow-sm h-100" style={{ borderLeft: "4px solid #3b82f6" }}>
+                    <div className="small text-muted fw-bold mb-1">📜 TỔNG HỢP GIÁ SHOWS</div>
+                    <div className="fs-5 fw-bold text-primary">
+                      {formatCurrency(revenueStats.totalShowPrice)}
+                    </div>
+                    <div className="text-muted mt-1" style={{ fontSize: "0.72rem" }}>
+                      (Tổng {revenueStats.count} show trong kỳ)
+                    </div>
+                  </div>
+                </Col>
+
+                <Col xs={12} sm={6} lg={3}>
+                  <div className="p-3 rounded-3 bg-white border shadow-sm h-100" style={{ borderLeft: "4px solid #eab308" }}>
+                    <div className="small text-muted fw-bold mb-1">🏦 TỔNG TIỀN ĐÃ CỌC</div>
+                    <div className="fs-5 fw-bold text-warning">
+                      {formatCurrency(revenueStats.totalDeposit)}
+                    </div>
+                    <div className="text-muted mt-1" style={{ fontSize: "0.72rem" }}>
+                      (Tổng cọc khách đã chuyển)
+                    </div>
+                  </div>
+                </Col>
+
+                <Col xs={12} sm={6} lg={3}>
+                  <div className="p-3 rounded-3 bg-white border shadow-sm h-100" style={{ borderLeft: "4px solid #ef4444" }}>
+                    <div className="small text-muted fw-bold mb-1">💳 CÒN NỢ CHƯA THU</div>
+                    <div className="fs-5 fw-bold text-danger">
+                      {formatCurrency(revenueStats.remainingDebt)}
+                    </div>
+                    <div className="text-muted mt-1" style={{ fontSize: "0.72rem" }}>
+                      (Tiền còn nợ của các show chưa thanh toán)
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+
+              {/* Bảng Chi Tiết Tất Cả Các Show */}
+              <div className="bg-white p-3 rounded-3 shadow-sm border">
+                <h6 className="fw-bold mb-3 text-dark">📋 Chi tiết danh sách show ({revenueItems.length} show trong khoảng chọn):</h6>
+                {revenueItems.length === 0 ? (
+                  <div className="text-center py-4 text-muted">Không có show nào trong khoảng thời gian này.</div>
+                ) : (
+                  <div className="table-responsive">
+                    <Table hover align="middle" className="mb-0" style={{ fontSize: "0.88rem" }}>
+                      <thead className="table-light">
+                        <tr>
+                          <th>Ngày & Giờ</th>
+                          <th>Tên Chương Trình / Địa Điểm</th>
+                          <th className="text-end">Tiền Show</th>
+                          <th className="text-end">Đã Cọc</th>
+                          <th className="text-center">Trạng Thái</th>
+                          <th className="text-center">Hành Động</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {revenueItems.map((it) => (
+                          <tr key={it._id || it.id}>
+                            <td className="fw-semibold text-nowrap">
+                              <div>{it.date}</div>
+                              <small className="text-muted">{it.time || "N/A"}</small>
+                            </td>
+                            <td>
+                              <div className="fw-bold text-dark">{it.description || "Chương trình"}</div>
+                              <small className="text-muted">{it.location}</small>
+                            </td>
+                            <td className="text-end fw-bold text-primary">
+                              {formatCurrency(it.totalPrice)}
+                            </td>
+                            <td className="text-end fw-bold text-warning">
+                              {formatCurrency(it.deposit)}
+                            </td>
+                            <td className="text-center">
+                              {it.isPaid ? (
+                                <span className="badge bg-success">✅ Đã thanh toán hết</span>
+                              ) : (
+                                <span className="badge bg-warning text-dark">⏳ Mới cọc (Chỉ cộng cọc)</span>
+                              )}
+                            </td>
+                            <td className="text-center">
+                              <Button
+                                size="sm"
+                                variant={it.isPaid ? "outline-secondary" : "success"}
+                                className="py-1 px-2 fw-bold"
+                                style={{ fontSize: "0.75rem" }}
+                                onClick={() => handleTogglePaidStatus(it)}
+                              >
+                                {it.isPaid ? "Hủy Đã Thanh Toán" : "✔ Đã Thanh Toán Hết"}
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
+                )}
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowRevenueModal(false)}>
+                Đóng
+              </Button>
+            </Modal.Footer>
           </Modal>
         </Container>
       </section>
