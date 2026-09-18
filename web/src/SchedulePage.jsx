@@ -602,13 +602,14 @@ export default function SchedulePage() {
                         <strong>Giờ:</strong> {item.time || "Chưa xác định"}
                       </div>
 
-                      {item.phone && (
+                      {/* Chỉ Admin mới thấy Thông tin liên hệ của khách */}
+                      {isAdmin && item.phone && (
                         <div className="mb-2" style={{ color: "#334155" }}>
                           <i className="bi bi-telephone-fill me-2 text-success"></i>
-                          <strong>Liên hệ:</strong>{" "}
-                          <a href={`tel:${item.phone}`} style={{ color: "#7c3aed", fontWeight: "600", textDecoration: "none" }}>
+                          <strong>Liên hệ (Chỉ Admin):</strong>{" "}
+                          <span style={{ color: "#7c3aed", fontWeight: "600" }}>
                             {item.phone}
-                          </a>
+                          </span>
                         </div>
                       )}
 
@@ -647,7 +648,7 @@ export default function SchedulePage() {
                         </div>
                       )}
 
-                      {/* Nút Xem chi tiết & Giá tiền show (Chỉ người có tài khoản mới ấn xem được) */}
+                      {/* Nút Xem chi tiết & Giá tiền show, Tiền cọc (Chỉ người có tài khoản mới ấn xem được) */}
                       <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3 pt-2 border-top" style={{ borderColor: "#f1f5f9" }}>
                         <Button
                           size="sm"
@@ -658,14 +659,28 @@ export default function SchedulePage() {
                         </Button>
 
                         {user ? (
-                          <div className="d-flex align-items-center gap-2 flex-wrap">
-                            <span className="badge" style={{ backgroundColor: "#f3e8ff", color: "#6b21a8", fontSize: "0.78rem", padding: "6px 10px" }}>
-                              💵 Giá: {formatCurrency(item.totalPrice)}
-                            </span>
-                            <span className="badge bg-success" style={{ fontSize: "0.78rem", padding: "6px 10px" }}>
-                              💳 Còn lại: {formatCurrency((item.totalPrice || 0) - (item.deposit || 0))}
-                            </span>
-                          </div>
+                          item.isPaid ? (
+                            <div className="d-flex align-items-center gap-2 flex-wrap">
+                              <span className="badge" style={{ backgroundColor: "#f3e8ff", color: "#6b21a8", fontSize: "0.78rem", padding: "6px 10px" }}>
+                                💵 Giá show: {formatCurrency(item.totalPrice)}
+                              </span>
+                              <span className="badge bg-success" style={{ fontSize: "0.78rem", padding: "6px 10px" }}>
+                                ✅ Đã thanh toán hết
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="d-flex align-items-center gap-2 flex-wrap">
+                              <span className="badge" style={{ backgroundColor: "#f3e8ff", color: "#6b21a8", fontSize: "0.78rem", padding: "6px 10px" }}>
+                                💵 Giá: {formatCurrency(item.totalPrice)}
+                              </span>
+                              <span className="badge" style={{ backgroundColor: "#fef9c3", color: "#854d0e", fontSize: "0.78rem", padding: "6px 10px" }}>
+                                🏦 Đã cọc: {formatCurrency(item.deposit)}
+                              </span>
+                              <span className="badge bg-success" style={{ fontSize: "0.78rem", padding: "6px 10px" }}>
+                                💳 Còn lại: {formatCurrency((item.totalPrice || 0) - (item.deposit || 0))}
+                              </span>
+                            </div>
+                          )
                         ) : (
                           <span className="small text-muted" style={{ fontSize: "0.78rem" }}>
                             🔒 Đăng nhập để xem giá show & cọc
@@ -713,18 +728,14 @@ export default function SchedulePage() {
                       <div className="small text-muted fw-bold mb-1">⏰ GIỜ BIỂU DIỄN</div>
                       <div className="fw-semibold text-dark">{detailItem.time || "Chưa xác định"}</div>
                     </Col>
-                    <Col md={6}>
-                      <div className="small text-muted fw-bold mb-1">📞 ĐIỆN THOẠI LIÊN HỆ</div>
-                      <div className="fw-semibold">
-                        {detailItem.phone ? (
-                          <a href={`tel:${detailItem.phone}`} style={{ color: "#7c3aed", textDecoration: "none" }}>
-                            {detailItem.phone}
-                          </a>
-                        ) : (
-                          <span className="text-muted">Chưa cập nhật</span>
-                        )}
-                      </div>
-                    </Col>
+                    {isAdmin && detailItem.phone && (
+                      <Col md={6}>
+                        <div className="small text-muted fw-bold mb-1">📞 THÔNG TIN LIÊN HỆ KHÁCH (CHỈ ADMIN)</div>
+                        <div className="fw-semibold" style={{ color: "#7c3aed" }}>
+                          {detailItem.phone}
+                        </div>
+                      </Col>
+                    )}
                     <Col md={12}>
                       <div className="small text-muted fw-bold mb-1">📍 ĐỊA ĐIỂM BIỂU DIỄN</div>
                       <div className="fw-semibold text-dark d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -757,40 +768,69 @@ export default function SchedulePage() {
                   className="p-3 rounded-3 shadow-sm"
                   style={{ backgroundColor: "#faf5ff", border: "2px dashed #a855f7" }}
                 >
-                  <h5 className="fw-bold mb-3 d-flex align-items-center gap-2" style={{ color: "#6b21a8" }}>
-                    💰 BẢNG TÍNH GIÁ SHOW & TIỀN CỌC
+                  <h5 className="fw-bold mb-3 d-flex align-items-center justify-content-between gap-2" style={{ color: "#6b21a8" }}>
+                    <span>💰 BẢNG TÍNH GIÁ SHOW & TIỀN CỌC</span>
+                    {detailItem.isPaid && (
+                      <span className="badge bg-success fs-6">✅ ĐÃ THANH TOÁN HẾT</span>
+                    )}
                   </h5>
-                  <Row className="g-3">
-                    <Col xs={12} sm={4}>
-                      <div className="p-3 rounded text-center bg-white border h-100">
-                        <div className="small text-muted fw-bold mb-1">💵 TIỀN SHOW</div>
-                        <div className="fs-5 fw-bold text-primary">
-                          {formatCurrency(detailItem.totalPrice)}
-                        </div>
-                      </div>
-                    </Col>
 
-                    <Col xs={12} sm={4}>
-                      <div className="p-3 rounded text-center bg-white border h-100">
-                        <div className="small text-muted fw-bold mb-1">🏦 ĐÃ ĐẶT CỌC</div>
-                        <div className="fs-5 fw-bold text-warning">
-                          {formatCurrency(detailItem.deposit)}
+                  {detailItem.isPaid ? (
+                    <Row className="g-3">
+                      <Col xs={12} sm={6}>
+                        <div className="p-3 rounded text-center bg-white border h-100">
+                          <div className="small text-muted fw-bold mb-1">💵 TỔNG GIÁ TIỀN SHOW</div>
+                          <div className="fs-4 fw-bold text-primary">
+                            {formatCurrency(detailItem.totalPrice)}
+                          </div>
                         </div>
-                      </div>
-                    </Col>
+                      </Col>
 
-                    <Col xs={12} sm={4}>
-                      <div className="p-3 rounded text-center bg-white border h-100" style={{ borderColor: "#86efac", backgroundColor: "#f0fdf4" }}>
-                        <div className="small text-success fw-bold mb-1">💳 SỐ TIỀN CÒN LẠI</div>
-                        <div className="fs-5 fw-bold text-success">
-                          {formatCurrency((detailItem.totalPrice || 0) - (detailItem.deposit || 0))}
+                      <Col xs={12} sm={6}>
+                        <div className="p-3 rounded text-center bg-white border h-100" style={{ borderColor: "#86efac", backgroundColor: "#f0fdf4" }}>
+                          <div className="small text-success fw-bold mb-1">TRẠNG THÁI THANH TOÁN</div>
+                          <div className="fs-5 fw-bold text-success mt-1">
+                            ✅ Đã thanh toán hết 100%
+                          </div>
+                          <div className="text-muted" style={{ fontSize: "0.72rem" }}>
+                            (Không còn dư nợ hay tiền cọc)
+                          </div>
                         </div>
-                        <div className="text-muted" style={{ fontSize: "0.68rem" }}>
-                          (Tiền show - Đã cọc)
+                      </Col>
+                    </Row>
+                  ) : (
+                    <Row className="g-3">
+                      <Col xs={12} sm={4}>
+                        <div className="p-3 rounded text-center bg-white border h-100">
+                          <div className="small text-muted fw-bold mb-1">💵 TIỀN SHOW</div>
+                          <div className="fs-5 fw-bold text-primary">
+                            {formatCurrency(detailItem.totalPrice)}
+                          </div>
                         </div>
-                      </div>
-                    </Col>
-                  </Row>
+                      </Col>
+
+                      <Col xs={12} sm={4}>
+                        <div className="p-3 rounded text-center bg-white border h-100">
+                          <div className="small text-muted fw-bold mb-1">🏦 ĐÃ ĐẶT CỌC</div>
+                          <div className="fs-5 fw-bold text-warning">
+                            {formatCurrency(detailItem.deposit)}
+                          </div>
+                        </div>
+                      </Col>
+
+                      <Col xs={12} sm={4}>
+                        <div className="p-3 rounded text-center bg-white border h-100" style={{ borderColor: "#86efac", backgroundColor: "#f0fdf4" }}>
+                          <div className="small text-success fw-bold mb-1">💳 SỐ TIỀN CÒN LẠI</div>
+                          <div className="fs-5 fw-bold text-success">
+                            {formatCurrency((detailItem.totalPrice || 0) - (detailItem.deposit || 0))}
+                          </div>
+                          <div className="text-muted" style={{ fontSize: "0.68rem" }}>
+                            (Tiền show - Đã cọc)
+                          </div>
+                        </div>
+                      </Col>
+                    </Row>
+                  )}
                 </div>
               </Modal.Body>
             )}
@@ -926,11 +966,11 @@ export default function SchedulePage() {
 
                 <Form.Group className="mb-3">
                   <Form.Label className="small fw-bold text-muted">
-                    📞 Số điện thoại liên hệ <span className="text-secondary fw-normal">(Không bắt buộc)</span>
+                    📞 Thông tin liên hệ khách / SĐT <span className="text-secondary fw-normal">(Chỉ Admin thấy - Nhập chữ hoặc số)</span>
                   </Form.Label>
                   <Form.Control
-                    type="tel"
-                    placeholder="VD: 0912345678 (SĐT khách hàng hoặc người phụ trách)"
+                    type="text"
+                    placeholder="VD: Anh Tuấn - 0912345678, Chị Hoa (Quản lý)..."
                     value={scheduleForm.phone || ""}
                     onChange={(e) => setScheduleForm({ ...scheduleForm, phone: e.target.value })}
                     style={{ backgroundColor: "#ffffff", borderColor: "#e2e8f0", color: "#1e1b4b" }}
