@@ -32,7 +32,7 @@ const config = {
   port: parseInt(process.env.PORT, 10) || 5000,
   clientUrl: process.env.CLIENT_URL || 'http://localhost:3000',
   mongoUri: process.env.MONGODB_URI || '',
-  jwtSecret: process.env.JWT_SECRET || 'luc_gia_duong_default_secret_key_123456',
+  jwtSecret: process.env.JWT_SECRET || 'luc_gia_duong_secure_jwt_secret_token_key_2026_qnh_production_auth_987654321',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   cloudinary: {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
@@ -41,5 +41,9 @@ const config = {
   },
   isProduction: process.env.NODE_ENV === 'production',
 };
+
+if (config.isProduction && !process.env.JWT_SECRET) {
+  console.warn('⚠️ CẢNH BÁO BẢO MẬT: Đang chạy ở môi trường Production nhưng chưa cấu hình JWT_SECRET trong biến môi trường!');
+}
 
 module.exports = config;

@@ -1,10 +1,11 @@
 const express = require('express');
 const { getAllItems, createItem, deleteItem } = require('../controllers/item.controller');
+const { verifyToken, requireAdmin } = require('../middlewares/auth.middleware');
 
 const router = express.Router();
 
 router.get('/', getAllItems);
-router.post('/', createItem);
-router.delete('/:id', deleteItem);
+router.post('/', verifyToken, requireAdmin, createItem);
+router.delete('/:id', verifyToken, requireAdmin, deleteItem);
 
 module.exports = router;

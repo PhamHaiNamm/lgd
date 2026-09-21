@@ -29,7 +29,8 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, 'Mật khẩu không được để trống'],
-      minlength: [3, 'Mật khẩu phải có ít nhất 3 ký tự'],
+      minlength: [6, 'Mật khẩu phải có ít nhất 6 ký tự'],
+      select: false,
     },
     role: {
       type: String,
@@ -50,11 +51,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
       trim: true,
+      maxlength: [200, 'Địa điểm không được vượt quá 200 ký tự'],
     },
     bio: {
       type: String,
       default: '',
       trim: true,
+      maxlength: [1000, 'Tiểu sử không được vượt quá 1000 ký tự'],
     },
     nameFrame: {
       type: String,
@@ -65,10 +68,23 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
       trim: true,
+      maxlength: [20, 'Số điện thoại không hợp lệ'],
     },
   },
   {
     timestamps: true,
+    toJSON: {
+      transform(doc, ret) {
+        delete ret.password;
+        return ret;
+      },
+    },
+    toObject: {
+      transform(doc, ret) {
+        delete ret.password;
+        return ret;
+      },
+    },
   }
 );
 

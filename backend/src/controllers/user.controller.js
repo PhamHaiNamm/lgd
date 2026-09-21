@@ -27,12 +27,15 @@ async function updateMyProfile(req, res, next) {
     if (birthYear !== undefined) updateFields.birthYear = birthYear ? Number(birthYear) : null;
     if (avatar) updateFields.avatar = avatar;
     if (location !== undefined) updateFields.location = location.trim();
-    if (bio !== undefined) updateFields.bio = bio.trim();
-    if (phone !== undefined) updateFields.phone = phone ? phone.trim() : '';
-    if (password && password.trim()) updateFields.password = hashPassword(password.trim());
+    if (password && password.trim()) {
+      if (password.trim().length < 6) {
+        return sendError(res, 'Mật khẩu mới phải có độ dài tối thiểu 6 ký tự.', 400);
+      }
+      updateFields.password = hashPassword(password.trim());
+    }
 
     if (nameFrame !== undefined) {
-      const isLeader = user.role === 'admin' || user.username === 'hainam' || (user.name && user.name.toLowerCase().includes('hải nam'));
+      const isLeader = user.role === 'admin' || user.username === 'hainam';
       if (nameFrame === 'frame_spider' && !isLeader) {
         return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
       }
@@ -86,7 +89,15 @@ async function createUserByAdmin(req, res, next) {
       return sendError(res, 'Vui lòng cung cấp Họ tên, Tên đăng nhập và Mật khẩu.', 400);
     }
 
+    if (password.length < 6) {
+      return sendError(res, 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.', 400);
+    }
+
     const cleanUsername = username.toLowerCase().trim();
+    if (cleanUsername.length < 3) {
+      return sendError(res, 'Tên đăng nhập phải có ít nhất 3 ký tự.', 400);
+    }
+
     const existing = await User.findOne({ username: cleanUsername });
     if (existing) {
       return sendError(res, `Tên đăng nhập "${cleanUsername}" đã tồn tại. Vui lòng chọn tên khác.`, 400);
@@ -145,26 +156,10 @@ async function updateUserByAdmin(req, res, next) {
       } catch (e) {}
     }
 
-    // 2. Tìm theo username hoặc _id
+    // 2. Tìm theo username nếu chưa thấy
     if (!targetUser) {
       const cleanUsername = cleanId.replace(/^u_/, '').toLowerCase().trim();
-      targetUser = await User.findOne({
-        $or: [
-          { username: cleanUsername },
-          { _id: cleanId }
-        ]
-      });
-    }
-
-    // 3. Tìm theo username hoặc name nếu vẫn chưa thấy
-    if (!targetUser) {
-      const cleanUsername = cleanId.replace(/^u_/, '').toLowerCase().trim();
-      targetUser = await User.findOne({
-        $or: [
-          { username: cleanUsername },
-          { name: name ? name.trim() : cleanId }
-        ]
-      });
+      targetUser = await User.findOne({ username: cleanUsername });
     }
 
     if (!targetUser) {
@@ -188,10 +183,15 @@ async function updateUserByAdmin(req, res, next) {
     if (location !== undefined) updateFields.location = location.trim();
     if (bio !== undefined) updateFields.bio = bio.trim();
     if (phone !== undefined) updateFields.phone = phone ? phone.trim() : '';
-    if (password && password.trim()) updateFields.password = hashPassword(password.trim());
+    if (password && password.trim()) {
+      if (password.trim().length < 6) {
+        return sendError(res, 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.', 400);
+      }
+      updateFields.password = hashPassword(password.trim());
+    }
 
     if (nameFrame !== undefined) {
-      const isLeader = targetUser.role === 'admin' || targetUser.username === 'hainam' || (targetUser.name && targetUser.name.toLowerCase().includes('hải nam'));
+      const isLeader = targetUser.role === 'admin' || targetUser.username === 'hainam';
       if (nameFrame === 'frame_spider' && !isLeader && req.user.role !== 'admin') {
         return sendError(res, 'Khung Nhện Tím là khung độc quyền chỉ dành riêng cho Trưởng đoàn!', 403);
       }

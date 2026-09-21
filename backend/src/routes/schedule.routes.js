@@ -1,5 +1,5 @@
 const express = require('express');
-const { verifyToken, requireAdmin } = require('../middlewares/auth.middleware');
+const { verifyToken, requireAdmin, optionalAuth } = require('../middlewares/auth.middleware');
 const {
   getAllSchedules,
   getScheduleById,
@@ -10,11 +10,11 @@ const {
 
 const router = express.Router();
 
-// Public: Lấy tất cả lịch biểu diễn
-router.get('/', getAllSchedules);
+// Lấy tất cả lịch biểu diễn (hỗ trợ phân quyền ẩn dữ liệu tài chính/SĐT khách đối với khách chưa đăng nhập)
+router.get('/', optionalAuth, getAllSchedules);
 
-// Public: Lấy chi tiết 1 lịch
-router.get('/:id', getScheduleById);
+// Lấy chi tiết 1 lịch
+router.get('/:id', optionalAuth, getScheduleById);
 
 // Admin: Thêm lịch mới
 router.post('/', verifyToken, requireAdmin, createSchedule);

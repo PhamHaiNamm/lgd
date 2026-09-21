@@ -48,11 +48,20 @@ function verifyTokenString(token, secret) {
       .update(`${header}.${body}`)
       .digest('base64url');
 
-    if (signature !== expected) {
+    const sigBuf = Buffer.from(signature, 'utf8');
+    const expBuf = Buffer.from(expected, 'utf8');
+
+    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
       throw new Error('Chữ ký Token không hợp lệ');
     }
 
-    const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+    let payload;
+    try {
+      payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+    } catch (err) {
+      throw new Error('Dữ liệu Token không hợp lệ');
+    }
+
     if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
       const err = new Error('Phiên đăng nhập đã hết hạn');
       err.name = 'TokenExpiredError';
@@ -78,9 +87,13 @@ function hashPassword(password) {
 }
 
 /**
- * So sánh mật khẩu
+ * So sánh mật khẩu an toàn
  */
 function verifyPassword(candidatePassword, storedHash) {
+  if (!candidatePassword || !storedHash || typeof candidatePassword !== 'string' || typeof storedHash !== 'string') {
+    return false;
+  }
+
   try {
     const bcrypt = require('bcryptjs');
     if (!storedHash.startsWith('scrypt:')) {
@@ -91,13 +104,20 @@ function verifyPassword(candidatePassword, storedHash) {
   }
 
   if (storedHash.startsWith('scrypt:')) {
-    const [, salt, key] = storedHash.split(':');
-    const keyBuffer = Buffer.from(key, 'hex');
-    const matchBuffer = crypto.scryptSync(candidatePassword, salt, 64);
-    return crypto.timingSafeEqual(keyBuffer, matchBuffer);
+    try {
+      const parts = storedHash.split(':');
+      if (parts.length === 3) {
+        const [, salt, key] = parts;
+        const keyBuffer = Buffer.from(key, 'hex');
+        const matchBuffer = crypto.scryptSync(candidatePassword, salt, 64);
+        return keyBuffer.length === matchBuffer.length && crypto.timingSafeEqual(keyBuffer, matchBuffer);
+      }
+    } catch (err) {
+      return false;
+    }
   }
 
-  return candidatePassword === storedHash;
+  return false;
 }
 
 module.exports = {
@@ -106,3 +126,4 @@ module.exports = {
   hashPassword,
   verifyPassword,
 };
+

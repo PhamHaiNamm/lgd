@@ -54,7 +54,42 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+/**
+ * Middleware tùy chọn xác thực JWT Token (nếu có token hợp lệ thì nạp req.user, nếu không thì vẫn cho qua dưới dạng khách)
+ */
+async function optionalAuth(req, res, next) {
+  try {
+    let token = null;
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.split(' ')[1];
+    }
+
+    if (token) {
+      const decoded = verifyTokenString(token, config.jwtSecret);
+      if (decoded && decoded.id) {
+        let user = null;
+        try {
+          user = await User.findById(decoded.id);
+        } catch (e) {}
+        if (!user) {
+          user = await User.findOne({ _id: decoded.id });
+        }
+        if (user) {
+          req.user = user;
+        }
+      }
+    }
+  } catch (error) {
+    // Không ném lỗi nếu token không hợp lệ hoặc hết hạn ở optional auth, chỉ tiếp tục như khách
+  }
+  next();
+}
+
 module.exports = {
   verifyToken,
   requireAdmin,
+  optionalAuth,
 };
+

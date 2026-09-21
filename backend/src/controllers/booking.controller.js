@@ -27,8 +27,7 @@ async function findBookingConflict(eventDate, eventTime, excludeBookingId = null
   if (existingBooking) {
     return {
       type: 'booking',
-      message: `Khung giờ ${cleanTime} ngày ${cleanDate} đã có khách hàng đặt lịch (${existingBooking.serviceType} tại ${existingBooking.location || 'địa điểm khách chọn'}).`,
-      detail: existingBooking,
+      message: `Khung giờ ${cleanTime} ngày ${cleanDate} đã có khách hàng đặt lịch trước.`,
     };
   }
 
@@ -40,8 +39,7 @@ async function findBookingConflict(eventDate, eventTime, excludeBookingId = null
   if (existingSchedule) {
     return {
       type: 'schedule',
-      message: `Khung giờ ${cleanTime} ngày ${cleanDate} trùng với lịch biểu diễn của đoàn (${existingSchedule.description} tại ${existingSchedule.location}).`,
-      detail: existingSchedule,
+      message: `Khung giờ ${cleanTime} ngày ${cleanDate} đã trùng với lịch biểu diễn của đoàn.`,
     };
   }
 

@@ -13,12 +13,36 @@ const Schedule = require('../models/schedule.model');
 const { sendSuccess, sendError } = require('../utils/responseHandler');
 
 /**
+ * Helper: Lọc bỏ các thông tin nhạy cảm (tài chính, SĐT khách) tùy theo quyền người dùng
+ */
+function sanitizeSchedule(schedule, user) {
+  if (!schedule) return schedule;
+  const obj = typeof schedule.toObject === 'function' ? schedule.toObject() : { ...schedule };
+  const isLoggedIn = !!user;
+  const isAdmin = user && (user.role === 'admin' || user.username === 'hainam');
+
+  if (!isLoggedIn) {
+    // Khách chưa đăng nhập: Ẩn toàn bộ thông tin giá tiền, cọc, thanh toán và SĐT khách
+    delete obj.totalPrice;
+    delete obj.deposit;
+    delete obj.isPaid;
+    delete obj.phone;
+    delete obj.createdBy;
+  } else if (!isAdmin) {
+    // Thành viên đã đăng nhập nhưng không phải admin: Được xem giá tiền để biết lịch đoàn nhưng ẩn SĐT liên hệ của khách
+    delete obj.phone;
+  }
+  return obj;
+}
+
+/**
  * Lấy tất cả danh sách lịch biểu diễn
  */
 async function getAllSchedules(req, res, next) {
   try {
     const schedules = await Schedule.find().sort({ date: 1, time: 1 });
-    return sendSuccess(res, schedules, 'Lấy danh sách lịch biểu diễn thành công.');
+    const sanitized = schedules.map((s) => sanitizeSchedule(s, req.user));
+    return sendSuccess(res, sanitized, 'Lấy danh sách lịch biểu diễn thành công.');
   } catch (error) {
     next(error);
   }
@@ -38,14 +62,12 @@ async function getScheduleById(req, res, next) {
     let schedule = null;
     if (mongoose.Types.ObjectId.isValid(cleanId) && cleanId.length === 24) {
       schedule = await Schedule.findById(cleanId);
-    } else {
-      schedule = await Schedule.findOne({ _id: cleanId });
     }
 
     if (!schedule) {
       return sendError(res, 'Không tìm thấy lịch biểu diễn.', 404);
     }
-    return sendSuccess(res, schedule, 'Lấy chi tiết lịch thành công.');
+    return sendSuccess(res, sanitizeSchedule(schedule, req.user), 'Lấy chi tiết lịch thành công.');
   } catch (error) {
     next(error);
   }
@@ -99,8 +121,6 @@ async function updateSchedule(req, res, next) {
     let schedule = null;
     if (mongoose.Types.ObjectId.isValid(cleanId) && cleanId.length === 24) {
       schedule = await Schedule.findById(cleanId);
-    } else {
-      schedule = await Schedule.findOne({ _id: cleanId });
     }
 
     if (!schedule) {
@@ -116,15 +136,15 @@ async function updateSchedule(req, res, next) {
     if (phone !== undefined) updateFields.phone = phone.trim();
     if (coordinates !== undefined) updateFields.coordinates = coordinates.trim();
     if (mapUrl !== undefined) updateFields.mapUrl = mapUrl.trim();
-    if (totalPrice !== undefined) updateFields.totalPrice = Number(totalPrice) || 0;
-    if (deposit !== undefined) updateFields.deposit = Number(deposit) || 0;
+    if (totalPrice !== undefined) updateFields.totalPrice = Math.max(0, Number(totalPrice) || 0);
+    if (deposit !== undefined) updateFields.deposit = Math.max(0, Number(deposit) || 0);
     if (isPaid !== undefined) updateFields.isPaid = Boolean(isPaid);
 
     await Schedule.updateOne({ _id: schedule._id }, { $set: updateFields });
 
     const updatedSchedule = await Schedule.findById(schedule._id);
 
-    return sendSuccess(res, updatedSchedule || schedule, 'Cập nhật lịch biểu diễn thành công!');
+    return sendSuccess(res, sanitizeSchedule(updatedSchedule || schedule, req.user), 'Cập nhật lịch biểu diễn thành công!');
   } catch (error) {
     next(error);
   }
@@ -144,8 +164,6 @@ async function deleteSchedule(req, res, next) {
     let schedule = null;
     if (mongoose.Types.ObjectId.isValid(cleanId) && cleanId.length === 24) {
       schedule = await Schedule.findById(cleanId);
-    } else {
-      schedule = await Schedule.findOne({ _id: cleanId });
     }
 
     if (!schedule) {

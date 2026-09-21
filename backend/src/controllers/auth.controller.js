@@ -14,22 +14,32 @@ async function register(req, res, next) {
       return sendError(res, 'Vui lòng điền đầy đủ Họ tên, Tên đăng nhập và Mật khẩu.', 400);
     }
 
-    const existingUser = await User.findOne({ username: username.toLowerCase().trim() });
+    if (password.length < 6) {
+      return sendError(res, 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.', 400);
+    }
+
+    const cleanUsername = username.toLowerCase().trim();
+    if (cleanUsername.length < 3) {
+      return sendError(res, 'Tên đăng nhập phải có ít nhất 3 ký tự.', 400);
+    }
+
+    const existingUser = await User.findOne({ username: cleanUsername });
     if (existingUser) {
       return sendError(res, 'Tên đăng nhập này đã được sử dụng. Vui lòng chọn tên khác.', 400);
     }
 
     const userCount = await User.countDocuments();
-    const role = userCount === 0 || username.toLowerCase().trim() === 'admin' ? 'admin' : 'user';
+    // Chỉ tài khoản đầu tiên tạo trong hệ thống mới được mặc định làm admin
+    const role = userCount === 0 ? 'admin' : 'user';
 
     const user = await User.create({
       name: name.trim(),
-      username: username.toLowerCase().trim(),
+      username: cleanUsername,
       password,
       role,
       birthYear: birthYear ? Number(birthYear) : undefined,
-      location: location || '',
-      bio: bio || '',
+      location: location ? location.trim() : '',
+      bio: bio ? bio.trim() : '',
       avatar: avatar || undefined,
     });
 
@@ -60,7 +70,8 @@ async function login(req, res, next) {
       return sendError(res, 'Vui lòng nhập tên đăng nhập và mật khẩu.', 400);
     }
 
-    const user = await User.findOne({ username: username.toLowerCase().trim() });
+    const cleanUsername = username.toLowerCase().trim();
+    const user = await User.findOne({ username: cleanUsername }).select('+password');
     if (!user) {
       return sendError(res, 'Tên đăng nhập hoặc mật khẩu không chính xác.', 401);
     }

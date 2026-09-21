@@ -15,6 +15,9 @@ function sanitizeUrls(obj) {
       return obj;
     }
     const target = typeof obj.toObject === 'function' ? obj.toObject() : { ...obj };
+    if (target.password !== undefined) {
+      delete target.password;
+    }
     for (const key of Object.keys(target)) {
       target[key] = sanitizeUrls(target[key]);
     }

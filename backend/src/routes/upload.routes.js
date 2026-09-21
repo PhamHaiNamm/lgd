@@ -1,5 +1,6 @@
 const express = require('express');
 const upload = require('../middlewares/upload.middleware');
+const { verifyToken, requireAdmin } = require('../middlewares/auth.middleware');
 const {
   uploadSingleImage,
   uploadMultipleImages,
@@ -19,14 +20,25 @@ const checkUploadMiddleware = (handler) => (req, res, next) => {
   return handler(req, res, next);
 };
 
-// Route upload 1 ảnh: POST /api/v1/upload/single (Form-data key: image)
-router.post('/single', checkUploadMiddleware(upload ? upload.single('image') : (req, res, next) => next()), uploadSingleImage);
+// Route upload 1 ảnh: POST /api/v1/upload/single (Yêu cầu đăng nhập)
+router.post(
+  '/single',
+  verifyToken,
+  checkUploadMiddleware(upload ? upload.single('image') : (req, res, next) => next()),
+  uploadSingleImage
+);
 
-// Route upload nhiều ảnh: POST /api/v1/upload/multiple (Form-data key: images, tối đa 10 ảnh)
-router.post('/multiple', checkUploadMiddleware(upload ? upload.array('images', 10) : (req, res, next) => next()), uploadMultipleImages);
+// Route upload nhiều ảnh: POST /api/v1/upload/multiple (Yêu cầu đăng nhập)
+router.post(
+  '/multiple',
+  verifyToken,
+  checkUploadMiddleware(upload ? upload.array('images', 10) : (req, res, next) => next()),
+  uploadMultipleImages
+);
 
-// Route xóa ảnh: POST hoặc DELETE /api/v1/upload/delete (JSON body: { publicId: "..." })
-router.post('/delete', deleteImage);
-router.delete('/', deleteImage);
+// Route xóa ảnh: POST hoặc DELETE /api/v1/upload/delete (Chỉ dành cho Admin)
+router.post('/delete', verifyToken, requireAdmin, deleteImage);
+router.delete('/', verifyToken, requireAdmin, deleteImage);
 
 module.exports = router;
+

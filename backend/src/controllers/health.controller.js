@@ -8,12 +8,8 @@ function getHealthStatus(req, res) {
   const healthData = {
     status: 'ok',
     timestamp: new Date().toISOString(),
-    uptime: `${Math.floor(process.uptime())} seconds`,
-    environment: process.env.NODE_ENV || 'development',
-    database: {
-      provider: 'MongoDB Atlas',
-      connectionStatus: getDBStatus(),
-    },
+    uptime: `${Math.floor(process.uptime())}s`,
+    database: getDBStatus() === 'connected' ? 'connected' : 'disconnected',
   };
 
   return sendSuccess(res, healthData, 'Hệ thống đang hoạt động bình thường.');
