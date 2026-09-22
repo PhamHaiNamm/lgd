@@ -93,13 +93,13 @@ async function createSchedule(req, res, next) {
       phone: phone ? phone.trim() : '',
       coordinates: coordinates ? coordinates.trim() : '',
       mapUrl: mapUrl ? mapUrl.trim() : '',
-      totalPrice: totalPrice !== undefined ? Number(totalPrice) || 0 : 0,
-      deposit: deposit !== undefined ? Number(deposit) || 0 : 0,
+      totalPrice: totalPrice !== undefined ? Math.max(0, Number(totalPrice) || 0) : 0,
+      deposit: deposit !== undefined ? Math.max(0, Number(deposit) || 0) : 0,
       isPaid: Boolean(isPaid),
       createdBy: req.user?._id,
     });
 
-    return sendSuccess(res, newSchedule, 'Thêm lịch biểu diễn thành công!', 201);
+    return sendSuccess(res, sanitizeSchedule(newSchedule, req.user), 'Thêm lịch biểu diễn thành công!', 201);
   } catch (error) {
     next(error);
   }

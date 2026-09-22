@@ -100,7 +100,9 @@ export default function SchedulePage() {
   const fetchSchedules = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE_URL}/schedules`);
+      const res = await fetch(`${API_BASE_URL}/schedules`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
         const normalized = data.data.map((item, idx) => {
@@ -121,7 +123,7 @@ export default function SchedulePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     fetchSchedules();
