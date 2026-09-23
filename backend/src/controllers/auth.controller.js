@@ -29,6 +29,15 @@ async function register(req, res, next) {
     }
 
     const userCount = await User.countDocuments();
+    // Đóng đăng ký tự do: Chỉ cho phép tạo tài khoản đầu tiên hoặc nếu người gọi là Admin
+    if (userCount > 0 && (!req.user || req.user.role !== 'admin')) {
+      return sendError(
+        res,
+        'Hệ thống không mở đăng ký tự do. Vui lòng liên hệ Trưởng đoàn hoặc Quản trị viên để được cấp tài khoản thành viên.',
+        403
+      );
+    }
+
     // Chỉ tài khoản đầu tiên tạo trong hệ thống mới được mặc định làm admin
     const role = userCount === 0 ? 'admin' : 'user';
 

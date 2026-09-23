@@ -8,6 +8,77 @@ import { compressImage } from './utils/imageCompressor';
 import { extractMongoId, MEMBER_POSITIONS } from './Introduction';
 import './SocialFeedPage.css';
 
+/**
+ * Phân tích và trích xuất thông tin nhúng cho video YouTube và Facebook
+ */
+export function parseVideoUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+  const trimmed = url.trim();
+
+  // 1. YouTube (Video chuẩn, Shorts, Youtu.be, Embed)
+  const ytMatch = trimmed.match(
+    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?/\s]{11})/i
+  );
+  if (ytMatch && ytMatch[1]) {
+    return {
+      type: 'youtube',
+      videoId: ytMatch[1],
+      embedUrl: `https://www.youtube-nocookie.com/embed/${ytMatch[1]}?rel=0`,
+      originalUrl: trimmed,
+    };
+  }
+
+  // 2. Facebook (Video, Reels, Watch, Share)
+  if (
+    trimmed.includes('facebook.com') ||
+    trimmed.includes('fb.watch') ||
+    trimmed.includes('fb.com')
+  ) {
+    const encoded = encodeURIComponent(trimmed);
+    return {
+      type: 'facebook',
+      embedUrl: `https://www.facebook.com/plugins/video.php?href=${encoded}&show_text=false&allowfullscreen=true`,
+      originalUrl: trimmed,
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Component trình phát nhúng Video đa nền tảng
+ */
+function VideoEmbedPlayer({ videoUrl }) {
+  const videoInfo = parseVideoUrl(videoUrl);
+  if (!videoInfo) return null;
+
+  return (
+    <div className="post-video-container">
+      {videoInfo.type === 'youtube' && (
+        <iframe
+          src={videoInfo.embedUrl}
+          title="YouTube Video Player"
+          className="post-video-iframe"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      )}
+      {videoInfo.type === 'facebook' && (
+        <iframe
+          src={videoInfo.embedUrl}
+          title="Facebook Video Player"
+          className="post-video-iframe"
+          frameBorder="0"
+          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+          allowFullScreen
+          scrolling="no"
+        />
+      )}
+    </div>
+  );
+}
+
 export default function SocialFeedPage() {
   const { user, token, isAdmin, updateUserData, logout } = useContext(AuthContext);
 
@@ -17,6 +88,8 @@ export default function SocialFeedPage() {
   const [caption, setCaption] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [videoUrlInput, setVideoUrlInput] = useState('');
+  const [showVideoInput, setShowVideoInput] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   const [viewingImage, setViewingImage] = useState(null);
 
@@ -110,16 +183,31 @@ export default function SocialFeedPage() {
       alert('Vui lòng đăng nhập để đăng bài.');
       return;
     }
-    if (!selectedFile) {
-      alert('Vui lòng chọn 1 hình ảnh để đăng.');
+
+    const hasImage = !!selectedFile;
+    const hasVideo = !!videoUrlInput.trim();
+    const hasCaption = !!caption.trim();
+
+    if (!hasImage && !hasVideo && !hasCaption) {
+      alert('Vui lòng nhập nội dung, chọn hình ảnh hoặc dán link video YouTube / Facebook.');
+      return;
+    }
+
+    if (hasVideo && !parseVideoUrl(videoUrlInput.trim())) {
+      alert('Đường dẫn video không hợp lệ! Vui lòng nhập đúng link YouTube hoặc Facebook.');
       return;
     }
 
     try {
       setIsPosting(true);
-      const processedFile = await compressImage(selectedFile, { maxWidth: 2048, maxHeight: 2048, quality: 0.88 });
       const formData = new FormData();
-      formData.append('image', processedFile);
+      if (hasImage) {
+        const processedFile = await compressImage(selectedFile, { maxWidth: 2048, maxHeight: 2048, quality: 0.88 });
+        formData.append('image', processedFile);
+      }
+      if (hasVideo) {
+        formData.append('videoUrl', videoUrlInput.trim());
+      }
       formData.append('caption', caption);
 
       const res = await fetch(`${API_BASE_URL}/posts`, {
@@ -133,6 +221,8 @@ export default function SocialFeedPage() {
       const data = await res.json();
       if (data.success) {
         setCaption('');
+        setVideoUrlInput('');
+        setShowVideoInput(false);
         handleRemoveImage();
         fetchPosts();
       } else {
@@ -486,27 +576,82 @@ export default function SocialFeedPage() {
             {previewUrl && (
               <div className="image-preview-container">
                 <img src={previewUrl} alt="Preview" className="image-preview" />
-                <button className="btn-remove-preview" onClick={handleRemoveImage}>
+                <button className="btn-remove-preview" onClick={handleRemoveImage} title="Bỏ ảnh này">
                   ✕
                 </button>
               </div>
             )}
 
+            {/* Ô nhập và Preview Link Video YouTube / Facebook */}
+            {showVideoInput && (
+              <div className="video-input-box">
+                <div className="video-input-wrapper">
+                  <span className="video-input-icon">🎬</span>
+                  <input
+                    type="url"
+                    className="video-url-input"
+                    placeholder="Dán link YouTube (watch, shorts, youtu.be) hoặc Facebook Video/Reel..."
+                    value={videoUrlInput}
+                    onChange={(e) => setVideoUrlInput(e.target.value)}
+                  />
+                  {videoUrlInput && (
+                    <button
+                      type="button"
+                      className="btn-clear-video"
+                      onClick={() => setVideoUrlInput('')}
+                      title="Xóa link video"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {videoUrlInput.trim() && (
+                  <div className="video-preview-wrapper">
+                    {parseVideoUrl(videoUrlInput) ? (
+                      <>
+                        <div className="video-preview-badge">
+                          {parseVideoUrl(videoUrlInput).type === 'youtube'
+                            ? '🔴 Xem trước YouTube Video'
+                            : '🔵 Xem trước Facebook Video'}
+                        </div>
+                        <VideoEmbedPlayer videoUrl={videoUrlInput} />
+                      </>
+                    ) : (
+                      <div className="video-invalid-hint">
+                        ⚠️ Link không đúng định dạng. Hãy dán link từ <strong>YouTube</strong> (youtube.com, youtu.be) hoặc <strong>Facebook</strong> (facebook.com, fb.watch).
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="create-post-footer">
-              <label className="file-upload-btn">
-                🖼️ Thêm hình ảnh
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="file-upload-input"
-                  ref={fileInputRef}
-                  onChange={handleSelectImage}
-                />
-              </label>
+              <div className="create-post-actions-group">
+                <label className="file-upload-btn">
+                  🖼️ Thêm hình ảnh
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="file-upload-input"
+                    ref={fileInputRef}
+                    onChange={handleSelectImage}
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  className={`btn-toggle-video ${showVideoInput ? 'active' : ''}`}
+                  onClick={() => setShowVideoInput(!showVideoInput)}
+                >
+                  🎬 {showVideoInput ? 'Đóng ô Video' : 'Thêm Video (YT/FB)'}
+                </button>
+              </div>
 
               <button
                 className="btn-submit-post"
-                disabled={isPosting || !selectedFile}
+                disabled={isPosting || (!selectedFile && !videoUrlInput.trim() && !caption.trim())}
                 onClick={handleCreatePost}
               >
                 {isPosting ? 'Đang đăng...' : 'Đăng bài'}
@@ -524,7 +669,7 @@ export default function SocialFeedPage() {
           ) : posts.length === 0 ? (
             <div className="feed-empty-state">
               <h3>Chưa có bài đăng nào</h3>
-              <p>Hãy là người đầu tiên chia sẻ hình ảnh đẹp tại đây!</p>
+              <p>Hãy là người đầu tiên chia sẻ hình ảnh hoặc video tại đây!</p>
             </div>
           ) : (
             posts.map((post) => {
@@ -569,7 +714,10 @@ export default function SocialFeedPage() {
                   {/* Caption */}
                   {post.caption && <div className="post-caption">{post.caption}</div>}
 
-                  {/* Ảnh bài viết */}
+                  {/* Video nhúng nếu có */}
+                  {post.videoUrl && <VideoEmbedPlayer videoUrl={post.videoUrl} />}
+
+                  {/* Ảnh bài viết nếu có */}
                   {post.imageUrl && (
                     <div
                       className="post-image-container"

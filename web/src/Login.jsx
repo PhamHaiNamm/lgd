@@ -91,7 +91,7 @@ function Login() {
                 </form>
 
                 <p className="text-center mt-4 mb-0 text-muted small">
-                  Chưa có tài khoản? <Link to="/register" style={{ color: '#7c3aed', fontWeight: 'bold' }}>Đăng ký ngay</Link>
+                  Chưa có tài khoản? <Link to="/register" style={{ color: '#7c3aed', fontWeight: 'bold' }}>Xem hướng dẫn cấp tài khoản</Link>
                 </p>
               </div>
             </div>

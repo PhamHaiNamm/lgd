@@ -25,9 +25,28 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(139, 92, 246, 0.4);
   margin-bottom: 12px;
   margin-left: auto;
-  max-width: 240px;
+  max-width: 260px;
   cursor: pointer;
   animation: lgdGreetingFadeIn 0.35s ease-out;
+  position: relative;
+}
+
+.lgd-greeting-close-btn {
+  background: transparent;
+  border: none;
+  color: #a78bfa;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 2px 4px;
+  margin-left: 4px;
+  border-radius: 4px;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.lgd-greeting-close-btn:hover {
+  color: #ffffff;
+  background: rgba(239, 68, 68, 0.4);
 }
 
 @keyframes lgdGreetingFadeIn {
@@ -306,6 +325,16 @@
   transform: none;
 }
 
+@media (max-width: 768px) {
+  .lgd-bubble-greeting {
+    display: none !important;
+  }
+
+  .lgd-bubble-badge {
+    display: none !important;
+  }
+}
+
 @media (max-width: 576px) {
   .lgd-floating-bubble-wrapper {
     right: 16px;
@@ -313,14 +342,22 @@
   }
 
   .lgd-bubble-trigger-btn {
-    width: 52px;
-    height: 52px;
+    width: 50px;
+    height: 50px;
     font-size: 22px;
+  }
+
+  .lgd-bubble-greeting {
+    display: none !important;
+  }
+
+  .lgd-bubble-badge {
+    display: none !important;
   }
 
   .lgd-chat-panel {
     width: calc(100vw - 24px);
     height: 480px;
-    bottom: 66px;
+    bottom: 64px;
   }
 }

@@ -15,14 +15,31 @@ async function getAllPosts(req, res, next) {
 }
 
 /**
- * Đăng bài viết mới (kèm ảnh và caption)
+ * Helper: Nhận diện loại video (YouTube hoặc Facebook) từ URL
+ */
+function detectVideoType(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim().toLowerCase();
+  if (trimmed.includes('youtube.com') || trimmed.includes('youtu.be')) {
+    return 'youtube';
+  }
+  if (trimmed.includes('facebook.com') || trimmed.includes('fb.watch') || trimmed.includes('fb.com')) {
+    return 'facebook';
+  }
+  return '';
+}
+
+/**
+ * Đăng bài viết mới (kèm ảnh, video hoặc caption)
  */
 async function createPost(req, res, next) {
   try {
     const user = req.user;
     const { caption } = req.body;
-    let imageUrl = req.body.imageUrl;
+    let imageUrl = req.body.imageUrl ? String(req.body.imageUrl).trim() : '';
     let publicId = req.body.publicId || '';
+    let videoUrl = req.body.videoUrl ? String(req.body.videoUrl).trim() : '';
+    let videoType = detectVideoType(videoUrl);
 
     // Nếu người dùng upload file ảnh qua form-data
     if (req.file) {
@@ -34,17 +51,19 @@ async function createPost(req, res, next) {
       publicId = uploadResult.publicId;
     }
 
-    if (!imageUrl) {
-      return sendError(res, 'Vui lòng chọn 1 ảnh để đăng bài.', 400);
+    if (!imageUrl && !videoUrl && (!caption || !caption.trim())) {
+      return sendError(res, 'Vui lòng cung cấp hình ảnh, video YouTube/Facebook hoặc nội dung bài viết.', 400);
     }
 
     const newPost = await Post.create({
       imageUrl,
       publicId,
-      caption: caption || '',
+      videoUrl,
+      videoType,
+      caption: caption ? caption.trim() : '',
       author: user._id,
-      authorName: user.name,
-      authorAvatar: user.avatar,
+      authorName: user.name || user.username,
+      authorAvatar: user.avatar || '',
       likes: [],
     });
 

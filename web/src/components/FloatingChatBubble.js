@@ -59,9 +59,11 @@ export default function FloatingChatBubble() {
   }, [token]);
 
   useEffect(() => {
-    // Hiện bóng chào mừng sau 2 giây
-    const timer = setTimeout(() => setShowGreeting(true), 2000);
-    return () => clearTimeout(timer);
+    // Chỉ hiển thị bóng chào mừng trên màn hình máy tính rộng (> 768px), không hiện trên điện thoại
+    if (typeof window !== 'undefined' && window.innerWidth > 768) {
+      const timer = setTimeout(() => setShowGreeting(true), 2500);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
   useEffect(() => {
@@ -167,11 +169,23 @@ export default function FloatingChatBubble() {
 
   return (
     <div className="lgd-floating-bubble-wrapper">
-      {/* Balloon chào mừng */}
+      {/* Balloon chào mừng (chỉ hiển thị trên máy tính) */}
       {showGreeting && !isOpen && (
         <div className="lgd-bubble-greeting" onClick={() => setIsOpen(true)}>
           <span>💬</span>
           <span>Nhắn tin với đoàn & Trợ lý AI ngay!</span>
+          <button
+            type="button"
+            className="lgd-greeting-close-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowGreeting(false);
+            }}
+            title="Đóng thông báo"
+            aria-label="Đóng thông báo"
+          >
+            ✕
+          </button>
         </div>
       )}
 
